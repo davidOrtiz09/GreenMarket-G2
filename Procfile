@@ -1,0 +1,1 @@
+web: gunicorn GreenMarket.wsgi --log-file -
