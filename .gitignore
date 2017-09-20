@@ -1,2 +1,7 @@
 .idea/
 venv/
+Administrador/migrations/
+Cliente/migrations/
+MarketPlace/migrations/
+Productor/migrations/
+Repartidor/migrations/
