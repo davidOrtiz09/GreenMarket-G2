@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'Administrador',
     'Cliente',
     'Productor',
-    'Cliente',
     'MarketPlace',
+    'Repartidor'
 ]
 
 MIDDLEWARE = [
