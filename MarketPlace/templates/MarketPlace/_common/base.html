@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Green Market</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'MarketPlace/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'MarketPlace/theme/css/shop-homepage.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    {% include 'MarketPlace/_common/navigation.html' %}
+
+    {% block main %}
+
+    {% endblock %}
+
+    <!-- Footer -->
+    {% include 'MarketPlace/_common/footer.html' %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="{% static 'MarketPlace/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'MarketPlace/popper/popper.min.js' %}"></script>
+    <script src="{% static 'MarketPlace/bootstrap/js/bootstrap.min.js' %}"></script>
+
+</body>
+
+</html>

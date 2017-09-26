@@ -8,4 +8,4 @@ from django.http import JsonResponse
 
 class Index(View):
     def get(self, request):
-        return JsonResponse({'status': 'ok'})
+        return render(request, 'Cliente/index.html', {})
