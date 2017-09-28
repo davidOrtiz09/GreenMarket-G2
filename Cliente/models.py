@@ -1,21 +1,35 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.validators import RegexValidator
 from django.db import models
 
 # Create your models here.
 # -*-
-from django.utils.encoding import python_2_unicode_compatible
+from django import forms
 
-@python_2_unicode_compatible
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=150, verbose_name='Nombres', unique=False, null=False, blank=False)
-    apellido = models.CharField(max_length=150, verbose_name='Apellidos', unique=False, null=False, blank=False)
-    departamento = models.CharField(max_length=20, verbose_name='Departamento', unique=False, null=False, blank=False)
-    ciudad = models.CharField(max_length=20, verbose_name='Ciudad', unique=False, null=False, blank=False)
-    numero_identificacion = models.CharField(max_length=20, verbose_name='Numero Identificacion', unique=True, null=False, blank=False)
-    tipo_identificacion = models.CharField(max_length=2, verbose_name='Tipo Identificacion', null=False, blank=False)
-    telefono_contacto = models.CharField(max_length=20, verbose_name='Telefono Contacto', null=False, blank=False)
-    correo = models.CharField(max_length=20, verbose_name='Correo', null=False, blank=False)
-    direccion = models.CharField(max_length=150, verbose_name='Direccion', null=False, blank=False)
-    contrasena = models.CharField(max_length=10, verbose_name='Contrasena', null=False, blank=False)
+    TIPO_DOCUMENTOS = (
+        ('CC', 'Cédula de Ciudadanía'),
+        ('PA', 'Pasaporte'),
+        ('CE', 'Cédula de Extranjería'),
+        ('RC', 'Registro Civil')
+    )
+
+    ##TODO: Cargar ciudades y departamentos
+
+    id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=150, unique=False, null=False, blank=False)
+    apellido = models.CharField(max_length=150, unique=False, null=False, blank=False)
+    departamento = models.CharField(max_length=20, unique=False, null=False, blank=False)
+    ciudad = models.CharField(max_length=20, unique=False, null=False, blank=False)
+    numero_identificacion = models.CharField(max_length=20)
+    tipo_identificacion = models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="El nùmero debe tener el formato correcto")
+    telefono_contacto = models.CharField(validators=[phone_regex], max_length=15, null=False, blank=False)
+    correo = models.EmailField(max_length=20)
+    direccion = models.CharField(max_length=150, null=False, blank=False)
+    contrasena = models.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        unique_together = ('numero_identificacion', 'tipo_identificacion',)
