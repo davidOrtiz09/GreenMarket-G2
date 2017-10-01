@@ -16,4 +16,8 @@ function setShoppingCartListeners(){
         var value = parseInt(input.val());
         input.val(value+1);
     });
+
+    $('.product-add').click(function(){
+        $('#modal-producto-agregado').modal('show')
+    });
 }
