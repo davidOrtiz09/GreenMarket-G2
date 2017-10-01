@@ -11,18 +11,18 @@
             aspernatur! Lorem ipsum dolor sit amet.</p>
     </div>
     <div class="card-footer">
-        <div class="row">
-            <div class="col-1 text-center">
-                <i class="fa fa-minus-circle fa-2x clickable"></i>
-            </div>
-            <div class="col-5 text-center">
-                <input class="form-control ml-3" type="number" min="0" value="0">
-            </div>
-            <div class="col-1 text-center">
-                <i class="fa fa-plus-circle fa-2x clickable"></i>
-            </div>
-            <div class="col-1 text-center">
-                <i class="fa fa-cart-plus fa-2x clickable ml-3"></i>
+        <div class="form-inline">
+            <div class="input-group">
+                <span class="input-group-btn clickable">
+                    <button class="btn btn-danger product-minus"><i class="fa fa-2x fa-minus-circle"></i></button>
+                </span>
+                <input class="form-control product-quantity" type="number" min="0" value="0" step="1">
+                <span class="input-group-btn clickable">
+                    <button class="btn btn-success product-plus"><i class="fa fa-2x fa-plus-circle"></i></button>
+                </span>
+                <span class="input-group-btn clickable">
+                    <button class="btn btn-link"><i class="fa fa-2x fa-cart-plus"></i></button>
+                </span>
             </div>
         </div>
     </div>
