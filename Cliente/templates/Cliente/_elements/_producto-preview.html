@@ -4,7 +4,7 @@
     </a>
     <div class="card-body">
         <h4 class="card-title">
-            <a href="#">Item Two</a>
+            <a href="#">Item {{ product_id }}</a>
         </h4>
         <h5>$24.99</h5>
         <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam
@@ -13,7 +13,8 @@
     <div class="card-footer">
         <form method="post" action="{% url 'cliente:update-shoppping-cart' %}" class="form-inline">
             {% csrf_token %}
-            <input type="hidden" name="product_id" value="{{ product.id }}">
+            {# TODO el product id se debería extraer directamente del producto #}
+            <input type="hidden" name="product_id" value="{{ product_id }}">
             <div class="input-group">
                 <span class="input-group-btn clickable">
                     <button type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
