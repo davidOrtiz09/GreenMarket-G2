@@ -60,3 +60,14 @@ class oferta_producto(models.Model):
     def __str__(self):
         return '{0}'.format(self.id)
 
+class Catalogo(models.Model):
+    productor_id = models.IntegerField(null=False, blank=False)
+    fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
+    fecha_cierre = models.DateTimeField(verbose_name="Fecha de Cierre", null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Catálogo'
+        verbose_name_plural = 'Catálogos'
+
+    def __str__(self):
+        return '{0}'.format(self.id)
