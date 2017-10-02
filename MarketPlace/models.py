@@ -40,3 +40,23 @@ class Oferta(models.Model):
 
     def __str__(self):
         return '{0}'.format(self.id)
+
+
+class oferta_producto(models.Model):
+    fk_oferta = models.ForeignKey(Oferta, on_delete=models.CASCADE, verbose_name='Oferta', null=False, blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    fecha_creacion = models.DateTimeField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
+    fecha_aceptacion = models.DateTimeField(verbose_name="Fecha de Aceptación", null=True)
+    precio = models.FloatField(verbose_name="Precio", null=False, blank=False)
+    cantidad_ofertada = models.IntegerField(verbose_name="Cantidad Ofertada", null=False, blank=False)
+    cantidad_aceptada = models.IntegerField(verbose_name="Cantidad Aceptada", null=False, blank=False, default=0)
+    cantidad_vendida = models.IntegerField(verbose_name="Cantidad Vendida", null=False, blank=False, default=0)
+    estado = models.SmallIntegerField(verbose_name="Estado", null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Oferta de producto'
+        verbose_name_plural = 'Ofertas de producto'
+
+    def __str__(self):
+        return '{0}'.format(self.id)
+
