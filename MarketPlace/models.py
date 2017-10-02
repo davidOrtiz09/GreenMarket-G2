@@ -70,7 +70,7 @@ class PedidoProducto(models.Model):
     fk_catalogo_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='CatalogoProducto', null=False, blank=False)
 
     class Meta:
-        unique_together = (("fk_pedido", "fk_catalogo_producto"),)
+        unique_together = ("fk_pedido", "fk_catalogo_producto")
 
     def __str__(self):
         return self.name
