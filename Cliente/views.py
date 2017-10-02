@@ -12,5 +12,7 @@ class Index(View):
 
 class UpdateShoppingCart(View):
     def post(self, request):
+        # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
+        # Se retorna a la página desde el que se añadió el producto al carrito
         messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
         return redirect(request.META.get('HTTP_REFERER', '/'))
