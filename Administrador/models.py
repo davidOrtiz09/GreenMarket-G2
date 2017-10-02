@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 
 class Cliente(models.Model):
-    fk_django_user = models.OneToOneField(User, verbose_name='Usuario del sistema', null=False, blank=False)
+    fk_django_user= models.OneToOneField(User, verbose_name='Usuario del sistema', null=False, blank=False)
     tipo_documento = models.CharField(max_length=150, verbose_name='Tipo documento', unique=True, null=False, blank=False)
     documento = models.CharField(max_length=20, verbose_name='Documento', unique=False, null=True, blank=False)
     fecha_nacimiento = models.DateField(verbose_name='Fecha nacemiento', null=False, blank=False)
