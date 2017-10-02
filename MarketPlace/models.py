@@ -60,6 +60,7 @@ class oferta_producto(models.Model):
     def __str__(self):
         return '{0}'.format(self.id)
 
+
 class Catalogo(models.Model):
     productor_id = models.IntegerField(null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
@@ -68,6 +69,22 @@ class Catalogo(models.Model):
     class Meta:
         verbose_name = 'Catálogo'
         verbose_name_plural = 'Catálogos'
+
+    def __str__(self):
+        return '{0}'.format(self.id)
+
+
+class catalogo_producto(models.Model):
+    fk_catalogo = models.ForeignKey(Catalogo, on_delete=models.CASCADE, verbose_name='Catálogo', null=False,
+                                    blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False,
+                                    blank=False)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+
+        verbose_name = 'Producto del Catalogo'
+        verbose_name_plural = 'Productos del Catalogo'
 
     def __str__(self):
         return '{0}'.format(self.id)
