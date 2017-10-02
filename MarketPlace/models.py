@@ -28,3 +28,15 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+class Oferta(models.Model):
+    productor_id = models.IntegerField(null=False, blank=False)
+    fecha = models.DateField(null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Oferta'
+        verbose_name_plural = 'Ofertas'
+
+    def __str__(self):
+        return '{0}'.format(self.id)
