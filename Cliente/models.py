@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -30,8 +30,7 @@ class Cliente(models.Model):
     )
 
     # TODO: Cargar ciudades y departamentos
-
-    id = models.AutoField(primary_key=True)
+    fk_django_user = models.OneToOneField(User, verbose_name='Usuario tipo cliente', null=False, blank=False)
     nombre = models.CharField(max_length=150, unique=False, null=False, blank=False)
     apellido = models.CharField(max_length=150, unique=False, null=False, blank=False)
     departamento = models.CharField(max_length=2, choices=DEPARTAMENTOS)
