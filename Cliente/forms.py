@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.forms import forms
 from django.forms import ModelForm
+from django.contrib.auth.models import User
+
 
 from Cliente.models import Cliente
 
@@ -17,3 +19,14 @@ class ClientForm(ModelForm):
     direccion = forms.CharField(max_length=150, label='Direcció de Residencia')
     contrasena = forms.CharField(widget=forms.PasswordInput(), label='Contraseña')
     contrasena2 = forms.CharField(widget=forms.PasswordInput(), label='Confirma tu contraseña')
+
+    class Meta:
+        model = User
+        fields = ('nombre', 'apellido', 'departamento', 'ciudad', 'numero_identificacion', 'tipo_identificacion', 'telefono_contacto', 'correo', 'direccion', 'contrasena', 'contrasena2')
+
+    def clean_password(self):
+        password = self.cleaned_data['contrasena']
+        password2 = self.cleaned_data['contrasena2']
+        if password != password2:
+            raise forms.ValidationError('Las claves no coinciden.')
+        return password2
