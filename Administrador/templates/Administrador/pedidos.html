@@ -1,0 +1,11 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load table_tags %}
+{% block main %}
+    <section>
+        <div class = "container" style = "margin-top: 10px">
+            <h1> Pedidos </h1>
+            <br />
+            {% render_table pedidos %}
+       </div>
+    </section>
+{% endblock %}
