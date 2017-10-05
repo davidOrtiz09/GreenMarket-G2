@@ -3,6 +3,48 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from django.utils.encoding import python_2_unicode_compatible
+
+
+@python_2_unicode_compatible
+class Cooperativa(models.Model):
+    nombre = models.CharField(max_length=150, verbose_name='Nombre de la Cooperativa', null=False, blank=False)
+    ciudad = models.CharField(max_length=150, verbose_name='Ciudad de la Cooperativa', null=False, blank=False)
+    departamento = models.CharField(max_length=150, verbose_name='Departamento de la Cooperativa', null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Cooperativa'
+        verbose_name_plural = 'Cooperativas'
+
+    def __str__(self):
+        return self.nombre
+
+    def to_json(self):
+        return {
+            "nombre": self.nombre,
+            "ciudad": self.ciudad,
+            "departamento": self.departamento,
+            "id": self.id
+        }
+
+
+@python_2_unicode_compatible
+class Productor(models.Model):
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
+                                       blank=False)
+    nombre = models.CharField(max_length=150, verbose_name='Nombre del Productor', null=False, blank=False)
+    direccion = models.CharField(max_length=150, verbose_name='Direccion del Productor ', null=False, blank=False)
+    descripcion = models.TextField(max_length=150, verbose_name='Descripcion del Productor', null=False,
+                                   blank=False)
+    coordenadas_gps = models.CharField(max_length=150, verbose_name='Ubicación del Productor', null=False,
+                                       blank=False)
+    class Meta:
+        verbose_name = 'Productor'
+        verbose_name_plural = 'Productores'
+
+    def __str__(self):
+        return self.nombre
+
 
 # Create your models here.
 class Categoria(models.Model):
@@ -30,9 +72,10 @@ class Producto(models.Model):
         return self.nombre
 
 
+@python_2_unicode_compatible
 class Oferta(models.Model):
-    productor_id = models.IntegerField(null=False, blank=False)
-    fecha = models.DateField(null=False, blank=False)
+    fk_productor= models.ForeignKey(Productor, verbose_name='Productor de la oferta', null=False, blank=False)
+    fecha = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación', editable=False, null=False, blank=False)
 
     class Meta:
         verbose_name = 'Oferta'
@@ -42,20 +85,22 @@ class Oferta(models.Model):
         return '{0}'.format(self.id)
 
 
-class oferta_producto(models.Model):
-    fk_oferta = models.ForeignKey(Oferta, on_delete=models.CASCADE, verbose_name='Oferta', null=False, blank=False)
-    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
-    fecha_creacion = models.DateTimeField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
-    fecha_aceptacion = models.DateTimeField(verbose_name="Fecha de Aceptación", null=True)
-    precio = models.FloatField(verbose_name="Precio", null=False, blank=False)
-    cantidad_ofertada = models.IntegerField(verbose_name="Cantidad Ofertada", null=False, blank=False)
-    cantidad_aceptada = models.IntegerField(verbose_name="Cantidad Aceptada", null=False, blank=False, default=0)
-    cantidad_vendida = models.IntegerField(verbose_name="Cantidad Vendida", null=False, blank=False, default=0)
-    estado = models.SmallIntegerField(verbose_name="Estado", null=False, blank=False)
+@python_2_unicode_compatible
+class Oferta_Producto(models.Model):
+    fk_oferta = models.ForeignKey(Oferta, verbose_name='Oferta del Producto', null=False, blank=False)
+    fk_producto= models.ForeignKey(Producto, verbose_name='Producto', null=False, blank=False)
+    cantidad_ofertada = models.PositiveIntegerField(verbose_name='Cantidad ofertada del producto', null=False, blank=False)
+    cantidad_aceptada = models.PositiveIntegerField(verbose_name='Cantidad aceptada del producto', null=True, blank=False, default=0)
+    cantidad_vendida = models.PositiveIntegerField(verbose_name='Cantidad productos vendidos', null=False, blank=False, default=0)
+    fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta',  null=True, blank=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True, blank=False)
+    precioProvedor = models.FloatField(verbose_name='Precio del producto', null=False, blank=False)
+    estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
+
 
     class Meta:
-        verbose_name = 'Oferta de producto'
-        verbose_name_plural = 'Ofertas de producto'
+        verbose_name = 'Oferta de productos'
+        verbose_name_plural = 'Ofertas de Productos'
 
     def __str__(self):
         return '{0}'.format(self.id)
