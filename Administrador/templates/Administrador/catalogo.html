@@ -4,7 +4,29 @@
         <div class="container-fluid">
             <div class="col-12">
                 <h1>Cat&aacute;logo</h1>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Producto</th>
+                                <th>cantidad</th><
+                                <th>Precios productores</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in ofertas_pro %}
+                            <tr>
+                                <th><img src="/media/{{ item.fk_producto__imagen }}" alt="Imagen {{ item.fk_producto__nombre}}" class="img-responsive center-block" style="max-height: 200px; max-width: 200px"></th>
+                                <th>{{ item.fk_producto__nombre }}</th>
+                                <th>{{ item.canAceptada }}</th>
+                                <th>{{ item.preMin }} - {{ item.preMax }}</th>
+                            </tr>
 
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
