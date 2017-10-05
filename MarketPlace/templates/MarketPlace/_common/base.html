@@ -18,12 +18,20 @@
     <link href="{% static 'MarketPlace/theme/css/shop-homepage.css' %}" rel="stylesheet">
 
     <link href="{% static 'MarketPlace/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+
+    <link href="{% static 'MarketPlace/styles.css' %}" rel="stylesheet">
+
+    {% block styles %}
+
+    {% endblock %}
 </head>
 
 <body>
 
     <!-- Navigation -->
     {% include 'MarketPlace/_common/navigation.html' %}
+
+    {% include 'MarketPlace/_common/_messages.html' %}
 
     {% block main %}
 
@@ -37,6 +45,9 @@
     <script src="{% static 'MarketPlace/popper/popper.min.js' %}"></script>
     <script src="{% static 'MarketPlace/bootstrap/js/bootstrap.min.js' %}"></script>
 
+    <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
+    {% block scripts %}
+    {% endblock %}
 </body>
 
 </html>
