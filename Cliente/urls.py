@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
-    url(r'^carrito-de-compras$', views.CarritoDeCompras.as_view(), name='carrito-de-compras')
+    url(r'^checkout$', views.Checkout.as_view(), name='checkout')
 ]

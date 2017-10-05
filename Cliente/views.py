@@ -11,6 +11,6 @@ class Index(View):
         return render(request, 'Cliente/index.html', {})
 
 
-class CarritoDeCompras(View):
+class Checkout(View):
     def get(self, request):
-        return render(request, 'Cliente/carrito-de-compras.html', {})
+        return render(request, 'Cliente/checkout/checkout.html', {})
