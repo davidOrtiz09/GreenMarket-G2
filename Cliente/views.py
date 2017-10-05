@@ -9,3 +9,8 @@ from django.http import JsonResponse
 class Index(View):
     def get(self, request):
         return render(request, 'Cliente/index.html', {})
+
+
+class CarritoDeCompras(View):
+    def get(self, request):
+        return render(request, 'Cliente/carrito-de-compras.html', {})
