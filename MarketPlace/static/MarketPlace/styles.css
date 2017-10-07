@@ -9,3 +9,7 @@
 th.cantidad{
     width: 200px;
 }
+
+.clickable, .clickable *{
+    cursor: pointer;
+}

@@ -4,17 +4,29 @@
     </a>
     <div class="card-body">
         <h4 class="card-title">
-            <a href="#">Item Two</a>
+            <a href="#">Item {{ product_id }}</a>
         </h4>
         <h5>$24.99</h5>
         <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam
             aspernatur! Lorem ipsum dolor sit amet.</p>
     </div>
     <div class="card-footer">
-        <i class="fa fa-star"></i>
-        <i class="fa fa-star"></i>
-        <i class="fa fa-star"></i>
-        <i class="fa fa-star-half-full"></i>
-        <i class="fa fa-star-o"></i>
+        <form method="post" action="{% url 'cliente:update-shoppping-cart' %}" class="form-inline">
+            {% csrf_token %}
+            {# TODO el product id se debería extraer directamente del producto #}
+            <input type="hidden" name="product_id" value="{{ product_id }}">
+            <div class="input-group">
+                <span class="input-group-btn clickable">
+                    <button type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
+                </span>
+                <input name="quantity" class="form-control product-quantity" type="number" min="0" value="0" step="1" pattern="\d*">
+                <span class="input-group-btn clickable">
+                    <button type="button" class="btn btn-success product-plus"><i class="fa fa-2x fa-plus-circle"></i></button>
+                </span>
+                <span class="input-group-btn clickable">
+                    <button class="btn btn-link add-to-cart" data-toggle="modal" disabled><i class="fa fa-2x fa-cart-plus"></i></button>
+                </span>
+            </div>
+        </form>
     </div>
 </div>

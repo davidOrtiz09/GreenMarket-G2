@@ -3,8 +3,6 @@
     <section>
         <div class="container">
             <div class="row">
-
-
                 <div class="col-lg-3">
                     <h1 class="my-4">Green Market</h1>
                     <div class="list-group">
@@ -15,7 +13,6 @@
                 </div>
 
                 <div class="col-lg-9">
-
                     <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
                         <ol class="carousel-indicators">
                             <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -44,12 +41,11 @@
                     <div class="row">
                         {% for x in '1232456789' %}
                             <div class="col-lg-4 col-md-6 mb-4">
-                                {% include 'Cliente/_elements/_producto-preview.html' %}
+                                {% include 'Cliente/_elements/_producto-preview.html' with product_id=x %}
                             </div>
                         {% endfor %}
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
