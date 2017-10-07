@@ -1,0 +1,50 @@
+<div class="mb-3" id="detalles-compra">
+    <table class="table table-responsive">
+        <thead class="sthead-default">
+            <tr class="table-success">
+                <th class="text-center">Producto</th>
+                <th class="text-center cantidad">Cantidad</th>
+                <th class="text-center">Precio unitario</th>
+                <th class="text-center">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <img src="https://placehold.it/200x200" class="img-fluid mx-auto">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5>Nombre del producto</h5>
+                            <p>x Kg</p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <span class="input-group-btn clickable">
+                            <button type="button" class="btn btn-danger product-minus" disabled>
+                                <i class="fa fa-2x fa-minus-circle"></i>
+                            </button>
+                        </span>
+                        <input name="quantity" class="form-control product-quantity" type="number" min="1" value="1" step="1" pattern="\d*">
+                        <span class="input-group-btn clickable">
+                            <button type="button" class="btn btn-success product-plus">
+                                <i class="fa fa-2x fa-plus-circle"></i>
+                            </button>
+                        </span>
+                    </div>
+                </td>
+                <td class="text-center">
+                    $200.000
+                </td>
+                <td class="text-center">
+                    $400.000
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

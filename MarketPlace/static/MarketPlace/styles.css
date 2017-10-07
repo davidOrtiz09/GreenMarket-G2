@@ -5,3 +5,7 @@
 #formulario-informacion-pago .input-group-addon{
     width: 220px;
 }
+
+th.cantidad{
+    width: 200px;
+}
