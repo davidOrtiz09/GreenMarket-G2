@@ -1,3 +1,4 @@
+{% load marketplace_filters %}
 <div class="mb-3" id="detalles-compra">
     <table class="table table-responsive" >
         <thead>
@@ -10,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for x in '123' %}
+            {% for cart_item in request.session.cart.items %}
                 <tr class="product-cart">
                     <td>
                         <div class="row">
@@ -20,7 +21,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-6 col-sm-6">
-                                <h5>Nombre del producto</h5>
+                                <h5>Producto {{ cart_item.product_id }}</h5>
                                 <p>x Kg</p>
                             </div>
                         </div>
@@ -28,11 +29,11 @@
                     <td>
                         <div class="input-group">
                             <span class="input-group-btn clickable">
-                                <button type="button" class="btn btn-danger product-minus" disabled>
+                                <button type="button" class="btn btn-danger product-minus">
                                     <i class="fa fa-2x fa-minus-circle"></i>
                                 </button>
                             </span>
-                            <input name="quantity" class="form-control product-quantity cart-details" type="number" min="1" value="1" step="1" pattern="\d*">
+                            <input name="quantity" class="form-control product-quantity cart-details" type="number" min="1" value="{{ cart_item.quantity }}" step="1" pattern="\d*">
                             <span class="input-group-btn clickable">
                                 <button type="button" class="btn btn-success product-plus">
                                     <i class="fa fa-2x fa-plus-circle"></i>
@@ -48,14 +49,14 @@
                     </td>
                     <td class="text-center">
                         <div class="mt-2">
-                            $<span class="total-producto">200.000</span>
+                            $<span class="subtotal-producto">{{ cart_item.quantity|multiply_cop:200000 }}</span>
                         </div>
                     </td>
                     <td>
-                        <button class="btn btn-link clickable" data-toggle="modal" data-target="#modal-eliminar-carrito-{{ forloop.counter }}">
+                        <button class="btn btn-link clickable" data-toggle="modal" data-keyboard="false" data-target="#modal-eliminar-carrito-{{ cart_item.product_id }}">
                             <i class="fa fa-2x fa-times-circle-o text-danger"></i>
                         </button>
-                        <div class="modal fade" id="modal-eliminar-carrito-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal fade" id="modal-eliminar-carrito-{{ cart_item.product_id }}" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-sm" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -64,7 +65,11 @@
                                     <div class="modal-body">
                                         <div class="row">
                                             <div class="col-6">
-                                                <button type="button" class="btn btn-danger btn-block clickable">Eliminar</button>
+                                                <form action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="product-id" value="{{ cart_item.product_id }}">
+                                                    <button type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
+                                                </form>
                                             </div>
                                             <div class="col-6">
                                                 <button type="button" class="btn btn-secondary btn-block clickable" data-dismiss="modal">Cancelar</button>

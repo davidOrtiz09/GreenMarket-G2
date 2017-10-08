@@ -11,7 +11,7 @@
             aspernatur! Lorem ipsum dolor sit amet.</p>
     </div>
     <div class="card-footer">
-        <form method="post" action="{% url 'cliente:update-shoppping-cart' %}" class="form-inline">
+        <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
             {% csrf_token %}
             {# TODO el product id se debería extraer directamente del producto #}
             <input type="hidden" name="product_id" value="{{ product_id }}">

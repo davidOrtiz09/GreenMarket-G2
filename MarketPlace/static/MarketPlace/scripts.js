@@ -13,8 +13,8 @@ function addCartDetailsListeners(){
         else{
             var row = $(this).parent().parent().parent();
             var unitPrice = row.find('input.unit-price').val();
-            var totalPrice = row.find('span.total-producto');
-            totalPrice.html(toCop(quantity*unitPrice));
+            var subtotal = row.find('span.subtotal-producto');
+            subtotal.html(toCop(quantity*unitPrice));
             actualizarTotalPagar();
         }
     });
@@ -72,7 +72,7 @@ function setAddToCartListeners() {
 }
 
 function toCop(number){
-    return number.toLocaleString('es-co', {minimumFractionDigits: 0 });
+    return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
 }
 
 function actualizarTotalPagar(){
