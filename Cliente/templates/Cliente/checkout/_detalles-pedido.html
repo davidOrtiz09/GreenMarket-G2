@@ -1,5 +1,5 @@
 {% load marketplace_filters %}
-<div class="mb-3" id="detalles-compra">
+<div class="mb-3" id="detalles-pedido">
     <table class="table table-responsive" >
         <thead>
             <tr class="table-success">
@@ -33,7 +33,8 @@
                                     <i class="fa fa-2x fa-minus-circle"></i>
                                 </button>
                             </span>
-                            <input name="quantity" class="form-control product-quantity cart-details" type="number" min="1" value="{{ cart_item.quantity }}" step="1" pattern="\d*">
+                            <input class="form-control product-quantity cart-details" type="number" min="1" value="{{ cart_item.quantity }}" step="1" pattern="\d*">
+                            <input class="product-id" type="hidden" value="{{ cart_item.product_id }}" readonly disabled>
                             <span class="input-group-btn clickable">
                                 <button type="button" class="btn btn-success product-plus">
                                     <i class="fa fa-2x fa-plus-circle"></i>

@@ -18,6 +18,70 @@ function addCartDetailsListeners(){
             actualizarTotalPagar();
         }
     });
+
+    $('button#pagar').click(function(){
+        var detallesPedido = getJsonDetallesPedido();
+        var informacionEnvio = getJsonInfoEnvio();
+        var informacionPago = getJsonInfoPago();
+
+        var formJson = {
+            detalles_pedido: detallesPedido,
+            informacion_envio: informacionEnvio,
+            informacion_pago: informacionPago
+        };
+
+        console.log(formJson);
+    });
+}
+
+function getJsonDetallesPedido(){
+    var container = $('div#detalles-pedido');
+    var response = [];
+    var productRows = container.find('tr.product-cart');
+    for(var i=0;i < productRows.length;i++){
+        var row = $(productRows[i]);
+        var productId = row.find('input.product-id').val();
+        var quantity = row.find('input.product-quantity.cart-details').val();
+        response.push({
+            quantity: quantity,
+            product_id: productId
+        })
+    }
+    return response;
+}
+
+function getJsonInfoEnvio(){
+    var container = $('div#formulario-informacion-envio');
+
+    var nombre = '';
+    var email = '';
+    var direccion = '';
+    var celular = '';
+    var telefono = '';
+    var observaciones = '';
+
+    return {
+        nombre: nombre,
+        email: email,
+        direccion: direccion,
+        celular: celular,
+        telefono: telefono,
+        observaciones: observaciones
+    }
+}
+
+function getJsonInfoPago(){
+    var container = $('div#formulario-informacion-pago');
+
+    var nombreCompleto = '';
+    var tipoDocumento = '';
+    var numeroDocumento = '';
+
+    return {
+        nombre_completo: nombreCompleto,
+        tipo_documento: tipoDocumento,
+        numero_documento: numeroDocumento
+    }
 }
 
 // Listeners para la funcionalidad de añadir un producto al carrito de compras
@@ -76,9 +140,9 @@ function toCop(number){
 }
 
 function actualizarTotalPagar(){
-    var detallesCompra = $('div#detalles-compra');
-    var spanTotalPagar = detallesCompra.find('span#total-a-pagar');
-    var productRows = detallesCompra.find('tr.product-cart');
+    var detallesPedido = $('div#detalles-pedido');
+    var spanTotalPagar = detallesPedido.find('span#total-a-pagar');
+    var productRows = detallesPedido.find('tr.product-cart');
     var totalPagar = 0;
     for(var i=0;i < productRows.length;i++){
         var row = $(productRows[i]);
