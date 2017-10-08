@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views import View
 from Cliente.forms import ClientForm
 from Cliente.models import Cliente
+from django.contrib.auth.models import User
 
 
 class Index(View):
@@ -14,7 +15,7 @@ class Index(View):
 
 def add_client_view(request):
     if request.method == 'POST':
-        form = ClientForm(request.POST, request.FILES)
+        form = ClientForm(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
             nombre = cleaned_data.get('nombre')
@@ -28,15 +29,24 @@ def add_client_view(request):
             numero_identificacion = cleaned_data.get('numero_identificacion')
             tipo_identificacion = cleaned_data.get('tipo_identificacion')
 
-            cliente_model = Cliente(nombre=nombre, appellido=apellido,
-                                    contrasena=contrasena, ciudad=ciudad,
-                                    departamento=departamento,telefono_contacto=telefono_contacto,
-                                    correo=correo, direccion=direccion, numero_identificacion=numero_identificacion,
+            user_model = User.objects.create_user(
+                username=correo,
+                password=contrasena,
+                first_name=nombre,
+                last_name=apellido,
+                email=correo
+            )
+            user_model.save()
+            cliente_model = Cliente(fk_django_user=user_model, ciudad=ciudad,
+                                    departamento=departamento, telefono_contacto=telefono_contacto,
+                                    direccion=direccion, numero_identificacion=numero_identificacion,
                                     tipo_identificacion=tipo_identificacion
                                     )
             cliente_model.save()
+            return render(request, 'Cliente/index.html', {})
+        else:
+            print(form.errors)
+            return render(request, 'Cliente/registrar_cliente.html', {'form': form})
     else:
         form = ClientForm()
         return render(request, 'Cliente/registrar_cliente.html', {'form': form})
-
-

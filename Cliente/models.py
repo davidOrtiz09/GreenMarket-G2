@@ -31,16 +31,12 @@ class Cliente(models.Model):
 
     # TODO: Cargar ciudades y departamentos
     fk_django_user = models.OneToOneField(User, verbose_name='Usuario tipo cliente', null=False, blank=False)
-    nombre = models.CharField(max_length=150, unique=False, null=False, blank=False)
-    apellido = models.CharField(max_length=150, unique=False, null=False, blank=False)
     departamento = models.CharField(max_length=2, choices=DEPARTAMENTOS)
     ciudad = models.CharField(max_length=2, choices=CIUDADES)
     numero_identificacion = models.CharField(max_length=20)
     tipo_identificacion = models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
     telefono_contacto = models.CharField(max_length=15, null=False, blank=False)
-    correo = models.EmailField(max_length=20)
     direccion = models.CharField(max_length=150, null=False, blank=False)
-    contrasena = models.CharField(max_length=150, null=False, blank=False)
 
     class Meta:
         unique_together = ('numero_identificacion', 'tipo_identificacion',)

@@ -1,20 +1,78 @@
-{% extends 'MarketPlace/_common/base.html' %}
-{% block main %}
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-      <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: grey">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-      </p>
-    {% endfor %}
-    <button type="submit">Sign up</button>
-  </form>
-{% endblock %}
+    {% extends 'MarketPlace/_common/base.html' %}
+    {% block main %}
+      <h2>Registro</h2>
+      <form method="post">
+        {% csrf_token %}
+          <form>
+              <div class="form-row">
+    <div class="form-group col-md-3">
+      <label for="nombre1" class="col-form-label">Nombre</label>
+      <input id="nombre1" type="text" class="form-control" placeholder="Nombre" name="nombre">
+    </div>
+    <div class="form-group col-md-3">
+      <label class="col-form-label">Apellido</label>
+      <input type="text" class="form-control"  placeholder="Apellido" name="apellido">
+    </div>
+                  <div class="form-group col-md-3">
+      <label class="col-form-label">Telefono</label>
+      <input type="tel" class="form-control"  placeholder="Telefono" name="telefono_contacto">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-3">
+      <label class="col-form-label">Correo</label>
+      <input type="email" class="form-control"  placeholder="Correo" name="correo">
+    </div>
+    <div class="form-group col-md-3">
+      <label class="col-form-label">Contraseña</label>
+      <input type="password" class="form-control" placeholder="Contraseña" name="contrasena">
+    </div>
+      <div class="form-group col-md-3">
+      <label class="col-form-label">Repetir Contraseña</label>
+      <input type="password" class="form-control" placeholder="Contraseña" name="contrasena2">
+    </div>
+  </div>
+  <div class="form-row">
+   <div class="form-group col-md-3">
+      <label class="col-form-label">Tipo De Identificacion</label>
+       <select id="inputState" class="form-control" name="tipo_identificacion">
+           <option value="CC">Cédula de Ciudadanía</option>
+           <option value="PA">Pasaporte</option>
+           <option value="CE">Cédula de Extranjería</option>
+           <option value="RC">Registro Civil</option>
+       </select>
+    </div>
+   <div class="form-group col-md-3">
+      <label class="col-form-label">Numero De Identificacion</label>
+      <input type="text" class="form-control"  placeholder="Numero De Identificacion" name="numero_identificacion">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-3">
+      <label for="inputCity" class="col-form-label">Ciudad</label>
+      <select id="inputState" class="form-control" name="ciudad">
+            <option value="1">Bogota</option>
+            <option value="2">Tunja</option>
+            <option value="3">Bucaramanga</option>
+            <option value="4">Cartagena</option>
+      </select>
+    </div>
+    <div class="form-group col-md-3">
+      <label for="inputState" class="col-form-label">Departamento</label>
+      <select id="inputState" class="form-control" name="departamento">
+            <option value="1">Cundinamarca</option>
+            <option value="2">Boyaca</option>
+            <option value="3">Santander</option>
+            <option value="4">Bolívar</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+      <div class="form-group col-md-4">
+      <label class="col-form-label">Direccion</label>
+      <input type="text" class="form-control"  placeholder="Direccion" name="direccion">
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Sign in</button>
+    </form>
+    {% endblock %}
