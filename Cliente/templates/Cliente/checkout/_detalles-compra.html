@@ -1,50 +1,72 @@
 <div class="mb-3" id="detalles-compra">
-    <table class="table table-responsive">
-        <thead class="sthead-default">
+    <table class="table table-responsive" >
+        <thead>
             <tr class="table-success">
                 <th class="text-center">Producto</th>
                 <th class="text-center cantidad">Cantidad</th>
                 <th class="text-center">Precio unitario</th>
                 <th class="text-center">Total</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="text-center">
-                                <img src="https://placehold.it/200x200" class="img-fluid mx-auto">
+            {% for x in '123' %}
+                <tr class="product-cart">
+                    <td>
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                <div class="text-center">
+                                    <img src="https://placehold.it/200x200" class="img-fluid mx-auto">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                                <h5>Nombre del producto</h5>
+                                <p>x Kg</p>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <h5>Nombre del producto</h5>
-                            <p>x Kg</p>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <span class="input-group-btn clickable">
+                                <button type="button" class="btn btn-danger product-minus" disabled>
+                                    <i class="fa fa-2x fa-minus-circle"></i>
+                                </button>
+                            </span>
+                            <input name="quantity" class="form-control product-quantity cart-details" type="number" min="1" value="1" step="1" pattern="\d*">
+                            <span class="input-group-btn clickable">
+                                <button type="button" class="btn btn-success product-plus">
+                                    <i class="fa fa-2x fa-plus-circle"></i>
+                                </button>
+                            </span>
                         </div>
-                    </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="mt-2">
+                            <input class="unit-price" type="hidden" value="200000" readonly disabled>
+                            $200.000
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="mt-2">
+                            $<span class="total-producto">200.000</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-link clickable"><i class="fa fa-2x fa-times-circle-o text-danger"></i></button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">
+                    <h5 class="text-right">Total a pagar</h5>
                 </td>
-                <td>
-                    <div class="input-group">
-                        <span class="input-group-btn clickable">
-                            <button type="button" class="btn btn-danger product-minus" disabled>
-                                <i class="fa fa-2x fa-minus-circle"></i>
-                            </button>
-                        </span>
-                        <input name="quantity" class="form-control product-quantity" type="number" min="1" value="1" step="1" pattern="\d*">
-                        <span class="input-group-btn clickable">
-                            <button type="button" class="btn btn-success product-plus">
-                                <i class="fa fa-2x fa-plus-circle"></i>
-                            </button>
-                        </span>
-                    </div>
-                </td>
-                <td class="text-center">
-                    $200.000
-                </td>
-                <td class="text-center">
-                    $400.000
+                <td colspan="2">
+                    $<span id="total-a-pagar"></span>
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
+
     </table>
 </div>

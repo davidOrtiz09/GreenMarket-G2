@@ -1,6 +1,24 @@
 $(document).ready(function(){
     setAddToCartListeners();
+    addCartDetailsListeners();
 });
+
+function addCartDetailsListeners(){
+    actualizarTotalPagar();
+    $('input.product-quantity.cart-details').change(function(){
+        var quantity = $(this).val();
+        if(quantity < 1){
+            $(this).val(1);
+        }
+        else{
+            var row = $(this).parent().parent().parent();
+            var unitPrice = row.find('input.unit-price').val();
+            var totalPrice = row.find('span.total-producto');
+            totalPrice.html(toCop(quantity*unitPrice));
+            actualizarTotalPagar();
+        }
+    });
+}
 
 // Listeners para la funcionalidad de añadir un producto al carrito de compras
 function setAddToCartListeners() {
@@ -8,7 +26,13 @@ function setAddToCartListeners() {
     $('.product-minus').click(function () {
         var input = $(this).parent().parent().find('input.product-quantity');
         var value = parseInt(input.val());
-        if (value > 0) {
+        var minValue = 0;
+
+        if(input.hasClass('cart-details')){
+            minValue=1;
+        }
+
+        if (value > minValue) {
             input.val(value - 1);
             input.change();
         }
@@ -27,7 +51,14 @@ function setAddToCartListeners() {
         var value = $(this).val();
         var minus = $(this).parent().find('.product-minus');
         var addToCart = $(this).parent().parent().find('.add-to-cart');
-        if(value > 0){
+
+        var minValue = 0;
+
+        if($(this).hasClass('cart-details')){
+            minValue = 1;
+        }
+
+        if(value > minValue){
             // Si la cantidad es mayor a 0 se habilita el botón de disminuir y el botón de de añadir al carrito
             addToCart.attr('disabled', false);
             minus.attr('disabled', false);
@@ -38,4 +69,22 @@ function setAddToCartListeners() {
             minus.attr('disabled', true);
         }
     });
+}
+
+function toCop(number){
+    return number.toLocaleString('es-co', {minimumFractionDigits: 0 });
+}
+
+function actualizarTotalPagar(){
+    var detallesCompra = $('div#detalles-compra');
+    var spanTotalPagar = detallesCompra.find('span#total-a-pagar');
+    var productRows = detallesCompra.find('tr.product-cart');
+    var totalPagar = 0;
+    for(var i=0;i < productRows.length;i++){
+        var row = $(productRows[i]);
+        var unitPrice = row.find('input.unit-price').val();
+        var quantity = row.find('input.product-quantity.cart-details').val();
+        totalPagar += (unitPrice*quantity)
+    }
+    spanTotalPagar.html(toCop(totalPagar));
 }
