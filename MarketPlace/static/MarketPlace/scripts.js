@@ -53,12 +53,12 @@ function getJsonDetallesPedido(){
 function getJsonInfoEnvio(){
     var container = $('div#formulario-informacion-envio');
 
-    var nombre = '';
-    var email = '';
-    var direccion = '';
-    var celular = '';
-    var telefono = '';
-    var observaciones = '';
+    var nombre = container.find('input[name="nombre"]').val();
+    var email =  container.find('input[name="email"]').val();
+    var direccion =  container.find('input[name="direccion"]').val();
+    var celular =  container.find('input[name="celular"]').val();
+    var telefono =  container.find('input[name="telefono"]').val();
+    var observaciones =  container.find('textarea[name="observaciones"]').val();
 
     return {
         nombre: nombre,
@@ -73,9 +73,9 @@ function getJsonInfoEnvio(){
 function getJsonInfoPago(){
     var container = $('div#formulario-informacion-pago');
 
-    var nombreCompleto = '';
-    var tipoDocumento = '';
-    var numeroDocumento = '';
+    var nombreCompleto = container.find('input[name="nombre-completo"]').val();
+    var tipoDocumento = container.find('select[name="tipo-documento"]').val();
+    var numeroDocumento = container.find('input[name="numero-documento"]').val();
 
     return {
         nombre_completo: nombreCompleto,
