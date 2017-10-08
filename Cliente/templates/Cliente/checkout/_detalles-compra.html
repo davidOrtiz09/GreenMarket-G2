@@ -52,7 +52,28 @@
                         </div>
                     </td>
                     <td>
-                        <button class="btn btn-link clickable"><i class="fa fa-2x fa-times-circle-o text-danger"></i></button>
+                        <button class="btn btn-link clickable" data-toggle="modal" data-target="#modal-eliminar-carrito-{{ forloop.counter }}">
+                            <i class="fa fa-2x fa-times-circle-o text-danger"></i>
+                        </button>
+                        <div class="modal fade" id="modal-eliminar-carrito-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h6 class="text-center">¿Desea eliminar este producto?</h6>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <button type="button" class="btn btn-danger btn-block clickable">Eliminar</button>
+                                            </div>
+                                            <div class="col-6">
+                                                <button type="button" class="btn btn-secondary btn-block clickable" data-dismiss="modal">Cancelar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             {% endfor %}
