@@ -22,11 +22,17 @@ class ClientForm(ModelForm):
 
     class Meta:
         model = User
-        fields = ('nombre', 'apellido', 'departamento', 'ciudad', 'numero_identificacion', 'tipo_identificacion', 'telefono_contacto', 'correo', 'direccion', 'contrasena', 'contrasena2')
+        fields = ['nombre', 'apellido', 'departamento', 'ciudad', 'numero_identificacion', 'tipo_identificacion', 'telefono_contacto', 'correo', 'direccion', 'contrasena', 'contrasena2']
 
-    def clean_password(self):
+    def clean_contrasena2(self):
         password = self.cleaned_data['contrasena']
         password2 = self.cleaned_data['contrasena2']
         if password != password2:
             raise forms.ValidationError('Las claves no coinciden.')
         return password2
+
+    def clean_correo(self):
+        email = self.cleaned_data['correo']
+        if User.objects.filter(email=email):
+            raise forms.ValidationError('Ya existe un email igual registrado.')
+        return email

@@ -1,8 +1,10 @@
     {% extends 'MarketPlace/_common/base.html' %}
+    {% load app_filters %}
     {% block main %}
-      <h2>Registro</h2>
       <form method="post">
         {% csrf_token %}
+          <div class="container">
+              <h2>Registro</h2>
           <form>
               <div class="form-row">
     <div class="form-group col-md-3">
@@ -22,6 +24,11 @@
     <div class="form-group col-md-3">
       <label class="col-form-label">Correo</label>
       <input type="email" class="form-control"  placeholder="Correo" name="correo">
+        {% if 'correo' in form.errors %}
+             <div style="color: red;">
+        {{ form.errors|get_error:'correo' }}
+             </div>
+        {% endif %}
     </div>
     <div class="form-group col-md-3">
       <label class="col-form-label">Contraseña</label>
@@ -29,7 +36,12 @@
     </div>
       <div class="form-group col-md-3">
       <label class="col-form-label">Repetir Contraseña</label>
-      <input type="password" class="form-control" placeholder="Contraseña" name="contrasena2">
+      <input type="password" class="form-control" placeholder="Repetir Contraseña" name="contrasena2">
+          {% if 'contrasena2' in form.errors %}
+               <div style="color: red;">
+          {{ form.errors|get_error:'contrasena2' }}
+               </div>
+          {% endif %}
     </div>
   </div>
   <div class="form-row">
@@ -73,6 +85,7 @@
       <input type="text" class="form-control"  placeholder="Direccion" name="direccion">
     </div>
   </div>
-  <button type="submit" class="btn btn-primary">Sign in</button>
+  <button type="submit" class="btn btn-primary">Registrar</button>
     </form>
+          </div>
     {% endblock %}

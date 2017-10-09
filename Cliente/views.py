@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.views import View
 from Cliente.forms import ClientForm
 from Cliente.models import Cliente
@@ -45,8 +45,13 @@ def add_client_view(request):
             cliente_model.save()
             return render(request, 'Cliente/index.html', {})
         else:
-            print(form.errors)
-            return render(request, 'Cliente/registrar_cliente.html', {'form': form})
+            context = {
+                'form': form
+            }
+            return render_to_response('Cliente/registrar_cliente.html', context)
     else:
         form = ClientForm()
-        return render(request, 'Cliente/registrar_cliente.html', {'form': form})
+        context = {
+            'form': form
+        }
+        return render(request, 'Cliente/registrar_cliente.html', context)
