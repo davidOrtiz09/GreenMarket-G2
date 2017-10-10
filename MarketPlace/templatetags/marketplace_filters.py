@@ -3,6 +3,7 @@ from django import template
 register = template.Library()
 
 
+# Dado un numero, lo retorna en formato moneda para que sea mas legible
 @register.filter(name='to_cop')
 def to_cop(number):
     try:
@@ -11,6 +12,7 @@ def to_cop(number):
         return number
 
 
+# Funcionalidad para multiplicar en templates y retornar el resultado en formato moneda
 @register.filter(name='multiply_cop')
 def multiply_cop(value, arg):
     try:
@@ -19,6 +21,7 @@ def multiply_cop(value, arg):
         return 0
 
 
+# Cuenta los items del carrito
 @register.filter(name='count_cart_products')
 def count_cart_products(request):
     cart = request.session.get('cart', None)
