@@ -12,6 +12,9 @@ class Index(View):
 
 class Checkout(View):
     def get(self, request):
+        # Obtenemos el carrito y sus items
+        # Si no encontramos nada, redirijimos el usuario al home y le notificamos que no tiene items en el carrito
+        # De lo contrario mostramos la página de checkout
         cart = request.session.get('cart', None)
         items = []
         if cart:
@@ -64,6 +67,7 @@ class UpdateShoppingCart(View):
 
 class DeleteProductFromShoppingCart(View):
     def post(self, request):
+        # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
         product_id = int(request.POST.get('product-id', '-1'))
         if cart:

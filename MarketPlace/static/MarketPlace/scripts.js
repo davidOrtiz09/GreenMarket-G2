@@ -3,8 +3,14 @@ $(document).ready(function(){
     addCartDetailsListeners();
 });
 
+/*
+    Añadimos los listeners para las funcionalidades Javascript de los detalles del carrito de compras
+ */
 function addCartDetailsListeners(){
     actualizarTotalPagar();
+    /*
+        Cuando la cantidad de un item del carrito compra cambia, se actualia el subtotal y el total de la compra
+     */
     $('input.product-quantity.cart-details').change(function(){
         var quantity = $(this).val();
         if(quantity < 1){
@@ -19,6 +25,9 @@ function addCartDetailsListeners(){
         }
     });
 
+    /*
+        Cuando le da click en pagar, se obtienen los datos de los 3 formularios, para posteriormente hacerles post
+     */
     $('button#pagar').click(function(){
         var detallesPedido = getJsonDetallesPedido();
         var informacionEnvio = getJsonInfoEnvio();
@@ -29,11 +38,12 @@ function addCartDetailsListeners(){
             informacion_envio: informacionEnvio,
             informacion_pago: informacionPago
         };
-
-        console.log(formJson);
     });
 }
 
+/*
+    Obtenemos la información de los detalles de compra
+ */
 function getJsonDetallesPedido(){
     var container = $('div#detalles-pedido');
     var response = [];
@@ -50,6 +60,9 @@ function getJsonDetallesPedido(){
     return response;
 }
 
+/*
+    Obtenemos la información que el usuario llenó en los datos de envío
+ */
 function getJsonInfoEnvio(){
     var container = $('div#formulario-informacion-envio');
 
@@ -70,6 +83,9 @@ function getJsonInfoEnvio(){
     }
 }
 
+/*
+    Obtenemos la información que el usuario puso en el formulario de pago
+ */
 function getJsonInfoPago(){
     var container = $('div#formulario-informacion-pago');
 
@@ -135,10 +151,16 @@ function setAddToCartListeners() {
     });
 }
 
+/*
+    Se formatea un número a moneda para que sea más legible
+ */
 function toCop(number){
     return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
 }
 
+/*
+    Se actualiza el total a pagar según los items y cantidades del carrito de compras
+ */
 function actualizarTotalPagar(){
     var detallesPedido = $('div#detalles-pedido');
     var spanTotalPagar = detallesPedido.find('span#total-a-pagar');
