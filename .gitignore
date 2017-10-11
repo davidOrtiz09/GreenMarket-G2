@@ -6,3 +6,4 @@ MarketPlace/migrations/
 Productor/migrations/
 Repartidor/migrations/
 media/
+*.pyc
