@@ -18,11 +18,23 @@ class Index(View):
 class CatalogoView(View):
     def get(self, request):
         # ofertas_pro = Oferta_Producto.objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today()).values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
-        ofertas_pro = Oferta_Producto.objects.filter(estado=1).values(
-            'fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
-            preMin=Min('precioProvedor'), preMax=Max('precioProvedor'), canAceptada=Sum('cantidad_aceptada')).distinct()
-        # print(aqui)
-        return render(request, 'Administrador/catalogo.html', {'ofertas_pro': ofertas_pro})
+        dia_semana = datetime.date.today().weekday()
+        if(dia_semana == 6):
+            ofertas_pro = Oferta_Producto.objects.filter(estado=1).values(
+                'fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
+                preMin=Min('precioProvedor'), preMax=Max('precioProvedor'), canAceptada=Sum('cantidad_aceptada')).distinct()
+            # print(aqui)
+            return render(request, 'Administrador/catalogo.html', {'ofertas_pro': ofertas_pro, 'oferta_nueva':True})
+        else:
+            catalogo = Catalogo.objects.order_by('-fecha_cierre').first()
+            ofertas_pro = catalogo.catalogo_producto_set.values('fk_producto',
+                                                                'fk_producto__nombre',
+                                                                'fk_producto__imagen',
+                                                                'precio')
+            return render(request, 'Administrador/catalogo.html', {'ofertas_pro': ofertas_pro, 'oferta_nueva': False})
+
+
+
 
     def post(self, request):
         if (request.method == 'POST'):
