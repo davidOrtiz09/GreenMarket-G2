@@ -13,7 +13,7 @@ class Index(View):
     def get(self, request):
         return render(request, 'Administrador/index.html', {})
 
-class Catalogo(View):
+class CatalogoView(View):
     def get(self, request):
 
         ofertas_pro = Oferta_Producto.objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today()).values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
