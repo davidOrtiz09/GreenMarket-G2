@@ -19,21 +19,32 @@ class CatalogoView(View):
     def get(self, request):
         # ofertas_pro = Oferta_Producto.objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today()).values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
         dia_semana = datetime.date.today().weekday()
+        oferta_nueva = False
+        info_catalogo ={}
+        # Se valida que sea domingo para permitir crear el catalogo.
         if(dia_semana == 6):
-            ofertas_pro = Oferta_Producto.objects.filter(estado=1).values(
-                'fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
-                preMin=Min('precioProvedor'), preMax=Max('precioProvedor'), canAceptada=Sum('cantidad_aceptada')).distinct()
-            # print(aqui)
-            return render(request, 'Administrador/catalogo.html', {'ofertas_pro': ofertas_pro, 'oferta_nueva':True})
+            # Se valida que no se haya creado ya un catalogo para la semana.
+            catalogo = Catalogo.objects.filter(fecha_creacion__gte = datetime.date.today()).first()
+            if (catalogo is None):
+                ofertas_pro = Oferta_Producto.objects.filter(estado=1).values(
+                    'fk_producto', 'fk_producto__nombre', 'fk_producto__imagen').annotate(
+                    preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
+                    canAceptada=Sum('cantidad_aceptada')).distinct()
+                info_catalogo.update({'catalogo': catalogo, 'ofertas_pro':ofertas_pro})
+                oferta_nueva = True
+            else:
+                # Se muestra el catalogo ya creado.
+                info_catalogo = catalogo_actual()
         else:
-            catalogo = Catalogo.objects.order_by('-fecha_cierre').first()
-            ofertas_pro = catalogo.catalogo_producto_set.values('fk_producto',
-                                                                'fk_producto__nombre',
-                                                                'fk_producto__imagen',
-                                                                'precio')
-            return render(request, 'Administrador/catalogo.html', {'ofertas_pro': ofertas_pro, 'oferta_nueva': False})
+            # Si no es domingo se muestra el ultimo catalogo que se haya creado.
+            info_catalogo = catalogo_actual()
 
-
+        catalogo = info_catalogo['catalogo']
+        subtitulo = catalogo.fecha_creacion.strftime("%d/%m/%y") + ' - ' + catalogo.fecha_cierre.strftime("%d/%m/%y")
+        return render(request, 'Administrador/catalogo.html',
+                      {'ofertas_pro': info_catalogo['ofertas_pro'],
+                       'subtitulo':subtitulo,
+                       'oferta_nueva': oferta_nueva})
 
 
     def post(self, request):
@@ -47,3 +58,12 @@ class CatalogoView(View):
                                                            fk_producto = Producto(id = item['producto']),
                                                            precio = item['precio'])
             return redirect(reverse('administrador:index'))
+
+def catalogo_actual():
+    catalogo = Catalogo.objects.order_by('-fecha_creacion').first()
+    ofertas_pro = catalogo.catalogo_producto_set.values('fk_producto',
+                                                        'fk_producto__nombre',
+                                                        'fk_producto__imagen',
+                                                        'precio')
+    return({'ofertas_pro':ofertas_pro, 'catalogo':catalogo})
+
