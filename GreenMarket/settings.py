@@ -126,11 +126,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'Administrador', 'static', 'Administrador'),
-    os.path.join(BASE_DIR, 'Cliente', 'static', 'Cliente'),
-    os.path.join(BASE_DIR, 'MarketPlace', 'static', 'MarketPlace'),
-    os.path.join(BASE_DIR, 'Productor', 'static', 'Productor'),
-    os.path.join(BASE_DIR, 'Repartidor', 'static', 'Repartidor'),
+    os.path.join(BASE_DIR, 'Administrador', 'static'),
+    os.path.join(BASE_DIR, 'Cliente', 'static'),
+    os.path.join(BASE_DIR, 'MarketPlace', 'static'),
+    os.path.join(BASE_DIR, 'Productor', 'static'),
+    os.path.join(BASE_DIR, 'Repartidor', 'static'),
 )
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
