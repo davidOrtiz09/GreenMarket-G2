@@ -12,14 +12,17 @@
         </div>
         <div class="main-menu">
             <ul id="side-main-menu" class="side-menu list-unstyled">
-                <li class="active">
-                    <a href="#">
+                {% url 'administrador:index' as url_index %}
+                <li {% if request.path == url_index %}class="active"{% endif %}>
+                    <a href="{{ url_index }}">
                         <i class="icon-home"></i> <span>Home</span>
                     </a>
-                    <a href="{% url 'administrador:catalogo' %}">
-                        <i class="icon-padnote"></i> <span>Cat&aacute;logo</span>
+                </li>
+                {% url 'administrador:catalogo' as url_catalogo %}
+                <li {% if request.path == url_catalogo %}class="active"{% endif %}>
+                    <a href="{{ url_catalogo }}">
+                        <i class="icon-padnote"></i> <span>Catálogo</span>
                     </a>
-
                 </li>
             </ul>
         </div>
