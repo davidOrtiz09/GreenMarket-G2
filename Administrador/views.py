@@ -81,7 +81,7 @@ class CatalogoView(View):
 
 class PedidosView(View):
     def get(self, request):
-        return render(request, 'administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
+        return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
     def post(self, request):
         if request.POST.get('fecha_inicio', '') == '':
