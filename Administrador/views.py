@@ -67,7 +67,14 @@ class CatalogoView(View):
                 cat_pro = catalogo_producto.objects.create(fk_catalogo = catalogo,
                                                            fk_producto = Producto(id = item['producto']),
                                                            precio = item['precio'])
-            return redirect(reverse('administrador:index'))
+
+            info_catalogo = catalogo_actual()
+            subtitulo = "Catálogo creado correctamente!\r\n" +info_catalogo['subtitulo']
+
+            return render(request, 'Administrador/catalogo.html',
+                          {'ofertas_pro': info_catalogo['ofertas_pro'],
+                           'subtitulo': subtitulo,
+                           'oferta_nueva': False})
 
 def catalogo_actual():
     catalogo = Catalogo.objects.order_by('-fecha_creacion').first()
