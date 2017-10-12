@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 import json
 from django.db.models import Sum, Min, Max
 from django.shortcuts import render
 from django.views import View
-from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto
+from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto
 from Administrador.utils import catalogo_actual
 
 
@@ -64,7 +64,7 @@ class CatalogoView(View):
 
         # Se agregan los  productos al catalogo
         for item in precios_recibidos:
-            catalogo_producto.objects.create(fk_catalogo=catalogo,
+            Catalogo_Producto.objects.create(fk_catalogo=catalogo,
                                              fk_producto=Producto(id=item['producto']),
                                              precio=item['precio'])
 
@@ -85,8 +85,8 @@ class PedidosView(View):
 
     def post(self, request):
         if request.POST.get('fecha_inicio', '') == '':
-            fecha_inicio = datetime.now()
-            fecha_fin = datetime.now()
+            fecha_inicio = datetime.datetime.now()
+            fecha_fin = datetime.datetime.now()
             pedidos = Pedido.objects.filter(fecha_pedido__gte=fecha_inicio, fecha_pedido__lte=fecha_fin)
         else:
             fecha_inicio = request.POST.get('fecha_inicio', '')
