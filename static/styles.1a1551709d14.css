@@ -1,0 +1,15 @@
+#formulario-informacion-envio .input-group-addon{
+    width: 120px;
+}
+
+#formulario-informacion-pago .input-group-addon{
+    width: 220px;
+}
+
+th.cantidad{
+    width: 200px;
+}
+
+.clickable, .clickable *{
+    cursor: pointer;
+}
