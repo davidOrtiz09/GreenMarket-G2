@@ -1,5 +1,17 @@
+
 body{margin-top:20px;}
 /* -------------------------------------------------------------- Box Product -------------------------------------------------------------- */
+.product-block .product-deatil p.price-container span,
+.product-content .product-deatil p.price-container span,
+.product-entry .product-deatil p.price-container span,
+.shipping table tbody tr td p.price-container span,
+.shopping-items table tbody tr td p.price-container span {
+    color: #ffffff;
+    font-family: Lato, sans-serif;
+    font-size: 24px;
+    line-height: 20px
+}
+
 .box-product-outer {
     margin-bottom: 5px;
     padding-top: 15px;
@@ -105,3 +117,6 @@ body{margin-top:20px;}
 }
 .rating i { color: #fc0 }
 .product-sorting-bar { border: 1px solid #e5e5e5 }
+
+
+/* -------------------------------------------------------------- End of Box Product -------------------------------------------------------------- */

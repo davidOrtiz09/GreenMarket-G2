@@ -42,9 +42,9 @@
                     </div>
 
                     <div class="row">
-                        {% for x in '1232456789' %}
+                        {% for producto in productos_catalogo %}
                             <div class="col-lg-4 col-md-6 mb-4">
-                                {% include 'Cliente/_elements/_producto-preview.html' %}
+                                {% include 'Cliente/_elements/_producto-preview.html' with product_id=producto %}
                             </div>
                         {% endfor %}
                     </div>

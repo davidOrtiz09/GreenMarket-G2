@@ -1,20 +1,21 @@
-        <div class="box-product">
-            <div class="img-wrapper">
-                <a href="detail.html">
-                    <img alt="Product" src="https://bootdey.com/img/Content/avatar/avatar1.png">
-                </a>
-                <div class="tags">
-                    <span class="label-tags"><span class="label label-danger">Sale</span></span>
-                    <span class="label-tags"><span class="label label-info">Featured</span></span>
-                    <span class="label-tags"><span class="label label-warning">Polo</span></span>
-                </div>
-                <div class="option">
-                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add to Cart"><i class="ace-icon fa fa-shopping-cart"></i></a>
-                </div>+
-            </div>
-            <h6><a href="detail.html">IncultGeo Print Polo T-Shirt</a></h6>
-            <div class="price">
-                <div>$16.59<span class="price-down">-10%</span></div>
-                <span class="price-old">$15.00</span>
-            </div>
+<div class="box-product">
+    <div class="img-wrapper">
+        <a href="detail.html">
+            <img alt="Product" src="{{ producto.fk_producto.imagen.url }}" class="img-responsive center-block">
+        </a>
+        <div class="option">
+            <a href="#" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Agregar al carrito"><i
+                    class="ace-icon fa fa-shopping-cart"></i></a>
+            <a href="#" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="ver Detalle"><i
+                    class="ace-icon fa fa-align-left"></i></a>
         </div>
+    </div>
+    <h5><a href="detail.html">{{product_id.fk_producto.nombre}}</a></h5>
+    <div class="price">
+        <div> <h6>${{product_id.precio}}</h6></div>
+    </div>
+    <div class="detail">
+        <div> <h5>{{product_id.fk_producto.descripcion}}</h5></div>
+    </div>
+
+</div>

@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.db import models
-
+from django.utils.encoding import python_2_unicode_compatible
 # Create your models here.
 
-
+@python_2_unicode_compatible
 class Catalogo(models.Model):
     id = models.AutoField(primary_key=True)
     fecha_creacion=models.DateField(auto_now_add=True)
@@ -18,13 +18,13 @@ class Catalogo(models.Model):
     def __str__(self):
         return self.name
 
-
+@python_2_unicode_compatible
 class Producto(models.Model):
     id = models.AutoField(primary_key=True)
     fecha_creacion=models.DateField(auto_now_add=True)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     descripcion= models.TextField(max_length=1000, verbose_name='Descripción', null=True, blank=True)
-    imagen= models.ImageField(upload_to='user-pictures', verbose_name='Foto', null=True, blank=False)
+    imagen= models.ImageField(upload_to='producto-imagenes', verbose_name='Foto', null=True, blank=False)
     fecha_vencimiento = models.DateField(null=True, blank=True)
     categoria=models.CharField(max_length=50, verbose_name='Categoría', null=False, blank=False)
     class Meta:
@@ -34,7 +34,7 @@ class Producto(models.Model):
     def __str__(self):
         return self.name
 
-
+@python_2_unicode_compatible
 class CatalogoProducto(models.Model):
     id = models.AutoField(primary_key=True)
     precio=models.DecimalField(max_digits=10, decimal_places=2)
@@ -48,7 +48,7 @@ class CatalogoProducto(models.Model):
 
 
 
-
+@python_2_unicode_compatible
 class Pedido(models.Model):
     id = models.AutoField(primary_key=True)
     fecha_creacion=models.DateField(auto_now_add=True)
@@ -63,7 +63,7 @@ class Pedido(models.Model):
     def __str__(self):
         return self.name
 
-
+@python_2_unicode_compatible
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
