@@ -1,9 +1,8 @@
 {% extends 'Administrador/_common/base.html' %}
-{% load table_tags %}
 {% block main %}
     <section>
         <div class = "container-fluid" style = "margin-top: 10px">
-            <h1 align="center"> Pedidos </h1>
+            <h1 class="text-center"> Pedidos </h1>
             <br />
             <form method="post" action="{% url 'administrador:pedidos' %}">
                 {% csrf_token %}
