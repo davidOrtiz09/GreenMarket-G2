@@ -1,0 +1,40 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <div class = "container-fluid" style = "margin-top: 10px">
+    <br>
+        <br>
+        <br>
+            <h1 class="text-center"> Detalle Pedido </h1>
+            <br />
+            <form method="post" action="{% url 'administrador:actualizarEstadoPedido' id_pedidoUpdate=id_pedido%}">
+                {% csrf_token %}
+            <div class="container-fluid" >
+                <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2" width="100%" border="1" align="center">
+                    <thead>
+                    <br/>
+                    <th colspan="6" bgcolor="#228b22" class="text-white text-center">Detelle Pedido</th>
+                        <tr bgcolor="#deb887" >
+                            <th class="text-center">Descripcion del producto</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-center">Unidad de medida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            {% for pedidosDetalleList in listDetallePedido %}
+
+                        <tr>
+                            <td class="text-center">{{pedidosDetalleList.fk_catalogo_producto.fk_producto.nombre}}</td>
+                            <td class="text-center">{{pedidosDetalleList.cantidad}}</td>
+                            <td class="text-center">{{pedidosDetalleList.fk_catalogo_producto.fk_producto.unidad_medida}}</td>
+                        </tr>
+            {% endfor %}
+                    </tbody>
+                </table>
+            <br>
+                <input {{ disableButton }} type="submit" class="btn btn-primary" value="Listo para enviar"/>
+            </div>
+            </form>
+       </div>
+    </section>
+
+{% endblock %}

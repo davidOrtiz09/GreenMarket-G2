@@ -1,0 +1,45 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class = "container-fluid" style = "margin-top: 10px">
+            <h1 class="text-center"> Pedidos </h1>
+            <br />
+            <form method="post" action="{% url 'administrador:pedidos' %}">
+                {% csrf_token %}
+                <div class="container-fluid" align="center">
+                    <input type="date" name="fechaInicio">
+                    <input type="date" name="fechaFin">
+                    <input type="submit" value="Buscar" class="btn btn-primary">
+                </div>
+            <br>
+            <div class="container-fluid" >
+                <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1" align="center">
+                    <thead>
+                    <br/>
+                    <th colspan="6" bgcolor="#228b22" class="text-white text-center">Pedidos</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Codigo Pedido</th>
+                            <th class="text-center">Valor</th>
+                            <th class="text-center">Fecha Pedido</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            {% for pedidosList in listPedidos %}
+
+                        <tr>
+                            <td class="text-center">{{pedidosList.id}}</td>
+                            <td>{{pedidosList.valor_total}}</td>
+                            <td class="text-center">{{pedidosList.fecha_pedido}}</td>
+                            <td class="text-center">{{pedidosList.estado}}</td>
+                            <td class="text-center"><a href="{% url 'administrador:detallePedidos' id_pedido=pedidosList.id %}" class="btn btn-info">Ver detalle</a></td>
+                        </tr>
+            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            </form>
+       </div>
+    </section>
+{% endblock %}
