@@ -93,7 +93,7 @@ class PedidosView(View):
             fecha_fin = request.POST.get('fecha_fin', '')
             pedidos = Pedido.objects.filter(fecha_pedido__gte=fecha_inicio, fecha_pedido__lte=fecha_fin)
 
-        return render(request, 'administrador/pedidos.html', {'pedidos': pedidos})
+        return render(request, 'Administrador/pedidos.html', {'pedidos': pedidos})
 
 
 class DetallePedidoView(View):
