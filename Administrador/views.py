@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
+from datetime import datetime
 import json
 from django.db.models import Sum, Min, Max
 from django.shortcuts import render
 from django.views import View
-from MarketPlace.models import Oferta_Producto, Catalogo, catalogo_producto, Producto
+from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto
 from Administrador.utils import catalogo_actual
 
 
@@ -79,36 +79,42 @@ class CatalogoView(View):
         })
 
 
-def pedidos(request):
+class PedidosView(View):
+    def get(self, request):
+        return render(request, 'administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
-    if request.method == 'POST':
-        if request.POST.get('fechaInicio', '')=='':
-            fechaInicio = datetime.now()
-            fechaFin = datetime.now()
-            listPedidos = Pedido.objects.filter(fecha_pedido__gte=fechaInicio, fecha_pedido__lte=fechaFin)
+    def post(self, request):
+        if request.POST.get('fecha_inicio', '') == '':
+            fecha_inicio = datetime.now()
+            fecha_fin = datetime.now()
+            pedidos = Pedido.objects.filter(fecha_pedido__gte=fecha_inicio, fecha_pedido__lte=fecha_fin)
         else:
-            fechaInicio = request.POST.get('fechaInicio', '')
-            fechaFin = request.POST.get('fechaFin','')
-            listPedidos = Pedido.objects.filter(fecha_pedido__gte=fechaInicio, fecha_pedido__lte=fechaFin)
-    else:
-        listPedidos = Pedido.objects.all()
-    context = {'listPedidos': listPedidos}
-    return render(request, 'administrador/pedidos.html', context)
+            fecha_inicio = request.POST.get('fecha_inicio', '')
+            fecha_fin = request.POST.get('fecha_fin', '')
+            pedidos = Pedido.objects.filter(fecha_pedido__gte=fecha_inicio, fecha_pedido__lte=fecha_fin)
 
-def detallePedido(request, id_pedido):
-    listDetallePedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
-    pedido=Pedido.objects.get(id=id_pedido)
-    if pedido.estado != 'PE':
-        disableButton = 'disabled'
-    else:
-        disableButton = ''
-    context = {'listDetallePedido':listDetallePedido, 'id_pedido':id_pedido,'disableButton':disableButton }
-    return render(request, 'administrador/detallePedidos.html', context)
+        return render(request, 'administrador/pedidos.html', {'pedidos': pedidos})
 
-def actualizarEstadoPedido (request, id_pedidoUpdate):
-    pedidoUpdate=Pedido.objects.get(id=id_pedidoUpdate)
-    pedidoUpdate.estado = 'EC'
-    pedidoUpdate.save()
-    listPedidos = Pedido.objects.all()
-    context = {'listPedidos': listPedidos}
-    return render(request, 'administrador/pedidos.html', context)
+
+class DetallePedidoView(View):
+    def get(self, request, id_pedido):
+        detalle_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
+        pedido = Pedido.objects.get(id=id_pedido)
+        if pedido.estado != 'PE':
+            disable_button = 'disabled'
+        else:
+            disable_button = ''
+        return render(request, 'Administrador/detalle-pedido.html', {
+            'detalle_pedido': detalle_pedido,
+            'id_pedido': id_pedido,
+            'disable_button': disable_button
+        })
+
+
+class ActualizarEstadoPedidoView(View):
+    def post(self, request):
+        id_pedido = request.POST.get('id_pedido', '0')
+        pedido = Pedido.objects.get(id=id_pedido)
+        pedido.estado = 'EC'
+        pedido.save()
+        return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})

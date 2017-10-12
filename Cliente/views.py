@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm
-from Cliente.models import Cliente
+from MarketPlace.models import Cliente
 from django.contrib.auth.models import User
 
 

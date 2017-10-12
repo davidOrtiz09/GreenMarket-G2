@@ -2,9 +2,7 @@
 from django.contrib.auth.forms import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
-
-
-from Cliente.models import Cliente
+from MarketPlace.models import Cliente
 
 
 class ClientForm(ModelForm):
