@@ -7,4 +7,4 @@ Productor/migrations/
 Repartidor/migrations/
 media/
 *.pyc
-static/
+/static/
