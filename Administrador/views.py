@@ -59,15 +59,21 @@ class CatalogoView(View):
 
     def post(self, request):
         if (request.method == 'POST'):
+            # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
             precios_recibidos = json.loads(request.POST.get('precios_enviar'))
+
+            # Se crea el catalogo
             catalogo = Catalogo.objects.create(productor_id = 1,
                                                fecha_cierre = datetime.date.today() + datetime.timedelta(days=3))
             catalogo.save()
+
+            # Se agregan los  productos al catalogo
             for item in precios_recibidos:
                 cat_pro = catalogo_producto.objects.create(fk_catalogo = catalogo,
                                                            fk_producto = Producto(id = item['producto']),
                                                            precio = item['precio'])
 
+            # Se carga la informacion del catalogo creado
             info_catalogo = catalogo_actual()
             subtitulo = "Catálogo creado correctamente!\r\n" +info_catalogo['subtitulo']
 
@@ -76,6 +82,7 @@ class CatalogoView(View):
                            'subtitulo': subtitulo,
                            'oferta_nueva': False})
 
+# Se obtiene el catalogo más reciente creado
 def catalogo_actual():
     catalogo = Catalogo.objects.order_by('-fecha_creacion').first()
     ofertas_pro = []
