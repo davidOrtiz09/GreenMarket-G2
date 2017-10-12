@@ -2,7 +2,7 @@
 $( "#fcatalogo" ).submit(function( event ) {
 
     // Se obtienen todos los elementos donde se tienen los precios.
-    var display = document.getElementsByClassName("precio");
+    var display = $('.precio');
     var proPre =[];
     var i;
     // Se arma el objeto JSON con los datos a enviar, id del producto con su  respectivo precio.
