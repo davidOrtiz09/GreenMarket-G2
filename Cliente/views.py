@@ -90,8 +90,11 @@ class DeleteProductFromShoppingCart(View):
         return redirect(reverse('cliente:checkout'))
 
 
-def add_client_view(request):
-    if request.method == 'POST':
+class RegisterClientView(View):
+    def get(self, request):
+        return render(request, 'Cliente/registrar_cliente.html', {'form': ClientForm()})
+
+    def post(self, request):
         form = ClientForm(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
@@ -114,21 +117,16 @@ def add_client_view(request):
                 email=correo
             )
             user_model.save()
-            cliente_model = Cliente(fk_django_user=user_model, ciudad=ciudad,
-                                    departamento=departamento, telefono_contacto=telefono_contacto,
-                                    direccion=direccion, numero_identificacion=numero_identificacion,
-                                    tipo_identificacion=tipo_identificacion
-                                    )
+            cliente_model = Cliente(
+                fk_django_user=user_model,
+                ciudad=ciudad,
+                departamento=departamento,
+                telefono_contacto=telefono_contacto,
+                direccion=direccion,
+                numero_identificacion=numero_identificacion,
+                tipo_identificacion=tipo_identificacion
+            )
             cliente_model.save()
             return render(request, 'Cliente/index.html', {})
         else:
-            context = {
-                'form': form
-            }
-            return render_to_response('Cliente/registrar_cliente.html', context)
-    else:
-        form = ClientForm()
-        context = {
-            'form': form
-        }
-        return render(request, 'Cliente/registrar_cliente.html', context)
+            return render_to_response('Cliente/registrar_cliente.html', {'form': form})
