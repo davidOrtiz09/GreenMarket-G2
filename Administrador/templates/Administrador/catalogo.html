@@ -1,0 +1,80 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="col-12">
+                <br>
+                <div class="row">
+                    <div class="col-4">
+                        <h1 class="text-center">Catálogo</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <h2 class="col-4" align="center">{{ subtitulo }}</h2>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div class="row">
+                    <table class="table table-responsive">
+                        <thead class="thead-inverse">
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Producto</th>
+                            {% if oferta_nueva %}
+                                <th>Cantidad</th>
+                                <th>Precios productores</th>
+                            {% endif %}
+                            <th>Precio</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in ofertas_pro %}
+                            <tr>
+                                <td>
+                                    <img src="/media/{{ item.fk_producto__imagen }}"
+                                         alt="Imagen {{ item.fk_producto__nombre }}" class="img-responsive center-block"
+                                         style="max-height: 200px; max-width: 200px">
+                                </td>
+                                <td>{{ item.fk_producto__nombre }}</td>
+                                {% if oferta_nueva %}
+                                    <td>{{ item.canAceptada }}</td>
+                                    <td>{{ item.preMin }} - {{ item.preMax }}</td>
+                                    <td>
+                                        <input type="number" id="precio_{{ item.fk_producto }}" class="form-control precio">
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        <input type="text" id="precio_{{ item.fk_producto }}" class="form-control precio" value="{{ item.precio }}" readonly>
+                                    </td>
+                                {% endif %}
+
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    {% if oferta_nueva %}
+                        <form id="fcatalogo" method="post">
+                            {% csrf_token %}
+                            <input id="precios_enviar" type="hidden" name="precios_enviar">
+                            <button class="btn btn-primary" type="submit">Publicar catálogo</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'administrador:index' %}" class="btn btn-danger">Cancelar</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'Administrador/catalogo/catalogo.js' %}"></script>
+{% endblock %}
