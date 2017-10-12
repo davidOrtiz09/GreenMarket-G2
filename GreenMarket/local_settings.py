@@ -3,7 +3,7 @@ import os
 import dj_database_url
 
 # Please change this value when deploying to heroku
-is_deployed = False
+is_deployed = True
 
 if is_deployed:
     DATABASE_DICT = dj_database_url.config(default=os.environ.get('DATABASE_URL', ''))
