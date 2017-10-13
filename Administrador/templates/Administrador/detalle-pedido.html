@@ -1,0 +1,51 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Detalle Pedido </h1>
+                    <br/>
+                    <form method="post" action="{% url 'administrador:actualizar-estado-pedido' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_pedido" value="{{ id_pedido }}">
+                        <div class="container-fluid">
+                            <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2"
+                                   width="100%"
+                                   border="1" align="center">
+                                <thead>
+                                <th colspan="6" bgcolor="#228b22" class="text-white text-center">Detelle Pedido</th>
+                                <tr bgcolor="#deb887">
+                                    <th class="text-center">Imagen del producto</th>
+                                    <th class="text-center">Descripcion del producto</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">Unidad de medida</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for detalle in detalle_pedido %}
+                                    <tr>
+                                        <td>
+                                            <img src="/media/{{ detalle.fk_catalogo_producto.fk_producto.imagen }}"
+                                                 class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
+                                        </td>
+                                        <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.nombre }}</td>
+                                        <td class="text-center">{{ detalle.cantidad }}</td>
+                                        <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.unidad_medida }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <br>
+                            <input {{ disable_button }} type="submit" class="btn btn-primary" value="Listo para enviar"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

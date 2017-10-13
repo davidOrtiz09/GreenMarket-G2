@@ -22,6 +22,10 @@
     <!-- Font Icons CSS-->
     <link rel="stylesheet" href="{% static 'Administrador/theme/myfontastic/icons.css' %}">
 
+    <link rel="stylesheet" href="{% static 'Administrador/theme/css/screen.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'Administrador/theme/css/jquery.dataTables.min.css' %}" />
+
 </head>
 <body>
 
@@ -52,5 +56,8 @@
 <script src="{% static 'Administrador/theme/js/jquery.validate.min.js' %}"></script>
 <script src="{% static 'Administrador/theme/js/front.js' %}"></script>
 
+{% block scripts %}
+
+{% endblock %}
 </body>
 </html>
