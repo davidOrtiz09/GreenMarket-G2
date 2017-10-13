@@ -131,5 +131,18 @@ class ListarOfertasView(View):
                 cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta.id).count()
             ofertas.append((productor.nombre, cantidad_ofertas))
 
-        print (ofertas)
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
+
+class DetalleOfertaView(View):
+    def get(self, request, oferta_id):
+        detalle_oferta = Oferta_Producto.objects.filter(fk_oferta=oferta_id)
+        pedido = Pedido.objects.get(id=id_pedido)
+        if pedido.estado != 'PE':
+            disable_button = 'disabled'
+        else:
+            disable_button = ''
+        return render(request, 'Administrador/detalle-pedido.html', {
+            'detalle_pedido': detalle_pedido,
+            'id_pedido': id_pedido,
+            'disable_button': disable_button
+        })
