@@ -19,6 +19,7 @@
                                 <thead>
                                 <th colspan="6" bgcolor="#228b22" class="text-white text-center">Detelle Pedido</th>
                                 <tr bgcolor="#deb887">
+                                    <th class="text-center">Imagen del producto</th>
                                     <th class="text-center">Descripcion del producto</th>
                                     <th class="text-center">Cantidad</th>
                                     <th class="text-center">Unidad de medida</th>
@@ -27,6 +28,10 @@
                                 <tbody>
                                 {% for detalle in detalle_pedido %}
                                     <tr>
+                                        <td>
+                                            <img src="/media/{{ detalle.fk_catalogo_producto.fk_producto.imagen }}"
+                                                 class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
+                                        </td>
                                         <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.nombre }}</td>
                                         <td class="text-center">{{ detalle.cantidad }}</td>
                                         <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.unidad_medida }}</td>

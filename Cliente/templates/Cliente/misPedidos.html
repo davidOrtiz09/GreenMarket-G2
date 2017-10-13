@@ -1,0 +1,74 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Mis Pedidos </h1>
+            <br/>
+            <form>
+                <br>
+                <div class="container-fluid">
+                    <table id="misPedidosTableEntregados" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Pedidos Entregados</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Codigo Pedido</th>
+                            <th class="text-center">Valor</th>
+                            <th class="text-center">Fecha Entrega</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for misPedidoEntregados in misPedidosEntregados %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ misPedidoEntregados.id }}
+                                </td>
+                                <td>
+                                    {{ misPedidoEntregados.valor_total }}
+                                </td>
+                                <td class="text-center">
+                                    {{ misPedidoEntregados.fecha_entrega }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <table id="misPedidosTablePorEntregar" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Pedidos Por Entregar</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Codigo Pedido</th>
+                            <th class="text-center">Valor</th>
+                            <th class="text-center">Fecha Pedido</th>
+                            <th class="text-center">Estado Pedido</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for misPedidoEntregar in misPedidosPorEntregar %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ misPedidoEntregar.id }}
+                                </td>
+                                <td>
+                                    {{ misPedidoEntregar.valor_total }}
+                                </td>
+                                <td class="text-center">
+                                    {{ misPedidoEntregar.fecha_pedido }}
+                                </td>
+                                <td class="text-center">
+                                    {{ misPedidoEntregar.estado }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}
