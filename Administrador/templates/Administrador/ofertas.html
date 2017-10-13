@@ -1,0 +1,44 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Ofertas de Proveedores por aprobar </h1>
+            <br/>
+            <form method="post" action="{% url 'administrador:ofertas' %}">
+                {% csrf_token %}
+                <br>
+                <div class="container-fluid">
+                    <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Nombre Provedor</th>
+                            <th class="text-center">Productos Ofertados</th>
+                            <th class="text-center">Detalle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for oferta in ofertas %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ oferta.0 }}
+                                </td>
+                                <td class="text-center">
+                                    {{ oferta.1 }}
+                                </td>
+                                <td class="text-center">
+                                      <a href="Se pondra cuando este la pagina de detalle" class="btn btn-info">
+                                        Ver detalle
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

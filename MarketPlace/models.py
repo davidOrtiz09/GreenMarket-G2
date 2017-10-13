@@ -78,6 +78,9 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+    #def __contar_producto__(self):
+     #   Oferta_Producto.objects.filter(fk_producto_id=self.id).count()
+
 
 @python_2_unicode_compatible
 class Oferta(models.Model):

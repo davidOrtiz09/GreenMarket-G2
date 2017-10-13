@@ -6,7 +6,8 @@ import json
 from django.db.models import Sum, Min, Max
 from django.shortcuts import render
 from django.views import View
-from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto
+from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
+    Productor, Oferta
 from Administrador.utils import catalogo_actual
 
 
@@ -27,10 +28,11 @@ class CatalogoView(View):
             if catalogo is None:
                 # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
                 # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
-                ofertas_pro = Oferta_Producto\
-                    .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3))\
-                    .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen')\
-                    .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'), canAceptada=Sum('cantidad_aceptada'))\
+                ofertas_pro = Oferta_Producto \
+                    .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
+                    .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen') \
+                    .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
+                              canAceptada=Sum('cantidad_aceptada')) \
                     .distinct()
 
                 oferta_nueva = ofertas_pro.count() > 0
@@ -50,7 +52,7 @@ class CatalogoView(View):
 
         return render(request, 'Administrador/catalogo.html',
                       {'ofertas_pro': info_catalogo['ofertas_pro'],
-                       'subtitulo':info_catalogo['subtitulo'],
+                       'subtitulo': info_catalogo['subtitulo'],
                        'oferta_nueva': oferta_nueva})
 
     def post(self, request):
@@ -118,3 +120,16 @@ class ActualizarEstadoPedidoView(View):
         pedido.estado = 'EC'
         pedido.save()
         return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
+
+
+class ListarOfertasView(View):
+    def get(self, request):
+        ofertas = list()
+        cantidad_ofertas = 0
+        for productor in Productor.objects.all():
+            for oferta in Oferta.objects.filter(fk_productor=productor.id):
+                cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta.id).count()
+            ofertas.append((productor.nombre, cantidad_ofertas))
+
+        print (ofertas)
+        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
