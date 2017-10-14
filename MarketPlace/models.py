@@ -5,28 +5,56 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 # Create your models here.
 
+
+class Cooperativa(models.Model):
+    nombre = models.CharField(max_length=150, verbose_name='Nombre de la Cooperativa', null=False, blank=False)
+    ciudad = models.CharField(max_length=150, verbose_name='Ciudad de la Cooperativa', null=False, blank=False)
+    departamento = models.CharField(max_length=150, verbose_name='Departamento de la Cooperativa', null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Cooperativa'
+        verbose_name_plural = 'Cooperativas'
+
+    def __str__(self):
+        return self.nombre
+
+
+
 @python_2_unicode_compatible
 class Catalogo(models.Model):
     id = models.AutoField(primary_key=True)
     fecha_creacion=models.DateField(auto_now_add=True)
     fecha_cierre = models.DateTimeField()
-    nombre = models.CharField(max_length=100, verbose_name='Pais', null=False, blank=False)
+    nombre = models.CharField(max_length=100, verbose_name='Nombre Catálogo', null=False, blank=False)
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
+                                       blank=False)
     class Meta:
-        verbose_name = 'Catalogo'
-        verbose_name_plural = 'Catalagos'
+        verbose_name = 'Catálogo'
+        verbose_name_plural = 'Catálagos'
 
     def __str__(self):
         return self.name
 
 @python_2_unicode_compatible
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name='Nombre Categoría', null=False, blank=False)
+    descripcion = models.TextField(max_length=300, verbose_name='Descripción Categoría', null=False, blank=False)
+    imagen = models.ImageField(upload_to='imagenes-categoria', verbose_name='Imagen', null=False, blank=False)
+
+    def __str__(self):
+        return self.nombre
+
+@python_2_unicode_compatible
 class Producto(models.Model):
     id = models.AutoField(primary_key=True)
-    fecha_creacion=models.DateField(auto_now_add=True)
-    nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
-    descripcion= models.TextField(max_length=1000, verbose_name='Descripción', null=True, blank=True)
+    fk_categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, verbose_name='Categoría', null=False,
+                                     blank=False)
+    nombre = models.CharField(max_length=100, verbose_name='Nombre Producto', null=False, blank=False)
+    descripcion= models.TextField(max_length=1000, verbose_name='Descripción Producto', null=True, blank=True)
     imagen= models.ImageField(upload_to='producto-imagenes', verbose_name='Foto', null=True, blank=False)
     fecha_vencimiento = models.DateField(null=True, blank=True)
-    categoria=models.CharField(max_length=50, verbose_name='Categoría', null=False, blank=False)
+    fecha_creacion = models.DateField(auto_now_add=True)
+    unidades=models.CharField(max_length=50, verbose_name='Categoría', null=False, blank=False)
     class Meta:
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
@@ -74,3 +102,5 @@ class PedidoProducto(models.Model):
 
     def __str__(self):
         return self.name
+
+

@@ -69,10 +69,10 @@ body{margin-top:20px;}
     position: absolute;
     top: auto;
     right: 0;
-    bottom: -30px;
+    bottom: -100px;
     left: 0;
     width: auto;
-    height: 28px;
+    height: auto;
     -webkit-transition: all .2s ease;
          -o-transition: all .2s ease;
             transition: all .2s ease;
