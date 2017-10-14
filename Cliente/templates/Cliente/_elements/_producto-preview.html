@@ -1,11 +1,12 @@
 <div class="box-product">
     <div class="img-wrapper">
         <a href="#">
-            <img alt="Product" src="{{ producto.fk_producto.imagen.url }}" class="img-responsive center-block">
+            <img alt="Product" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block">
         </a>
 
         <div class="option">
-            {{ product.fk_producto.descripcion|linebreaks }}
+            <a title="" data-original-title="Descripcion"><i
+                    >{{product.fk_producto.descripcion}}</i></a>
         </div>
     </div>
     <h5>
@@ -34,10 +35,10 @@
     </form>
 
 
-    <div class="detail">
-        <div>
-            <h5>{{ product.fk_producto.descripcion }}</h5>
-        </div>
-    </div>
+{#    <div class="detail">#}
+{#        <div>#}
+{#            <h5>{{ product.fk_producto.descripcion }}</h5>#}
+{#        </div>#}
+{#    </div>#}
 
 </div>

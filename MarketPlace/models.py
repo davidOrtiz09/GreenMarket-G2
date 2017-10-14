@@ -121,7 +121,8 @@ class Catalogo(models.Model):
     productor_id = models.IntegerField(null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
     fecha_cierre = models.DateTimeField(verbose_name="Fecha de Cierre", null=False, blank=False)
-
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
+                                       blank=False)
     class Meta:
         verbose_name = 'Catálogo'
         verbose_name_plural = 'Catálogos'
@@ -201,36 +202,4 @@ class PedidoProducto(models.Model):
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
 
-####################
-'''
-@python_2_unicode_compatible
-class Catalogo(models.Model):
-    fecha_creacion=models.DateField(auto_now_add=True)
-    fecha_cierre = models.DateTimeField()
-    nombre = models.CharField(max_length=100, verbose_name='Nombre Catálogo', null=False, blank=False)
-    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
-                                       blank=False)
-    class Meta:
-        verbose_name = 'Catálogo'
-        verbose_name_plural = 'Catálagos'
 
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Pedido(models.Model):
-    fecha_creacion = models.DateField(auto_now_add=True)
-    fecha_hora_entrega = models.DateTimeField()
-    estado = models.BooleanField()
-    direccion_entrega = models.CharField(max_length=300, unique=False, null=False, blank=False)
-    nombre_repartidor = models.CharField(max_length=300, unique=False, null=False, blank=False)
-
-    class Meta:
-        verbose_name = 'Pedido'
-        verbose_name_plural = 'Pedidos'
-
-    def __str__(self):
-        return self.name
-
-'''

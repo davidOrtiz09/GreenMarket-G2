@@ -12,7 +12,7 @@ class Index(View):
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
         producto_catalogo = Catalogo_Producto.objects\
-            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first().id)\
+            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first())\
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
