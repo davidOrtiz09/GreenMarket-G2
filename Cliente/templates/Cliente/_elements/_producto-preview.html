@@ -3,28 +3,22 @@
         <a href="#">
             <img alt="Product" src="{{ producto.fk_producto.imagen.url }}" class="img-responsive center-block">
         </a>
-        {% comment %}
+
         <div class="option">
-            <a href="#" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Descripcion">
-                {{product_id.fk_producto.descripcion}}
-            </a>
-            <a href="#" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="ver Detalle">
-                <i class="ace-icon fa fa-align-left"></i>
-            </a>
+            {{ product.fk_producto.descripcion|linebreaks }}
         </div>
-        {% endcomment %}
     </div>
     <h5>
-        <a href="#">{{product_id.fk_producto.nombre}}</a>
+        <a href="#">{{product.fk_producto.nombre}}</a>
     </h5>
     <div class="price">
-        <div> <h6>${{product_id.precio}}  {{product_id.fk_producto.unidades}}</h6></div>
+        <h6>${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
     </div>
 
     <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
         {% csrf_token %}
         {# TODO el product id se debería extraer directamente del producto #}
-        <input type="hidden" name="product_id" value="{{ product_id }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
         <div class="input-group">
             <span class="input-group-btn clickable">
                 <button type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
@@ -39,11 +33,11 @@
         </div>
     </form>
 
-    {% comment %}
+
     <div class="detail">
         <div>
-            <h5>{{product_id.fk_producto.descripcion}}</h5>
+            <h5>{{ product.fk_producto.descripcion }}</h5>
         </div>
     </div>
-    {% endcomment %}
+
 </div>

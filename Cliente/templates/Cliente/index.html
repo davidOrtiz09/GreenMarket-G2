@@ -41,9 +41,9 @@
                         {% csrf_token %}
                         <div align="center">
                             <label for="cooperativa">Cooperativa</label>
-                            <select name="cooperativa" id="cooperativa">
+                            <select name="cooperativa_id" id="cooperativa">
                                 {% for cooperativa in cooperativas %}
-                                    <option value="{{ cooperativa }}">{{ cooperativa.nombre }}</option>
+                                    <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
                                 {% endfor %}
 
                             </select>
@@ -63,7 +63,7 @@
                     <div class="row">
                         {% for producto in productos_catalogo %}
                             <div class="col-lg-4 col-md-6 mb-4">
-                                {% include 'Cliente/_elements/_producto-preview.html' with product_id=producto %}
+                                {% include 'Cliente/_elements/_producto-preview.html' with product=producto %}
                             </div>
                         {% endfor %}
                     </div>
