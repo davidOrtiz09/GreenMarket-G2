@@ -126,23 +126,26 @@ class ListarOfertasView(View):
     def get(self, request):
         ofertas = list()
         cantidad_ofertas = 0
+        id_oferta = 0
         for productor in Productor.objects.all():
             for oferta in Oferta.objects.filter(fk_productor=productor.id):
                 cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta.id).count()
-            ofertas.append((productor.nombre, cantidad_ofertas))
+                id_oferta = oferta.id
+            ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
 
+
 class DetalleOfertaView(View):
-    def get(self, request, oferta_id):
-        detalle_oferta = Oferta_Producto.objects.filter(fk_oferta=oferta_id)
-        pedido = Pedido.objects.get(id=id_pedido)
-        if pedido.estado != 'PE':
-            disable_button = 'disabled'
-        else:
-            disable_button = ''
-        return render(request, 'Administrador/detalle-pedido.html', {
-            'detalle_pedido': detalle_pedido,
-            'id_pedido': id_pedido,
-            'disable_button': disable_button
+    def get(self, request, id_oferta):
+        ofertas_producto = list()
+        for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
+            print (oferta.fk_producto)
+            producto = oferta.fk_producto
+            ofertas_producto.append((producto.imagen, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+                                     oferta.cantidad_aceptada, oferta.estado))
+
+        return render(request, 'Administrador/detalle-oferta.html', {
+            'ofertas_producto': ofertas_producto,
+            'id_oferta': id_oferta
         })

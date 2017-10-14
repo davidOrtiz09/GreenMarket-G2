@@ -1,47 +1,54 @@
 {% extends 'Administrador/_common/base.html' %}
 {% block main %}
     <section>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <br>
-                    <br>
-                    <br>
-                    <h1 class="text-center"> Detalle De Oferta </h1>
-                    <br/>
-                    <form method="post" action="{% url 'administrador:actualizar-estado-pedido' %}">
-                        {% csrf_token %}
-                        <div class="container-fluid">
-                            <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2"
-                                   width="100%"
-                                   border="1" align="center">
-                                <thead>
-                                <th colspan="6" bgcolor="#228b22" class="text-white text-center">Detelle Pedido</th>
-                                <tr bgcolor="#deb887">
-                                    <th class="text-center">Imagen</th>
-                                    <th class="text-center">Producto</th>
-                                    <th class="text-center">Cantidad Disponible</th>
-                                    <th class="text-center">Precio/Unidad</th>
-                                    <th class="text-center">Cantidad Aceptada</th>
-                                    <th class="text-center">Aprobar</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for oferta in detalle_oferta %}
-                                    <tr>
-                                        <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.nombre }}</td>
-                                        <td class="text-center">{{ detalle.cantidad }}</td>
-                                        <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.unidad_medida }}</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            <br>
-                        </div>
-                    </form>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Productos Ofertados </h1>
+            <br/>
+            <form method="post" action="{% url 'administrador:ofertas' %}">
+                {% csrf_token %}
+                <br>
+                <div class="container-fluid">
+                    <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Imagen</th>
+                            <th class="text-center">Producto</th>
+                            <th class="text-center">Cantidad Disponible</th>
+                            <th class="text-center">Precio/Unidad</th>
+                            <th class="text-center">Cantidad Aceptada</th>
+                            <th class="text-center">Aprobar</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for producto in ofertas_producto %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ producto.0 }}
+                                </td>
+                                <td class="text-center">
+                                    {{ producto.1 }}
+                                </td>
+                                <td class="text-center">
+                                    {{ producto.2 }}
+                                </td>
+                                <td class="text-center">
+                                    {{ producto.3 }}
+                                </td>
+                                <td class="text-center">
+                                    {{ producto.4 }}
+                                </td>
+                                 <td class="text-center">
+                                    {{ producto.5 }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            </form>
         </div>
     </section>
-
 {% endblock %}
