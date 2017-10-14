@@ -143,7 +143,7 @@ class DetalleOfertaView(View):
             print (oferta.fk_producto)
             producto = oferta.fk_producto
             ofertas_producto.append((producto.imagen, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
-                                     oferta.cantidad_aceptada, oferta.estado))
+                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida))
 
         return render(request, 'Administrador/detalle-oferta.html', {
             'ofertas_producto': ofertas_producto,

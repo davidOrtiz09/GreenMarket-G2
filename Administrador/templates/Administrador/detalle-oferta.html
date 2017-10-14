@@ -26,7 +26,7 @@
                         {% for producto in ofertas_producto %}
                             <tr>
                                 <td class="text-center">
-                                    {{ producto.0 }}
+                                    <img src="/media/{{ producto.0 }}" style="width:100px;height:100px;">
                                 </td>
                                 <td class="text-center">
                                     {{ producto.1 }}
@@ -35,13 +35,19 @@
                                     {{ producto.2 }}
                                 </td>
                                 <td class="text-center">
-                                    {{ producto.3 }}
+                                    {{ producto.3 }} / {{ producto.6 }}
                                 </td>
                                 <td class="text-center">
-                                    {{ producto.4 }}
+                                    <input type="number" name="cantidad_aceptada" min="0" value="{{ producto.4 }}">
                                 </td>
-                                 <td class="text-center">
-                                    {{ producto.5 }}
+                                 <td>
+                                     {% if producto.5  == 0 %}
+                                         <input type="radio" name="aprobar" value="1"> Aceptar<br>
+                                         <input type="radio" name="aprobar" value="0" checked> Rechazar<br>
+                                         {% else %}
+                                          <input type="radio" name="aprobar" value="1" checked> Aceptar<br>
+                                          <input type="radio" name="aprobar" value="0"> Rechazar<br>
+                                     {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
