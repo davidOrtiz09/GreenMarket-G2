@@ -10,6 +10,7 @@ def catalogo_actual():
         ofertas_pro = catalogo.catalogo_producto_set.values('fk_producto',
                                                             'fk_producto__nombre',
                                                             'fk_producto__imagen',
+                                                            'fk_producto__unidad_medida',
                                                             'precio')
         subtitulo = catalogo.fecha_creacion.strftime("%d/%m/%y") + ' - ' + catalogo.fecha_cierre.strftime("%d/%m/%y")
     else:

@@ -12,17 +12,24 @@
 
                 </div>
             </div>
+            <br>
+            <br>
             <div class="row">
                 <table class="table table-responsive">
-                    <thead class="thead-inverse">
+                    <thead>
                     <tr>
-                        <th>Imagen</th>
-                        <th>Producto</th>
+                       <th class="text-white text-center" bgcolor="#228b22" colspan="6">
+                        Catálogo
+                       </th>
+                    </tr>
+                    <tr bgcolor="#dbeb887">
+                        <th class="text-center">Imagen</th>
+                        <th class="text-center">Producto</th>
                         {% if oferta_nueva %}
-                            <th>Cantidad</th>
-                            <th>Precios productores</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-center">Precios productores</th>
                         {% endif %}
-                        <th>Precio</th>
+                        <th class="text-center" colspan="2">Precio/Unidad</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -45,6 +52,9 @@
                                     <input type="text" id="precio_{{ item.fk_producto }}" class="form-control precio" value="{{ item.precio }}" readonly>
                                 </td>
                             {% endif %}
+                            <td>
+                                /{{ item.fk_producto__unidad_medida }}
+                            </td>
 
                         </tr>
 
