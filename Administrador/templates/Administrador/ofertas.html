@@ -7,7 +7,7 @@
             <form method="post" action="{% url 'administrador:ofertas' %}">
                 {% csrf_token %}
                 <br>
-                <div class="container-fluid">
+                <div class="container-fluid" style="height: 350px;overflow: auto">
                     <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
