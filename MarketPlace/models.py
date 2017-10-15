@@ -130,7 +130,8 @@ class Catalogo(models.Model):
     productor_id = models.IntegerField(null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
     fecha_cierre = models.DateTimeField(verbose_name="Fecha de Cierre", null=False, blank=False)
-
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
+                                       blank=False)
     class Meta:
         verbose_name = 'Catálogo'
         verbose_name_plural = 'Catálogos'
@@ -197,7 +198,7 @@ class Pedido(models.Model):
         ('EN', 'ENTREGADO')
 
     )
-    fk_cliente = models.OneToOneField(Cliente, verbose_name='Cliente', null=False, blank=False)
+    fk_cliente = models.ForeignKey(Cliente, verbose_name='Cliente', null=False, blank=False)
     fecha_pedido = models.DateField(verbose_name='Fecha pedido', null=False, blank=False)
     fecha_entrega = models.DateField(verbose_name='Fecha de entrega del pedido', null=False, blank=False)
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
@@ -209,3 +210,5 @@ class PedidoProducto(models.Model):
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
+
+

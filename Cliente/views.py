@@ -4,13 +4,38 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm
-from MarketPlace.models import Cliente
+from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido
 from django.contrib.auth.models import User
 
 
 class Index(View):
     def get(self, request):
-        return render(request, 'Cliente/index.html', {})
+        cooperativas = Cooperativa.objects.all()
+        producto_catalogo = Catalogo_Producto.objects\
+            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first())\
+            .order_by('fk_producto__nombre')
+        categorias = Categoria.objects.all()
+        return render(request, 'Cliente/index.html', {
+            'productos_catalogo': producto_catalogo,
+            'categorias': categorias,
+            'cooperativas': cooperativas
+        })
+
+    def post(self, request):
+        #Se listan los productos por Cooperativa y se ordenan segun filtro
+        cooperativa_id = request.POST.get('cooperativa_id', '')
+        ordenar_por = request.POST.get('ordenar', '')
+        producto_catalogo = Catalogo_Producto.objects\
+            .filter(fk_catalogo__fk_cooperativa__id=cooperativa_id)\
+            .order_by(ordenar_por)
+        categorias = Categoria.objects.all()
+        cooperativas = Cooperativa.objects.all()
+
+        return render(request, 'Cliente/index.html', {
+            'productos_catalogo': producto_catalogo,
+            'categorias': categorias,
+            'cooperativas': cooperativas
+        })
 
 
 class Checkout(View):
@@ -130,3 +155,14 @@ class RegisterClientView(View):
             return render(request, 'Cliente/index.html', {})
         else:
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
+
+
+class MisPedidosView(View):
+    def get(self, request):
+        user_model = User.objects.get(username=request.user.username)
+        cliente = Cliente.objects.filter(fk_django_user_id=user_model.id)
+        pedidos_cliente = Pedido.objects.filter(fk_cliente_id=cliente.id)
+        return render(request, 'Cliente/mis_pedidos.html', {
+            'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
+            'pedidos_por_entregar': pedidos_cliente.filter(estado__in=('PE', 'EC'))
+        })

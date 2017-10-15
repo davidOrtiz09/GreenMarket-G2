@@ -1,0 +1,74 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Mis Pedidos </h1>
+            <br/>
+            <form>
+                <br>
+                <div class="container-fluid">
+                    <table id="misPedidosTableEntregados" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Pedidos Entregados</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Codigo Pedido</th>
+                            <th class="text-center">Valor</th>
+                            <th class="text-center">Fecha Entrega</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pedido in pedidos_entregados %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ pedido.id }}
+                                </td>
+                                <td>
+                                    {{ pedido.valor_total }}
+                                </td>
+                                <td class="text-center">
+                                    {{ pedido.fecha_entrega }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <table id="misPedidosTablePorEntregar" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Pedidos Por Entregar</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Codigo Pedido</th>
+                            <th class="text-center">Valor</th>
+                            <th class="text-center">Fecha Pedido</th>
+                            <th class="text-center">Estado Pedido</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for pedido in pedidos_por_entregar %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ pedido.id }}
+                                </td>
+                                <td>
+                                    {{ pedido.valor_total }}
+                                </td>
+                                <td class="text-center">
+                                    {{ pedido.fecha_pedido }}
+                                </td>
+                                <td class="text-center">
+                                    {{ pedido.estado }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

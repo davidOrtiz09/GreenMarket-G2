@@ -16,6 +16,6 @@ else:
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'TEST': {
-            'NAME': 'test_green_market',
+        'NAME': 'test_green_market',
         }
     }
