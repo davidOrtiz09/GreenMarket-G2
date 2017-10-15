@@ -4,15 +4,13 @@
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Productos Ofertados </h1>
             <br/>
-            <form method="post" action="{% url 'administrador:ofertas' %}">
-                {% csrf_token %}
                 <br>
                 <div class="container-fluid">
                     <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
                         <br/>
-                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
                         <tr bgcolor="#deb887">
                             <th class="text-center">Imagen</th>
                             <th class="text-center">Producto</th>
@@ -20,10 +18,13 @@
                             <th class="text-center">Precio/Unidad</th>
                             <th class="text-center">Cantidad Aceptada</th>
                             <th class="text-center">Aprobar</th>
+                            <th class="text-center">Guardar</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for producto in ofertas_producto %}
+                            <form method="post" action="{% url 'administrador:terminar-oferta' %}">
+                                            {% csrf_token %}
                             <tr>
                                 <td class="text-center">
                                     <img src="/media/{{ producto.0 }}" style="width:100px;height:100px;">
@@ -38,7 +39,7 @@
                                     {{ producto.3 }} / {{ producto.6 }}
                                 </td>
                                 <td class="text-center">
-                                    <input type="number" name="cantidad_aceptada" min="0" value="{{ producto.4 }}">
+                                    <input type="number" name="cantidad_aceptada" min="0" max="{{ producto.2 }}" value="{{ producto.4 }}">
                                 </td>
                                  <td>
                                      {% if producto.5  == 0 %}
@@ -49,12 +50,16 @@
                                           <input type="radio" name="aprobar" value="0"> Rechazar<br>
                                      {% endif %}
                                 </td>
+                                <td class="text-center">
+                                    <input type="hidden" name="id_oferta_producto" value="{{ producto.7 }}">
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
+                                </td>
                             </tr>
+                            </form>
                         {% endfor %}
                         </tbody>
                     </table>
                 </div>
-            </form>
         </div>
     </section>
 {% endblock %}

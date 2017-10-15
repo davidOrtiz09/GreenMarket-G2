@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import datetime
 import json
 from django.db.models import Sum, Min, Max
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta
@@ -140,12 +140,23 @@ class DetalleOfertaView(View):
     def get(self, request, id_oferta):
         ofertas_producto = list()
         for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
-            print (oferta.fk_producto)
             producto = oferta.fk_producto
             ofertas_producto.append((producto.imagen, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
-                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida))
+                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
 
         return render(request, 'Administrador/detalle-oferta.html', {
             'ofertas_producto': ofertas_producto,
             'id_oferta': id_oferta
         })
+
+
+class RealizarOfertaView(View):
+    def post(self, request):
+        id_oferta_producto = request.POST.get('id_oferta_producto')
+        aprobar = request.POST.get('aprobar')
+        cantidad_aceptada = request.POST.get('cantidad_aceptada')
+        oferta_producto = Oferta_Producto.objects.get(pk=id_oferta_producto)
+        oferta_producto.estado = aprobar
+        oferta_producto.cantidad_aceptada = cantidad_aceptada
+        oferta_producto.save()
+        return render_to_response('Administrador/detalle-oferta.html')
