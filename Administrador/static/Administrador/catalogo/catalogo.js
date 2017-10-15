@@ -9,7 +9,7 @@ $(document).ready(function () {
         for (i = 0; i < display.length; i++) {
             proPre.push({
                 producto: display[i].id.split('_')[1],
-                precio: display[i].val()
+                precio: display[i].value
             });
         }
 
