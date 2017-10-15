@@ -7,7 +7,7 @@ from django.db.models import Sum, Min, Max
 from django.shortcuts import render, render_to_response, redirect
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta
+    Productor, Oferta, Cooperativa
 from Administrador.utils import catalogo_actual
 
 
@@ -59,9 +59,12 @@ class CatalogoView(View):
         # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
         precios_recibidos = json.loads(request.POST.get('precios_enviar'))
 
+        #Se obtiene la cooperativa
+        cooperativa = Cooperativa.objects.first()
+
         # Se crea el catalogo
         fecha_cierre = datetime.date.today() + datetime.timedelta(days=3)
-        catalogo = Catalogo.objects.create(productor_id=1, fecha_cierre=fecha_cierre)
+        catalogo = Catalogo.objects.create(fk_cooperativa=cooperativa,productor_id=1, fecha_cierre=fecha_cierre)
         catalogo.save()
 
         # Se agregan los  productos al catalogo
