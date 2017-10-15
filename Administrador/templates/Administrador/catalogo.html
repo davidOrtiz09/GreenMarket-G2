@@ -18,7 +18,7 @@
                 <table class="table table-responsive">
                     <thead>
                     <tr>
-                       <th class="text-white text-center" bgcolor="#228b22" colspan="5">
+                       <th class="text-white text-center" bgcolor="#228b22" colspan="6">
                         Catálogo
                        </th>
                     </tr>
@@ -29,7 +29,7 @@
                             <th class="text-center">Cantidad</th>
                             <th class="text-center">Precios productores</th>
                         {% endif %}
-                        <th class="text-center">Precio</th>
+                        <th class="text-center" colspan="2">Precio/Unidad</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -52,6 +52,9 @@
                                     <input type="text" id="precio_{{ item.fk_producto }}" class="form-control precio" value="{{ item.precio }}" readonly>
                                 </td>
                             {% endif %}
+                            <td>
+                                /{{ item.fk_producto__unidad_medida }}
+                            </td>
 
                         </tr>
 

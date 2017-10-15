@@ -34,7 +34,7 @@ class CatalogoView(View):
                     # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
                     ofertas_pro = Oferta_Producto \
                         .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
-                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen') \
+                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
                         .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
                                   canAceptada=Sum('cantidad_aceptada')) \
                         .distinct()
