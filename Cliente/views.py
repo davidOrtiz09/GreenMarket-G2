@@ -173,9 +173,9 @@ class RegisterClientView(View):
 
 class MisPedidosView(View):
     def get(self, request):
-        user_model = User.objects.get(username=request.user.username)
-        cliente = Cliente.objects.filter(fk_django_user_id=user_model.id)
-        pedidos_cliente = Pedido.objects.filter(fk_cliente_id=cliente.id)
+        user_model = User.objects.get(username="qwerty@m.com")
+        cliente = Cliente.objects.filter(fk_django_user=user_model)
+        pedidos_cliente = Pedido.objects.filter(fk_cliente=cliente)
         return render(request, 'Cliente/mis_pedidos.html', {
             'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
             'pedidos_por_entregar': pedidos_cliente.filter(estado__in=('PE', 'EC'))
@@ -207,8 +207,17 @@ class DoPayment(View):
             fk_cliente=cliente_model,
             fecha_pedido=datetime.now(),
             fecha_entrega=datetime.now(),
-            estado="0",
-            valor_total=0)
+            estado='PE',
+            valor_total=0,
+            nombre_envio=nombre_envio,
+            direccion_envio=direccion_envio,
+            email_envio=email_envio,
+            telefono_envio=telefono_envio,
+            observaciones_envio=observaciones_envio,
+            nombre_pago=nombre_pago,
+            tipo_identificacion=tipo_identificacion,
+            numero_identificacion=numero_identificacion
+        )
 
         pedido_model.save()
 
@@ -225,7 +234,6 @@ class DoPayment(View):
             valor_total += producto_catalogo.precio * cantidad
             cantidad_disponible=0
             while cantidad != 0:
-
                 if cantidad_disponible > cantidad:
                     oferta_producto.cantidad_vendida = cantidad
                     oferta_producto.save()
@@ -240,15 +248,11 @@ class DoPayment(View):
                         .objects.filter(fk_producto=producto_catalogo.fk_producto)\
                         .exclude(cantidad_vendida=F('cantidad_aceptada')) \
                         .order_by('precioProvedor').first()
-
                     cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
 
-
+        request.session['cart'] = ''
         pedido_model.valor_total = valor_total
         pedido_model.save()
 
-        ##Se quita la cantidad disponible en Oferta_producto
-
-
-
-        return render(request, 'Cliente/index.html', {})
+        return render(request, 'Cliente/mis_pedidos.html',
+                      {'compra':True})
