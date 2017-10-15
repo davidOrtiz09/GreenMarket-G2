@@ -33,11 +33,17 @@ function addCartDetailsListeners(){
         var informacionEnvio = getJsonInfoEnvio();
         var informacionPago = getJsonInfoPago();
 
+
         var formJson = {
             detalles_pedido: detallesPedido,
             informacion_envio: informacionEnvio,
             informacion_pago: informacionPago
         };
+        var stringPago=JSON.stringify(formJson)
+        var form=$('form#form-ckeckout');
+        var inputJson=form.find('input#json-form');
+        inputJson.val(stringPago);
+        form.submit();
     });
 }
 
@@ -169,6 +175,7 @@ function actualizarTotalPagar(){
     for(var i=0;i < productRows.length;i++){
         var row = $(productRows[i]);
         var unitPrice = row.find('input.unit-price').val();
+        console.log(row.find('input.unit-price').val())
         var quantity = row.find('input.product-quantity.cart-details').val();
         totalPagar += (unitPrice*quantity)
     }

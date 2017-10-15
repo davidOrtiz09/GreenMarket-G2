@@ -4,8 +4,9 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm
-from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido
+from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto
 from django.contrib.auth.models import User
+from datetime import datetime
 import json
 
 
@@ -136,6 +137,7 @@ class RegisterClientView(View):
             nombre = cleaned_data.get('nombre')
             apellido = cleaned_data.get('apellido')
             contrasena = cleaned_data.get('contrasena')
+
             ciudad = cleaned_data.get('ciudad')
             departamento = cleaned_data.get('departamento')
             telefono_contacto = cleaned_data.get('telefono_contacto')
@@ -143,7 +145,8 @@ class RegisterClientView(View):
             direccion = cleaned_data.get('direccion')
             numero_identificacion = cleaned_data.get('numero_identificacion')
             tipo_identificacion = cleaned_data.get('tipo_identificacion')
-
+            print contrasena
+            print correo
             user_model = User.objects.create_user(
                 username=correo,
                 password=contrasena,
@@ -176,3 +179,49 @@ class MisPedidosView(View):
             'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
             'pedidos_por_entregar': pedidos_cliente.filter(estado__in=('PE', 'EC'))
         })
+
+class DoPayment(View):
+    def get(self, request):
+        return render(request, 'Cliente/checkout/checkout.html')
+
+    def post(self, request):
+        checkout_Json=json.loads(request.POST.get('checkout_form'))
+        detalles_pedido=checkout_Json.get('detalles_pedido')
+        informacion_envio=checkout_Json.get('informacion_envio')
+        informacion_pago=checkout_Json.get('informacion_pago')
+        nombre_envio=informacion_envio.get('nombre')
+        direccion_envio=informacion_envio.get('direccion')
+        email_envio=informacion_envio.get('email')
+        celular_envio=informacion_envio.get('celular')
+        telefono_envio=informacion_envio.get('telefono')
+        observaciones_envio=informacion_envio.get('observaciones')
+        nombre_pago=informacion_pago.get('nombre_completo')
+        numero_identificacion = informacion_pago.get('numero_documento')
+        tipo_identificacion = informacion_pago.get('tipo_documento')
+
+        user_model=User.objects.get(username="qwerty@m.com")
+        cliente_model = Cliente.objects.get(fk_django_user=user_model)
+        pedido_model = Pedido(
+            fk_cliente=cliente_model,
+            fecha_pedido=datetime.now(),
+            fecha_entrega=datetime.now(),
+            estado="0",
+            valor_total=0)
+
+        pedido_model.save()
+
+        valor_total = 0
+        for item in detalles_pedido:
+            producto_catalogo = Catalogo_Producto.objects.get(id=item.get('product_id'))
+            pedido_producto_model=PedidoProducto(
+                fk_catalogo_producto=producto_catalogo,
+                fk_pedido=pedido_model,
+                cantidad=item.get('product_id')
+            )
+            pedido_producto_model.save()
+            valor_total+=producto_catalogo.precio
+
+        pedido_model.valor_total=valor_total
+        pedido_model.save()
+
+        return render(request, 'Cliente/index.html', {})

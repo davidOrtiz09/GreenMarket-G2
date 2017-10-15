@@ -8,8 +8,8 @@
                     <a href="{% url 'cliente:index' %}" class="btn btn-info">Ver más productos</a>
                 </div>
             </div>
-{#            <form method="post" id="form-ckeckout" action="{% url 'cliente:realizar-pago' %}">#}
-{#                {% csrf_token %}#}
+            <form method="post" id="form-ckeckout" action="{% url 'cliente:realizar-pago' %}">
+                {% csrf_token %}
                 <div class="row">
                     <div class="col">
                         <div id="proceso-checkout" role="tablist">
@@ -87,7 +87,7 @@
                         </div>
                        </div>
                 </div>
-{#            </form>#}
+            </form>
         </div>
     </section>
 {% endblock %}
