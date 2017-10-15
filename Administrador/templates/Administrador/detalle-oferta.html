@@ -3,6 +3,12 @@
     <section>
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Productos Ofertados </h1>
+            {% if guardado_exitoso == '1' %}
+            <div class="alert alert-success" id="success-alert">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            La oferta ha sido guardada satisfactoriamente !
+             </div>
+           {% endif %}
             <br/>
                 <br>
                 <div class="container-fluid">
@@ -52,6 +58,7 @@
                                 </td>
                                 <td class="text-center">
                                     <input type="hidden" name="id_oferta_producto" value="{{ producto.7 }}">
+                                     <input type="hidden" name="id_oferta" value="{{ id_oferta }}">
                                     <button type="submit" class="btn btn-primary">Guardar</button>
                                 </td>
                             </tr>

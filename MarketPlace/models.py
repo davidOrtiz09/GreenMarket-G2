@@ -79,7 +79,6 @@ class Producto(models.Model):
         return self.nombre
 
 
-
 @python_2_unicode_compatible
 class Oferta(models.Model):
     fk_productor = models.ForeignKey(Productor, verbose_name='Productor de la oferta', null=False, blank=False)
@@ -116,6 +115,15 @@ class Oferta_Producto(models.Model):
 
     def __str__(self):
         return '{0}'.format(self.id)
+
+    @staticmethod
+    def cargar_ofertas(id_oferta):
+        ofertas_producto = list()
+        for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
+            producto = oferta.fk_producto
+            ofertas_producto.append((producto.imagen, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
+        return ofertas_producto
 
 
 class Catalogo(models.Model):
