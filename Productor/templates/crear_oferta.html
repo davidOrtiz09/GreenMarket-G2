@@ -14,79 +14,66 @@
                     <p style="margin-bottom: 0px;">
                         Lista de Productos:
                     </p>
-                    <button type="button" class="btn btn-primary" style="float: right;">Agregar un Producto</button>
+                    <button id="agregarProducto" type="button" class="btn btn-primary" style="float: right;">Agregar un Producto</button>
                 </div>
                 <div id="tablaOferta">
                     <table class="table table-hover table-bordered">
                         <thead>
                           <tr>
-                            <th>Firstname</th>
-                            <th>Lastname</th>
-                            <th>Email</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Total Produtos</th>
+                            <th>Acciones</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <tr>
-                            <td>John</td>
-                            <td>Doe</td>
-                            <td>john@example.com</td>
-                          </tr>
-                          <tr>
-                            <td>Mary</td>
-                            <td>Moe</td>
-                            <td>mary@example.com</td>
-                          </tr>
-                          <tr>
-                            <td>July</td>
-                            <td>Dooley</td>
-                            <td>july@example.com</td>
-                          </tr>
+                        <tbody id="listaProductos">
                         </tbody>
                     </table>
                 </div>
                 <div class="botonesSuccess">
-                    <button type="button" class="btn btn-success" style="width: 145px;">Realizar la oferta</button>
+                    <button type="button" class="btn btn-success" onclick="realizarOferta();" style="width: 145px;">Realizar la oferta</button>
                 </div>
             </div>
             <div id="sectionAgregarProducto">
                 <div id="popUpAgregarProducto">
                     <div id="headerPopUp" class="seccion" style="height: 43px;">
-                        <a class="close-btn popup-close">x</a>
+                        <a id="cerrarPopUpAgregarProducto" class="close-btn popup-close">x</a>
                     </div>
 
                     <div id="seccionCategoria" class="seccionPopUp" style="height: 60px;">
                         <strong class="strongPopUp">Categoria</strong>
-                        <select class="form-control inputPopUp">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
+                        <select id="selectCategoria" class="form-control inputPopUp">
                         </select>
                     </div>
 
                     <div id="seccionProducto" class="seccionPopUp" style="height: 60px;">
                         <strong class="strongPopUp">Producto</strong>
-                        <select class="form-control inputPopUp">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
+                        <select id="selectProductos" class="form-control inputPopUp">
                         </select>
                     </div>
 
-                    <div id="seccionCantidad" class="seccionPopUp" style="height: 110px;">
+                    <div id="seccionCantidad" class="seccionPopUp" style="height: 70px;">
                         <strong class="strongPopUp">Ingresar la cantidad del producto a ofertar</strong>
                         <div class="inputPopUp">
+                            <input type="text" id="cantidadProductoOfertar" class="form-control">
+                        </div>
+                    </div>
+
+                    <div id="seccionCantidad" class="seccionPopUp" style="height: 110px;">
+                        <strong class="strongPopUp">Ingresar el precio del producto a ofertar</strong>
+                        <div class="inputPopUp">
                             <spam style="float: left;">$</spam>
-                            <input style="width: 50%; float: left; margin-left: 15%;" type="text" class="form-control">
-                            <span style="float: right;"   > /   Unidad</span>
+                            <input id="precioProductoOfertar" style="width: 50%; float: left; margin-left: 15%;" type="text" class="form-control">
+                            <span style="float: right;"   > /    <span id="campoUnidad">Unidad</span></span>
                         </div>
                     </div>
                     <div id="buttonPopUp" style="width: 100%;">
-                        <button type="button" class="btn btn-success" style="width: 145px;">Realizar la oferta</button>
+                        <button id="botonAgregarProducto" type="button" class="btn btn-success" style="width: 145px;" onclick="agregarProducto();">Agregar Producto</button>
+                        <button id="botonEditarProducto" type="button" class="btn btn-success" style="width: 145px; display: none;" >Editar Producto</button>
                     </div>
                 </div>
             </div>
         </section>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="{% static  '/js/crear-oferta.js' %}"></script>
 {% endblock %}

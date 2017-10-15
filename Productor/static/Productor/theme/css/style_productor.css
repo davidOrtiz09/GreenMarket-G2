@@ -67,12 +67,12 @@ ul.breadcrumb li a:hover {
 
 #popUpAgregarProducto{
     position: relative;
-    border-radius:3px;
+    border-radius:20px;
     background:#fff;
     text-align:center;
     width: 70%;
     margin: 50px auto;
-    height: 80%;
+    height: 400px;
 }
 
 .close-btn {
@@ -98,7 +98,6 @@ ul.breadcrumb li a:hover {
 }
 
 .seccion{
-    border-top: 1px solid #eae7e7;
     border-bottom: 1px solid #eae7e7;
     margin-bottom: 30px;
 }
@@ -121,5 +120,17 @@ ul.breadcrumb li a:hover {
 
 #buttonPopUp{
     position: absolute;
-    bottom: 30px;
+    top: 345px;
+}
+
+#cerrarPopUpAgregarProducto{
+    background: #545558 !important;
+    cursor: pointer;
+    color: #fff;
+}
+
+.botonTabla{
+    height: 27px;
+    padding: 2px 15px;
+    margin-left: 5px;
 }
