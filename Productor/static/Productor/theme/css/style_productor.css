@@ -1,0 +1,125 @@
+
+#tablaOferta{
+    width: 70%;
+    border-radius: 5px;
+    margin: 0px auto;
+    float: none;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+/* Style the list */
+ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+}
+
+/* Display list items side by side */
+ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+}
+
+/* Add a slash symbol (/) before/behind each list item */
+ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+}
+
+/* Add a color to all links inside the list */
+ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+}
+
+#headerCrearOferta{
+    margin: 40px 10% 80px 10%;
+}
+
+.botonesSuccess
+{
+    margin: 55px auto 90px auto;
+    width: 150px;
+}
+
+.btn{
+    cursor: pointer;
+}
+
+#sectionAgregarProducto{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    display: none;
+}
+
+#popUpAgregarProducto{
+    position: relative;
+    border-radius:3px;
+    background:#fff;
+    text-align:center;
+    width: 70%;
+    margin: 50px auto;
+    height: 80%;
+}
+
+.close-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    -webkit-transition: all ease 0.50s;
+    transition: all ease 0.75s;
+    border-radius: 1000px;
+    background: #1e5615;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    line-height: 160%;
+}
+
+.close-btn:hover {
+  -webkit-transform:rotate(360deg);
+  transform:rotate(360deg);
+}
+
+.seccion{
+    border-top: 1px solid #eae7e7;
+    border-bottom: 1px solid #eae7e7;
+    margin-bottom: 30px;
+}
+
+.seccionPopUp{
+    padding: 10px 10%;
+}
+
+.strongPopUp{
+    float: left;
+    max-width: 40%;
+    width: 50%;
+    text-align: left;
+}
+
+.inputPopUp{
+    float: right;
+    width: 40%;
+}
+
+#buttonPopUp{
+    position: absolute;
+    bottom: 30px;
+}
