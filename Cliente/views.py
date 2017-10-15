@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm
-from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa
+from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido
 from django.contrib.auth.models import User
 
 
@@ -155,3 +155,9 @@ class RegisterClientView(View):
             return render(request, 'Cliente/index.html', {})
         else:
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
+
+class misPedidosView(View):
+    def get(self, request):
+        user_model = User.objects.get(username=request.user.username)
+        cliente=Cliente.objects.filter(fk_django_user=user_model.id)
+        return render(request, 'Cliente/misPedidos.html', {'misPedidosEntregados': Pedido.objects.filter(fk_cliente=cliente,estado='EN'),'misPedidosPorEntregar':Pedido.objects.filter(fk_cliente=cliente, estado__in=('PE','EC')) })

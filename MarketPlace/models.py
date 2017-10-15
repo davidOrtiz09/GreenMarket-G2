@@ -189,7 +189,7 @@ class Pedido(models.Model):
         ('EN', 'ENTREGADO')
 
     )
-    fk_cliente = models.OneToOneField(Cliente, verbose_name='Cliente', null=False, blank=False)
+    fk_cliente = models.ForeignKey(Cliente, verbose_name='Cliente', null=False, blank=False)
     fecha_pedido = models.DateField(verbose_name='Fecha pedido', null=False, blank=False)
     fecha_entrega = models.DateField(verbose_name='Fecha de entrega del pedido', null=False, blank=False)
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
