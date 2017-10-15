@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
-from Cliente.forms import ClientForm
+from Cliente.forms import ClientForm, PaymentForm
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
     Oferta_Producto
 from django.contrib.auth.models import User
@@ -184,7 +184,7 @@ class MisPedidosView(View):
 
 class DoPayment(View):
     def get(self, request):
-        return render(request, 'Cliente/checkout/checkout.html')
+        return render(request, 'Cliente/checkout/checkout.html', {'form': PaymentForm()})
 
     def post(self, request):
         checkout_Json = json.loads(request.POST.get('checkout_form'))

@@ -2,7 +2,7 @@
 from django.contrib.auth.forms import forms
 from django.forms import ModelForm
 from django.contrib.auth.models import User
-from MarketPlace.models import Cliente
+from MarketPlace.models import Cliente, Pedido
 
 
 class ClientForm(ModelForm):
@@ -34,3 +34,25 @@ class ClientForm(ModelForm):
         if User.objects.filter(email=email):
             raise forms.ValidationError('Ya existe un email igual registrado.')
         return email
+
+
+class PaymentForm(ModelForm):
+    nombre = forms.CharField(max_length=150, label='Nombre')
+    email = forms.EmailField(max_length=50, label='Correo electrónico')
+    direccion = forms.CharField(max_length=150, label='Direcció de Residencia')
+    celular = forms.CharField(max_length=15, label='Celular')
+    telefono = forms.CharField(max_length=15, label='Telefono')
+    observaciones = forms.CharField(max_length=500, label='Observaciones')
+    nombre_completo = forms.CharField(max_length=150, label='Nombre')
+    tipo_documento= forms.ChoiceField(choices=Pedido._meta.get_field('tipo_identificacion').choices)
+    numero_documento=forms.CharField(max_length=20)
+
+    class Meta:
+         model = Pedido
+         fields = ['nombre', 'email', 'direccion', 'celular', 'telefono', 'observaciones', 'nombre_completo','tipo_documento','numero_documento']
+    #
+    # def clean_correo(self):
+    #     email = self.cleaned_data['email']
+    #     if User.objects.filter(email=email):
+    #         raise forms.ValidationError('Ya existe un email igual registrado.')
+    #     return email
