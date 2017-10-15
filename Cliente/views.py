@@ -160,7 +160,7 @@ class RegisterClientView(View):
 class MisPedidosView(View):
     def get(self, request):
         user_model = User.objects.get(username=request.user.username)
-        cliente = Cliente.objects.filter(fk_django_user=user_model.id)
+        cliente = Cliente.objects.filter(fk_django_user_id=user_model.id)
         pedidos_cliente = Pedido.objects.filter(fk_cliente_id=cliente.id)
         return render(request, 'Cliente/mis_pedidos.html', {
             'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
