@@ -32,7 +32,15 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        {% for item in ofertas_pro %}
+                            <tr>
+                                <td>{{ item.fk_producto__nombre }}</td>
+                                <td>{{ item.cantidad_vendida }}</td>
+                                <td>{{ item.cantidad_disponible}}</td>
+                                <td>{{ item.cantidad_aceptada }}</td>
+                                <td>{{ item.precioProvedor }} /{{ item.fk_producto__unidad_medida }}</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
