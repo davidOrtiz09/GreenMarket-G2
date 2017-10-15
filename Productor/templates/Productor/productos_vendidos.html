@@ -1,0 +1,43 @@
+{% extends 'Productor/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <link href="{% static '/theme/css/style_productor.css' %}" rel="stylesheet">
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center">
+                        <h1 class="text-center">Productos vendidos</h1>
+                        <h2>{{ subtitulo }}</h2>
+                    </div>
+
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row" id="tablaOferta" style="width: 80%">
+                <table class="table table-responsive table-bordered">
+                    <thead>
+                        <tr>
+                           <th class="text-white text-center" bgcolor="#228b22" colspan="6">
+                            Productos vendidos
+                           </th>
+                        </tr>
+                        <tr bgcolor="#dbeb887">
+                            <th class="text-center">Producto</th>
+                            <th class="text-center">Can. Vendida</th>
+                            <th class="text-center">Can. Disponible</th>
+                            <th class="text-center">Can. Total</th>
+                            <th class="text-center">Precio/Unidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </section>
+{% endblock %}

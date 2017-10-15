@@ -8,4 +8,9 @@ from django.http import JsonResponse
 
 class Index(View):
     def get(self, request):
-        return JsonResponse({'status': 'ok'})
+        return render(request, 'Productor/crear_oferta.html', {})
+
+
+class ProductosVendidosView(View):
+    def get(self, request):
+        return render(request, 'Productor/productos_vendidos.html',{})
