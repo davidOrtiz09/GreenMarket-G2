@@ -6,6 +6,7 @@ from django.contrib import messages
 from Cliente.forms import ClientForm
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido
 from django.contrib.auth.models import User
+import json
 
 
 class Index(View):
@@ -61,15 +62,19 @@ class UpdateShoppingCart(View):
         # Se retorna a la página desde el que se añadió el producto al carrito
         product_id = int(request.POST.get('product_id', '0'))
         quantity = int(request.POST.get('quantity', '0'))
-
+        product = Catalogo_Producto.objects.get(id=product_id)
         if product_id > 0 and quantity != 0:
             cart = request.session.get('cart', None)
             if not cart:
                 cart = {
                     'items': [{
                         'product_id': product_id,
-                        'quantity': quantity
-                    }]
+                        'quantity': quantity,
+                        'name': product.fk_producto.nombre,
+                        'image': product.fk_producto.imagen.url,
+                        'price': float(product.precio),
+                        'unit': product.fk_producto.unidad_medida
+                }]
                 }
             else:
                 items = cart.get('items', [])
@@ -84,13 +89,18 @@ class UpdateShoppingCart(View):
                 if not exists:
                     items.append({
                         'product_id': product_id,
-                        'quantity': quantity
+                        'quantity': quantity,
+                        'name': product.fk_producto.nombre,
+                        'image': product.fk_producto.imagen.url,
+                        'price': float(product.precio),
+                        'unit': product.fk_producto.unidad_medida
                     })
                 cart['items'] = items
 
             request.session['cart'] = cart
             messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
         return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 
 class DeleteProductFromShoppingCart(View):
