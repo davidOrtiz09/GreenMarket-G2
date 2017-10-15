@@ -156,8 +156,12 @@ class RegisterClientView(View):
         else:
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
 
-class misPedidosView(View):
+
+class MisPedidosView(View):
     def get(self, request):
         user_model = User.objects.get(username=request.user.username)
-        cliente=Cliente.objects.filter(fk_django_user=user_model.id)
-        return render(request, 'Cliente/misPedidos.html', {'misPedidosEntregados': Pedido.objects.filter(fk_cliente=cliente,estado='EN'),'misPedidosPorEntregar':Pedido.objects.filter(fk_cliente=cliente, estado__in=('PE','EC')) })
+        cliente = Cliente.objects.filter(fk_django_user=user_model.id)
+        return render(request, 'Cliente/mis_pedidos.html', {
+            'pedidos_entregados': Pedido.objects.filter(fk_cliente=cliente, estado='EN'),
+            'pedidos_por_entregar': Pedido.objects.filter(fk_cliente=cliente, estado__in=('PE', 'EC'))
+        })

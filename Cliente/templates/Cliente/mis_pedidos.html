@@ -19,16 +19,16 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for misPedidoEntregados in misPedidosEntregados %}
+                        {% for pedido in pedidos_entregados %}
                             <tr>
                                 <td class="text-center">
-                                    {{ misPedidoEntregados.id }}
+                                    {{ pedido.id }}
                                 </td>
                                 <td>
-                                    {{ misPedidoEntregados.valor_total }}
+                                    {{ pedido.valor_total }}
                                 </td>
                                 <td class="text-center">
-                                    {{ misPedidoEntregados.fecha_entrega }}
+                                    {{ pedido.fecha_entrega }}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -49,19 +49,19 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for misPedidoEntregar in misPedidosPorEntregar %}
+                        {% for pedido in pedidos_por_entregar %}
                             <tr>
                                 <td class="text-center">
-                                    {{ misPedidoEntregar.id }}
+                                    {{ pedido.id }}
                                 </td>
                                 <td>
-                                    {{ misPedidoEntregar.valor_total }}
+                                    {{ pedido.valor_total }}
                                 </td>
                                 <td class="text-center">
-                                    {{ misPedidoEntregar.fecha_pedido }}
+                                    {{ pedido.fecha_pedido }}
                                 </td>
                                 <td class="text-center">
-                                    {{ misPedidoEntregar.estado }}
+                                    {{ pedido.estado }}
                                 </td>
                             </tr>
                         {% endfor %}
