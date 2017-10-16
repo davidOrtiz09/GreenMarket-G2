@@ -1,4 +1,5 @@
 var JsonProductos = [];
+var URLDomain = "http://localhost:8000/";
 
 renderTable();
 
@@ -14,8 +15,8 @@ $('#cerrarPopUpAgregarProducto').click(function(){
 
 
 (function(){
-    $.getJSON("http://localhost:8000/productor/getCategorias/").done(function (data) {
-        $("#selectCategoria").prepend('<option disabled selected>Seleccione una categoria</option>');
+    $.getJSON(URLDomain+"productor/getCategorias/").done(function (data) {
+        $("#selectCategoria").prepend('<option disabled selected value="">Seleccione una categoria</option>');
         $.each(data.ListaCategorias,function (i,item) {
             $("#selectCategoria").append('<option value="'+item.id+'">'+item.nombre+'</option>')
         })
@@ -23,12 +24,14 @@ $('#cerrarPopUpAgregarProducto').click(function(){
 })();
 
 $('#selectCategoria').on('change', function (e) {
+    $("#sectionLoading").show();
     var valueSelected = this.value;
-    $("#selectProductos").html('<option disabled selected>Seleccione un producto</option>');
-    $.getJSON("http://localhost:8000/productor/getProductosPorCategoria/?idCategoria="+valueSelected+"").done(function (data) {
+    $("#selectProductos").html('<option disabled selected value="">Seleccione un producto</option>');
+    $.getJSON(URLDomain+"productor/getProductosPorCategoria/?idCategoria="+valueSelected+"").done(function (data) {
         $.each(data.ListaProductos,function (i,item) {
             $("#selectProductos").append('<option value="'+item.id+'" name="'+item.unidad_medida+'" >'+item.nombre+'</option>')
         })
+        $("#sectionLoading").hide();
     })
 });
 
@@ -57,6 +60,29 @@ function agregarProducto(){
     var cantidad = $("#cantidadProductoOfertar").val();
     var precio = $("#precioProductoOfertar").val();
     var unidad = $("#campoUnidad").html();
+
+    var test = categoriaSelect.val();
+
+    if (typeof categoriaSelect.val() === "undefined"  || categoriaSelect.val() == ""){
+        alert ("Es necesario seleccionar una categoria de la lista.");
+        return;
+    }
+
+    if (typeof productoSelect.val() === "undefined" || productoSelect.val() == "" ){
+        alert ("Es necesario seleccionar un producto de la lista.");
+        return;
+    }
+
+    if (cantidad=="" || isNaN(cantidad) || cantidad <= 0 ) {
+        alert ("La cantidad del producto a ofertar no puede estar vacia y debe ser un número mayor a cero.");
+        return;
+    }
+
+    if (precio == "" || isNaN(precio) || precio <= 0 ) {
+        alert ("El precio del producto a ofertar no puede estar vacio y debe ser un número mayor a cero.");
+        return;
+    }
+
     JsonProductos.push({"idProducto":productoSelect.val(),"Producto":productoSelect.html(),"Precio":precio,"TotalProductos":cantidad,"Unidad":unidad, "CategoriaId":categoriaSelect.val()});
     renderTable();
     $('#sectionAgregarProducto').toggle();
@@ -94,22 +120,43 @@ function PopUpEditarProducto(idCategoria, producto, cantidad, precio, unidad, po
 }
 
 function editarProducto(posicion){
-    JsonProductos[posicion].TotalProductos = $("#cantidadProductoOfertar").val();
-    JsonProductos[posicion].Precio = $("#precioProductoOfertar").val();
+
+    var cantidad = $("#cantidadProductoOfertar").val();
+    var precio = $("#precioProductoOfertar").val();
+
+    if (cantidad=="" || isNaN(cantidad) || cantidad <= 0 ) {
+        alert ("La cantidad del producto a ofertar no puede estar vacia y debe ser un número mayor a cero.");
+        return;
+    }
+
+    if (precio == "" || isNaN(precio) || precio <= 0 ) {
+        alert ("El precio del producto a ofertar no puede estar vacio y debe ser un número mayor a cero.");
+        return;
+    }
+    JsonProductos[posicion].TotalProductos = cantidad;
+    JsonProductos[posicion].Precio = precio;
     renderTable();
     $('#sectionAgregarProducto').toggle();
 }
 
 function realizarOferta(){
+    $("#sectionLoading").show();
+    if (JsonProductos.length == 0){
+        $("#sectionLoading").hide();
+        alert("Es necesario que al menos exista un producto en la oferta.");
+        return;
+    }
+
     $.ajax({
-            url: "http://localhost:8000/productor/agregarOfertaProductor/",
+            url: URLDomain+"productor/agregarOfertaProductor/",
             data: JSON.stringify(JsonProductos),
             type: 'POST',
             contentType: "application/json; charset=utf-8;",
             dataType: "json",
             success: function (data) {
-                alert("La oferta ha sido creada.");
-                window.location = "http://localhost:8000/productor/crear-oferta"
+                $("#sectionLoading").hide();
+                alert("La oferta ha sido creada de forma satisfactoria, el administrador revisará la solicitud.");
+                window.location = URLDomain+"productor/crear-oferta"
             }
         });
 }
