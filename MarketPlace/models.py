@@ -193,6 +193,12 @@ class Cliente(models.Model):
 
 
 class Pedido(models.Model):
+    TIPO_DOCUMENTOS = (
+        ('CC', 'Cédula de Ciudadanía'),
+        ('PA', 'Pasaporte'),
+        ('CE', 'Cédula de Extranjería'),
+        ('RC', 'Registro Civil')
+    )
     ESTADOS = (
         ('PE', 'PEDIDO'),
         ('EC', 'EN CAMINO'),
@@ -203,8 +209,17 @@ class Pedido(models.Model):
     fecha_pedido = models.DateField(verbose_name='Fecha pedido', null=False, blank=False)
     fecha_entrega = models.DateField(verbose_name='Fecha de entrega del pedido', null=False, blank=False)
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
-    valor_total = models.CharField(max_length=300, verbose_name='Valor del pedido', null=False, blank=False)
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
 
+    nombre_envio=models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
+    direccion_envio=models.CharField(max_length=150, null=False, blank=False)
+    email_envio=models.CharField(max_length=150, null=False, blank=False)
+    telefono_envio=models.CharField(max_length=150, null=False, blank=False)
+    observaciones_envio=models.CharField(max_length=150, null=False, blank=False)
+
+    nombre_pago=models.CharField(max_length=150, null=False, blank=False)
+    tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
+    numero_identificacion=models.CharField(max_length=20)
 
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)

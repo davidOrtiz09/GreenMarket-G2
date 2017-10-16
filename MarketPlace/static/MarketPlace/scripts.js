@@ -24,7 +24,7 @@ function addCartDetailsListeners(){
             actualizarTotalPagar();
         }
     });
-
+    
     /*
         Cuando le da click en pagar, se obtienen los datos de los 3 formularios, para posteriormente hacerles post
      */
@@ -45,6 +45,11 @@ function addCartDetailsListeners(){
         inputJson.val(stringPago);
         form.submit();
     });
+
+    $(document).ready(function(){
+        $("#myModal").modal('show');
+    });
+
 }
 
 /*
