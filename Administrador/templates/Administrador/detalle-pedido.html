@@ -29,7 +29,7 @@
                                 {% for detalle in detalle_pedido %}
                                     <tr>
                                         <td>
-                                            <img src="/media/{{ detalle.fk_catalogo_producto.fk_producto.imagen }}"
+                                            <img src="{{ detalle.fk_catalogo_producto.fk_producto.imagen.url }}"
                                                  class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
                                         </td>
                                         <td class="text-center">{{ detalle.fk_catalogo_producto.fk_producto.nombre }}</td>

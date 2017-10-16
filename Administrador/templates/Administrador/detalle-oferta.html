@@ -33,7 +33,7 @@
                                             {% csrf_token %}
                             <tr>
                                 <td class="text-center">
-                                    <img src="/media/{{ producto.0 }}" style="width:100px;height:100px;">
+                                    <img src="{{ producto.0.imagen.url }}" style="width:100px;height:100px;">
                                 </td>
                                 <td class="text-center">
                                     {{ producto.1 }}
