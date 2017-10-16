@@ -25,4 +25,4 @@ urlpatterns = [
     url(r'^repartidor/', include('Repartidor.urls', namespace='repartidor')),
     url(r'^marketplace', include('MarketPlace.urls', namespace='marketplace')),
     url(r'^', include('Cliente.urls', namespace='cliente')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
