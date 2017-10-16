@@ -146,8 +146,6 @@ class RegisterClientView(View):
             direccion = cleaned_data.get('direccion')
             numero_identificacion = cleaned_data.get('numero_identificacion')
             tipo_identificacion = cleaned_data.get('tipo_identificacion')
-            print contrasena
-            print correo
             user_model = User.objects.create_user(
                 username=correo,
                 password=contrasena,
