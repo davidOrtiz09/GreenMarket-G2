@@ -122,6 +122,11 @@
                                             Dirección
                                         </span>
                                         <input type="text" class="form-control" placeholder="Direccion" name="direccion">
+                                        {% if 'direccion' in form.errors %}
+                                            <div class="invalid-feedback ml-3">
+                                                {{ form.errors|get_error:'direccion' }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
