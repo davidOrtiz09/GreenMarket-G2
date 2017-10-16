@@ -171,7 +171,7 @@ class RegisterClientView(View):
 
 class MisPedidosView(View):
     def get(self, request):
-        user_model = User.objects.get(username="qwerty@m.com")
+        user_model = User.objects.get(username=request.user.username)
         cliente = Cliente.objects.filter(fk_django_user=user_model)
         pedidos_cliente = Pedido.objects.filter(fk_cliente=cliente)
         return render(request, 'Cliente/mis_pedidos.html', {
@@ -199,7 +199,7 @@ class DoPayment(View):
         numero_identificacion = informacion_pago.get('numero_documento')
         tipo_identificacion = informacion_pago.get('tipo_documento')
 
-        user_model = User.objects.get(username="qwerty@m.com")
+        user_model = User.objects.get(username=request.user.username)
         cliente_model = Cliente.objects.get(fk_django_user=user_model)
         pedido_model = Pedido(
             fk_cliente=cliente_model,
