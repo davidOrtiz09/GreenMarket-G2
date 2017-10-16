@@ -9,6 +9,7 @@ from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativ
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 
@@ -131,6 +132,7 @@ class RegisterClientView(View):
     def get(self, request):
         return render(request, 'Cliente/registrar_cliente.html', {'form': ClientForm()})
 
+    @csrf_exempt
     def post(self, request):
         form = ClientForm(request.POST)
         if form.is_valid():
