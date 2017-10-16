@@ -39,7 +39,7 @@ function addCartDetailsListeners(){
             informacion_envio: informacionEnvio,
             informacion_pago: informacionPago
         };
-        var stringPago=JSON.stringify(formJson)
+        var stringPago=JSON.stringify(formJson);
         var form=$('form#form-ckeckout');
         var inputJson=form.find('input#json-form');
         inputJson.val(stringPago);
