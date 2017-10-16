@@ -17,12 +17,12 @@
                         <div class="row">
                             <div class="col-lg-6 col-sm-12">
                                 <div class="text-center">
-                                    <img src="https://placehold.it/200x200" class="img-fluid mx-auto">
+                                    <img src="{{ cart_item.image}} class="img-fluid mx-auto">
                                 </div>
                             </div>
                             <div class="col-lg-6 col-sm-6">
-                                <h5>Producto {{ cart_item.product_id }}</h5>
-                                <p>x Kg</p>
+                                <h5>Producto {{ cart_item.name}}</h5>
+                                <p>x  {{ cart_item.unit}}</p>
                             </div>
                         </div>
                     </td>
@@ -44,13 +44,13 @@
                     </td>
                     <td class="text-center">
                         <div class="mt-2">
-                            <input class="unit-price" type="hidden" value="200000" readonly disabled>
-                            $200.000
+                            <input class="unit-price" type="hidden" value={{ cart_item.price }} readonly disabled>
+                            ${{ cart_item.price }}
                         </div>
                     </td>
                     <td class="text-center">
                         <div class="mt-2">
-                            $<span class="subtotal-producto">{{ cart_item.quantity|multiply_cop:200000 }}</span>
+                            $<span class="subtotal-producto">{{ cart_item.quantity|multiply_cop:cart_item.price }}</span>
                         </div>
                     </td>
                     <td>

@@ -8,73 +8,86 @@
                     <a href="{% url 'cliente:index' %}" class="btn btn-info">Ver más productos</a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <div id="proceso-checkout" role="tablist">
-                        <div class="card">
-                            <div class="card-header" role="tab">
-                                <a data-toggle="collapse" href="#detalles-pedido" class="btn btn-link">
-                                    <h5 class="mb-0">Detalles de tu pedido</h5>
-                                </a>
-                            </div>
+            <form method="post" id="form-ckeckout" action="{% url 'cliente:realizar-pago' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col">
+                        <div id="proceso-checkout" role="tablist">
+                            <div class="card">
+                                <div class="card-header" role="tab">
+                                    <a data-toggle="collapse" href="#detalles-pedido" class="btn btn-link">
+                                        <h5 class="mb-0">Detalles de tu pedido</h5>
+                                    </a>
+                                </div>
 
-                            <div id="detalles-pedido" class="collapse show" role="tabpanel" data-parent="#proceso-checkout">
-                                <div class="card-body">
-                                    {% include 'Cliente/checkout/_detalles-pedido.html' %}
-                                    <div class="row">
-                                        <div class="col text-right">
-                                            <a data-toggle="collapse" href="#informacion-envio" class="btn btn-outline-success">Siguiente</a>
+                                <div id="detalles-pedido" class="collapse show" role="tabpanel"
+                                     data-parent="#proceso-checkout">
+                                    <div class="card-body">
+                                        {% include 'Cliente/checkout/_detalles-pedido.html' %}
+                                        <div class="row">
+                                            <div class="col text-right">
+                                                <a data-toggle="collapse" href="#informacion-envio"
+                                                   class="btn btn-outline-success">Siguiente</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" role="tab">
+                                    <a data-toggle="collapse" href="#informacion-envio" class="btn btn-link">
+                                        <h5 class="mb-0">Información de envío</h5>
+                                    </a>
+                                </div>
+                                <div id="informacion-envio" class="collapse" role="tabpanel"
+                                     data-parent="#proceso-checkout">
+                                    <div class="card-body">
+                                        {% include 'Cliente/checkout/_informacion-envio.html' %}
+
+                                        <div class="row">
+                                            <div class="col text-left">
+                                                <a data-toggle="collapse" href="#detalles-pedido"
+                                                   class="btn btn-outline-info">Anterior</a>
+                                            </div>
+                                            <div class="col text-right">
+                                                <a data-toggle="collapse" href="#informacion-pago"
+                                                   class="btn btn-outline-success">Siguiente</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header" role="tab">
+                                    <a data-toggle="collapse" href="#informacion-pago" class="btn btn-link">
+                                        <h5 class="mb-0">Información de pago</h5>
+                                    </a>
+                                </div>
+                                <div id="informacion-pago" class="collapse" role="tabpanel"
+                                     data-parent="#proceso-checkout">
+                                    <div class="card-body">
+                                        {% include 'Cliente/checkout/_informacion-pago.html' %}
+
+                                        <div class="row">
+                                            <div class="col text-left">
+                                                <a data-toggle="collapse" href="#informacion-envio"
+                                                   class="btn btn-outline-info">Anterior</a>
+                                            </div>
+
+                                            <div class="col text-right">
+                                                <button id="pagar" class="btn btn-success"><i
+                                                        class="fa fa-money mr-2"></i> Pagar
+                                                </button>
+                                                <input name="checkout_form" id="json-form">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-header" role="tab">
-                                <a data-toggle="collapse" href="#informacion-envio" class="btn btn-link">
-                                    <h5 class="mb-0">Información de envío</h5>
-                                </a>
-                            </div>
-                            <div id="informacion-envio" class="collapse" role="tabpanel" data-parent="#proceso-checkout">
-                                <div class="card-body">
-                                    {% include 'Cliente/checkout/_informacion-envio.html' %}
-
-                                    <div class="row">
-                                        <div class="col text-left">
-                                            <a data-toggle="collapse" href="#detalles-pedido" class="btn btn-outline-info">Anterior</a>
-                                        </div>
-                                        <div class="col text-right">
-                                            <a data-toggle="collapse" href="#informacion-pago" class="btn btn-outline-success">Siguiente</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" role="tab">
-                                <a data-toggle="collapse" href="#informacion-pago" class="btn btn-link">
-                                    <h5 class="mb-0">Información de pago</h5>
-                                </a>
-                            </div>
-                            <div id="informacion-pago" class="collapse" role="tabpanel" data-parent="#proceso-checkout">
-                                <div class="card-body">
-                                    {% include 'Cliente/checkout/_informacion-pago.html' %}
-
-                                    <div class="row">
-                                        <div class="col text-left">
-                                            <a data-toggle="collapse" href="#informacion-envio" class="btn btn-outline-info">Anterior</a>
-                                        </div>
-
-                                        <div class="col text-right">
-                                            <button id="pagar" class="btn btn-success"><i class="fa fa-money mr-2"></i> Pagar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                       </div>
                 </div>
-            </div>
+            </form>
         </div>
     </section>
 {% endblock %}

@@ -1,13 +1,30 @@
 {% extends 'MarketPlace/_common/base.html' %}
 {% block main %}
     <section>
+        {% if compra %}
+            <div id="myModal" class="modal fade bootstrap-dialog type-warning size-normal in">
+            <div class="modal-dialog type-danger">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Green Markey</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tu compra fue exitosa</p>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Mis Pedidos </h1>
             <br/>
             <form>
                 <br>
                 <div class="container-fluid">
-                    <table id="misPedidosTableEntregados" class="table dataTable" cellspacing="2" width="100%" border="1"
+                    <table id="misPedidosTableEntregados" class="table dataTable" cellspacing="2" width="100%"
+                           border="1"
                            align="center">
                         <thead>
                         <br/>
@@ -36,7 +53,8 @@
                     </table>
                 </div>
                 <div>
-                    <table id="misPedidosTablePorEntregar" class="table dataTable" cellspacing="2" width="100%" border="1"
+                    <table id="misPedidosTablePorEntregar" class="table dataTable" cellspacing="2" width="100%"
+                           border="1"
                            align="center">
                         <thead>
                         <br/>
