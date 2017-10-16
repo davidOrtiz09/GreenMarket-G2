@@ -24,10 +24,13 @@ def multiply_cop(value, arg):
 # Cuenta los items del carrito
 @register.filter(name='count_cart_products')
 def count_cart_products(request):
-    cart = request.session.get('cart', None)
-    response = 0
-    if cart:
-        items = cart.get('items', [])
-        for item in items:
-            response += item['quantity']
-    return response
+    try:
+        cart = request.session.get('cart', None)
+        response = 0
+        if cart:
+            items = cart.get('items', [])
+            for item in items:
+                response += item['quantity']
+        return response
+    except:
+        return 0
