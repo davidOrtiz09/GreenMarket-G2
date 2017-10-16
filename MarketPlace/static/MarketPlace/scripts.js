@@ -20,7 +20,7 @@ function addCartDetailsListeners(){
             var row = $(this).parent().parent().parent();
             var unitPrice = row.find('input.unit-price').val();
             var subtotal = row.find('span.subtotal-producto');
-            subtotal.html(toCop(quantity*unitPrice));
+            subtotal.html(toCop(quantity*unitPrice.split(',')[0]));
             actualizarTotalPagar();
         }
     });
@@ -180,7 +180,6 @@ function actualizarTotalPagar(){
     for(var i=0;i < productRows.length;i++){
         var row = $(productRows[i]);
         var unitPrice = parseFloat(row.find('input.unit-price').val());
-        console.log(row.find('input.unit-price').val())
         var quantity = row.find('input.product-quantity.cart-details').val();
         totalPagar += (unitPrice*quantity)
     }
