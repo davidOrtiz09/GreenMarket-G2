@@ -10,7 +10,7 @@
             <ul class="navbar-nav ml-auto">
                 {% url 'productor:index' as url_index %}
                 <li {% if request.path == url_index %}class="active"{% endif %}>
-                    <a class="nav-link" href="{{ url_index }}">Realizar Oferta</a>
+                    <a class="nav-link" href="{{ url_index }}">Realizar oferta semanal</a>
                 </li>
                 {% url 'productor:productos-vendidos' as url_productos_vendidos %}
                 <li {% if request.path == url_productos_vendidos %}class="active"{% endif %}>
