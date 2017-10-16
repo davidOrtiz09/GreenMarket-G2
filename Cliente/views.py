@@ -127,7 +127,6 @@ class DeleteProductFromShoppingCart(View):
                 request.session['cart'] = cart
         return redirect(reverse('cliente:checkout'))
 
-
 @csrf_exempt
 def register_client(request):
     if request.method == 'GET':
@@ -168,6 +167,17 @@ def register_client(request):
             return render(request, 'Cliente/index.html', {})
         else:
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
+
+
+class MisPedidosView(View):
+    def get(self, request):
+        user_model = User.objects.get(username=request.user.username)
+        cliente = Cliente.objects.filter(fk_django_user=user_model)
+        pedidos_cliente = Pedido.objects.filter(fk_cliente=cliente)
+        return render(request, 'Cliente/mis_pedidos.html', {
+            'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
+            'pedidos_por_entregar': pedidos_cliente.filter(estado__in=('PE', 'EC'))
+        })
 
 
 class DoPayment(View):
