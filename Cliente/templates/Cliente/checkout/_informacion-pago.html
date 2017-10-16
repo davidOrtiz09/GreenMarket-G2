@@ -15,8 +15,10 @@
                 Tipo de documento
             </span>
             <select name="tipo-documento" class="form-control" required>
-                <option selected>Cédula de ciudadanía</option>
-                <option>Cédula de extranjería</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="PA">Pasaporte</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="RC">Registro Civil</option>
             </select>
         </div>
     </div>
@@ -26,7 +28,8 @@
                 <i class="fa fa-credit-card mr-2" aria-hidden="true"></i>
                 Número de documento
             </span>
-            <input name="numero-documento" type="text" class="form-control" placeholder="Número de documento *" required>
+            <input name="numero-documento" type="text" class="form-control" placeholder="Número de documento *"
+                   required>
         </div>
     </div>
 </div>
