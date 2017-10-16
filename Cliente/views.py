@@ -201,7 +201,7 @@ class DoPayment(View):
         numero_identificacion = informacion_pago.get('numero_documento')
         tipo_identificacion = informacion_pago.get('tipo_documento')
 
-        user_model = User.objects.get(username=request.user.username)
+        user_model = User.objects.first()
         cliente_model = Cliente.objects.get(fk_django_user=user_model)
         pedido_model = Pedido(
             fk_cliente=cliente_model,
@@ -250,7 +250,6 @@ class DoPayment(View):
                         .order_by('precioProvedor').first()
                     cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
 
-        request.session['cart'] = ''
         pedido_model.valor_total = valor_total
         pedido_model.save()
 
