@@ -127,6 +127,7 @@ class DeleteProductFromShoppingCart(View):
                 request.session['cart'] = cart
         return redirect(reverse('cliente:checkout'))
 
+
 @csrf_exempt
 def register_client(request):
     if request.method == 'GET':

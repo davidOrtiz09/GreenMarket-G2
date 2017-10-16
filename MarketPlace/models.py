@@ -122,7 +122,7 @@ class Oferta_Producto(models.Model):
         ofertas_producto = list()
         for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
             producto = oferta.fk_producto
-            ofertas_producto.append((producto.imagen, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+            ofertas_producto.append((producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
                                      oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
         return ofertas_producto
 
