@@ -24,7 +24,7 @@ class ProductosVendidosView(View):
         dia_semana = datetime.date.today().weekday()
 
         # Si el dia esta entre el jueves y el domingo.
-        if (dia_semana >= 3):
+        if dia_semana >= 3:
             dias_restar = dia_semana -3
         else:
             dias_restar = dia_semana + 4
@@ -56,7 +56,7 @@ def crear_oferta(request):
     context = {
         'form': 'form'
     }
-    return render(request, 'crear_oferta.html', context)
+    return render(request, 'Productor/crear_oferta.html', context)
 
 
 @csrf_exempt

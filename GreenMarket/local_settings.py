@@ -2,8 +2,7 @@
 import os
 import dj_database_url
 
-# Please change this value when deploying to heroku
-
+# Ya no es necesario cambiar esto
 if os.environ.get('is_deployed', 'False') == 'True':
     DATABASE_DICT = dj_database_url.config(default=os.environ.get('DATABASE_URL', ''))
 else:
@@ -15,6 +14,6 @@ else:
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'TEST': {
-        'NAME': 'test_green_market',
+            'NAME': 'test_green_market',
         }
     }
