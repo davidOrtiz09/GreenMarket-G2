@@ -76,7 +76,7 @@ class UpdateShoppingCart(View):
                         'quantity': quantity,
                         'name': product.fk_producto.nombre,
                         'image': product.fk_producto.imagen.url,
-                        'price': product.precio,
+                        'price': float(product.precio),
                         'unit': product.fk_producto.unidad_medida
                     }]
                 }
@@ -96,7 +96,7 @@ class UpdateShoppingCart(View):
                         'quantity': quantity,
                         'name': product.fk_producto.nombre,
                         'image': product.fk_producto.imagen.url,
-                        'price': product.precio,
+                        'price': float(product.precio),
                         'unit': product.fk_producto.unidad_medida
                     })
                 cart['items'] = items
