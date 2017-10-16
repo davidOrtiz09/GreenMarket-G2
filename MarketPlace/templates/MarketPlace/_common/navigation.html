@@ -9,11 +9,11 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="{% url 'cliente:index' %}">Home</a>
                 </li>
 
-                <li>
-                    <a href="{% url 'cliente:registrar-cliente' %}">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'cliente:registrar-cliente' %}">
                         Regístrate
                     </a>
                 <li>
