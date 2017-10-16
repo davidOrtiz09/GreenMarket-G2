@@ -230,20 +230,20 @@ class DoPayment(View):
             )
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
-            cantidad_disponible=0
+            cantidad_disponible = 0
             while cantidad != 0:
                 if cantidad_disponible > cantidad:
                     oferta_producto.cantidad_vendida = cantidad
                     oferta_producto.save()
-                    cantidad=0;
+                    cantidad = 0
 
                 elif cantidad_disponible > 0:
                     oferta_producto.cantidad_vendida = oferta_producto.cantidad_aceptada
                     oferta_producto.save()
-                    cantidad=cantidad-cantidad_disponible
+                    cantidad = cantidad - cantidad_disponible
                 else:
                     oferta_producto = Oferta_Producto \
-                        .objects.filter(fk_producto=producto_catalogo.fk_producto)\
+                        .objects.filter(fk_producto=producto_catalogo.fk_producto) \
                         .exclude(cantidad_vendida=F('cantidad_aceptada')) \
                         .order_by('precioProvedor').first()
                     cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
@@ -253,4 +253,4 @@ class DoPayment(View):
         pedido_model.save()
 
         return render(request, 'Cliente/mis_pedidos.html',
-                      {'compra':True})
+                      {'compra': True})
