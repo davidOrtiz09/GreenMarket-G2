@@ -1,4 +1,5 @@
 var JsonProductos = [];
+var URLDomain = "http://localhost:8000/";
 
 renderTable();
 
@@ -14,7 +15,7 @@ $('#cerrarPopUpAgregarProducto').click(function(){
 
 
 (function(){
-    $.getJSON("http://localhost:8000/productor/getCategorias/").done(function (data) {
+    $.getJSON(URLDomain+"productor/getCategorias/").done(function (data) {
         $("#selectCategoria").prepend('<option disabled selected value="">Seleccione una categoria</option>');
         $.each(data.ListaCategorias,function (i,item) {
             $("#selectCategoria").append('<option value="'+item.id+'">'+item.nombre+'</option>')
@@ -26,7 +27,7 @@ $('#selectCategoria').on('change', function (e) {
     $("#sectionLoading").show();
     var valueSelected = this.value;
     $("#selectProductos").html('<option disabled selected value="">Seleccione un producto</option>');
-    $.getJSON("http://localhost:8000/productor/getProductosPorCategoria/?idCategoria="+valueSelected+"").done(function (data) {
+    $.getJSON(URLDomain+"productor/getProductosPorCategoria/?idCategoria="+valueSelected+"").done(function (data) {
         $.each(data.ListaProductos,function (i,item) {
             $("#selectProductos").append('<option value="'+item.id+'" name="'+item.unidad_medida+'" >'+item.nombre+'</option>')
         })
@@ -147,7 +148,7 @@ function realizarOferta(){
     }
 
     $.ajax({
-            url: "http://localhost:8000/productor/agregarOfertaProductor/",
+            url: URLDomain+"productor/agregarOfertaProductor/",
             data: JSON.stringify(JsonProductos),
             type: 'POST',
             contentType: "application/json; charset=utf-8;",
@@ -155,7 +156,7 @@ function realizarOferta(){
             success: function (data) {
                 $("#sectionLoading").hide();
                 alert("La oferta ha sido creada de forma satisfactoria, el administrador revisará la solicitud.");
-                window.location = "http://localhost:8000/productor/crear-oferta"
+                window.location = URLDomain+"productor/crear-oferta"
             }
         });
 }

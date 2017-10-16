@@ -23,13 +23,12 @@ def crear_oferta(request):
     return render(request, 'crear_oferta.html', context)
 
 
-@csrf_exempt
 def get_categorias_view(request):
     categorias = Categoria.objects.all().values('nombre','id')
     context = {"ListaCategorias":list(categorias)}
     return JsonResponse(context)
 
-@csrf_exempt
+
 def get_productos_por_categoria(request):
     idCategoria = request.GET['idCategoria']
     productos = Producto.objects.filter(fk_categoria_id = idCategoria).values('nombre','id','unidad_medida')
