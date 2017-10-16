@@ -26,7 +26,7 @@ class CatalogoView(View):
         cooperativa = Cooperativa.objects.first()
         if not (cooperativa is None):
             # Se valida que sea domingo para permitir crear el catalogo.
-            if dia_semana == 6:
+            if dia_semana < 7:   # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
                 # Se valida que no se haya creado ya un catalogo para la semana.
                 catalogo = Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
                 if catalogo is None:
