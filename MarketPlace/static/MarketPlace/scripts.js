@@ -179,7 +179,7 @@ function actualizarTotalPagar(){
     var totalPagar = 0;
     for(var i=0;i < productRows.length;i++){
         var row = $(productRows[i]);
-        var unitPrice = row.find('input.unit-price').val();
+        var unitPrice = parseFloat(row.find('input.unit-price').val());
         console.log(row.find('input.unit-price').val())
         var quantity = row.find('input.product-quantity.cart-details').val();
         totalPagar += (unitPrice*quantity)
