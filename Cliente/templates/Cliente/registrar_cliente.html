@@ -168,7 +168,7 @@
                                          <input type="password" class="form-control {% if 'contrasena2' in form.errors %}is-invalid{% endif %}" placeholder="Repetir Contraseña" name="contrasena2">
                                         {% if 'contrasena2' in form.errors %}
                                             <div class="invalid-feedback ml-3">
-                                                {{ form.errors|get_error:'correo' }}
+                                                {{ form.errors|get_error:'contrasena2' }}
                                             </div>
                                         {% endif %}
                                     </div>
