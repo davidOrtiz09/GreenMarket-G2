@@ -5,7 +5,7 @@ from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto
+    Oferta_Producto, Catalogo
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -16,8 +16,9 @@ import json
 class Index(View):
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
+        catalogo=Catalogo.objects.last()
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first()) \
+            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
