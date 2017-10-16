@@ -30,6 +30,12 @@
                         <i class="icon-list"></i> <span>Pedidos</span>
                     </a>
                 </li>
+            {% url 'administrador:ofertas' as url_ofertas %}
+                <li {% if request.path == url_ofertas %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:ofertas' %}">
+                        <i class="icon-list"></i> <span>Ofertas</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
