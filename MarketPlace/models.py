@@ -56,6 +56,7 @@ class Categoria(models.Model):
         return self.nombre
 
 
+
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
         ('Kg', 'Kilogramos'),

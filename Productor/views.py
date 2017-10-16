@@ -2,13 +2,15 @@
 from __future__ import unicode_literals
 
 import datetime
-
+import json
 from django.db.models.expressions import ExpressionWrapper, F
 from django.shortcuts import render
 from django.views import View
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa
+    Productor, Oferta, Cooperativa, Categoria
 
 
 class Index(View):
@@ -48,3 +50,41 @@ class ProductosVendidosView(View):
 
         return render(request, 'Productor/productos_vendidos.html'
                       ,{'ofertas_pro':ofertas_pro, 'hay_ofertas':hay_ofertas, 'subtitulo':subtitulo})
+
+
+def crear_oferta(request):
+    context = {
+        'form': 'form'
+    }
+    return render(request, 'crear_oferta.html', context)
+
+
+@csrf_exempt
+def get_categorias_view(request):
+    categorias = Categoria.objects.all().values('nombre','id')
+    context = {"ListaCategorias":list(categorias)}
+    return JsonResponse(context)
+
+@csrf_exempt
+def get_productos_por_categoria(request):
+    idCategoria = request.GET['idCategoria']
+    productos = Producto.objects.filter(fk_categoria_id = idCategoria).values('nombre','id','unidad_medida')
+    context = {"ListaProductos":list(productos)}
+    return JsonResponse(context)
+
+@csrf_exempt
+def agregar_oferta_productor(request):
+    context = {}
+    if request.method == 'POST':
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        productor = Productor.objects.all().first()
+        oferta = Oferta(fk_productor = productor)
+        oferta.save()
+        for producto in  body:
+            productoObjeto = Producto.objects.filter(id=producto["idProducto"]).first()
+            ofertaProducto = Oferta_Producto(fk_oferta = oferta, fk_producto = productoObjeto,
+                                             cantidad_ofertada = producto["TotalProductos"], precioProvedor = producto["Precio"])
+            ofertaProducto.save()
+        context = {"Mensaje":"Finalizó con exito"}
+    return JsonResponse(context)
