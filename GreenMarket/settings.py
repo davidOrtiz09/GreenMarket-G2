@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
     'Administrador',
     'Cliente',
     'Productor',
@@ -125,7 +126,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
@@ -139,7 +139,6 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert alert-info',
@@ -148,3 +147,9 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert alert-warning',
     messages.ERROR: 'alert alert-danger',
 }
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+AWS_S3_ACCESS_KEY_ID = 'AKIAJ6AF3NCNF5457AIQ'
+AWS_S3_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'green-market'
