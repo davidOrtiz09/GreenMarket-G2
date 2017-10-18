@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 import json
 
 
@@ -129,11 +130,12 @@ class DeleteProductFromShoppingCart(View):
         return redirect(reverse('cliente:checkout'))
 
 
-@csrf_exempt
-def register_client(request):
-    if request.method == 'GET':
+@method_decorator(csrf_exempt, name='dispatch')
+class RegisterClientView(View):
+    def get(self, request):
         return render(request, 'Cliente/registrar_cliente.html', {'form': ClientForm()})
-    else:
+
+    def post(self, request):
         form = ClientForm(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
@@ -182,6 +184,7 @@ class MisPedidosView(View):
         })
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DoPayment(View):
     def get(self, request):
         return render(request, 'Cliente/checkout/checkout.html', {'form': PaymentForm()})
