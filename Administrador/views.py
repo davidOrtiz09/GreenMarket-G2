@@ -28,7 +28,7 @@ class CatalogoView(View):
             # Se valida que sea domingo para permitir crear el catalogo.
             if dia_semana < 7:   # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
                 # Se valida que no se haya creado ya un catalogo para la semana.
-                catalogo = None  # Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
+                catalogo = Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
                 if catalogo is None:
                     # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
                     # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
