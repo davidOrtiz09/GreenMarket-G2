@@ -1,7 +1,7 @@
 {% extends 'MarketPlace/_common/base.html' %}
 {% block main %}
     <section>
-              {% if compra %}
+        {% if compra %}
             <div id="myModal" class="modal fade bootstrap-dialog type-warning in">
                 <div class="modal-dialog type-danger modal-lg">
                     <div class="modal-content">
@@ -16,7 +16,8 @@
                         </div>
                         <div class="modal-body">
 
-                            <p><h3 class="text-center">Tu compra fue Exitosa</h3></p>
+                            <p>
+                            <h3 class="text-center">Tu compra fue Exitosa</h3></p>
                             <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
                         </div>
                     </div>
