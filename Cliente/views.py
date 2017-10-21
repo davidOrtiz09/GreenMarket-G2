@@ -204,8 +204,8 @@ class DoPayment(View):
         numero_identificacion = informacion_pago.get('numero_documento')
         tipo_identificacion = informacion_pago.get('tipo_documento')
 
-        user_model = User.objects.first()
-        cliente_model = Cliente.objects.get(fk_django_user=user_model)
+        # user_model = User.objects.first() #TODO La consulta del usuario se haría con request.user
+        cliente_model = Cliente.objects.first()
         pedido_model = Pedido(
             fk_cliente=cliente_model,
             fecha_pedido=datetime.now(),
