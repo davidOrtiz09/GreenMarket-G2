@@ -228,3 +228,17 @@ class PedidoProducto(models.Model):
                                              verbose_name='CatalogoProducto', null=False, blank=False)
 
 
+
+class Orden_Compra(models.Model):
+    ESTADOS = (
+        ('PP', 'Por Pagar'),
+        ('PA', 'Pagado'),
+        ('AC', 'Activo'),
+        ('CA', 'Cancelado')
+
+    )
+    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False)
+    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False)
+    fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
+    estado = models.CharField(max_length=2, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
+
