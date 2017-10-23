@@ -47,6 +47,23 @@ class Productor(models.Model):
         return self.nombre
 
 
+
+class Orden_Compra(models.Model):
+    ESTADOS = (
+        ('PP', 'Por Pagar'),
+        ('PA', 'Pagado'),
+        ('AC', 'Activo'),
+        ('CA', 'Cancelado')
+
+    )
+    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False)
+    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False)
+    fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
+    estado = models.CharField(max_length=2, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
+
+
+
+
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     descripcion = models.TextField(max_length=300, verbose_name='Descripción', null=False, blank=False)
@@ -98,6 +115,7 @@ class Oferta(models.Model):
 class Oferta_Producto(models.Model):
     fk_oferta = models.ForeignKey(Oferta, verbose_name='Oferta del Producto', null=False, blank=False)
     fk_producto = models.ForeignKey(Producto, verbose_name='Producto', null=False, blank=False)
+    fk_orden_compra = models.ForeignKey(Orden_Compra, verbose_name='Orden de Compra', null=True, blank=True)
     cantidad_ofertada = models.PositiveIntegerField(verbose_name='Cantidad ofertada del producto', null=False,
                                                     blank=False)
     cantidad_aceptada = models.PositiveIntegerField(verbose_name='Cantidad aceptada del producto', null=True,
@@ -227,18 +245,4 @@ class PedidoProducto(models.Model):
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
 
-
-
-class Orden_Compra(models.Model):
-    ESTADOS = (
-        ('PP', 'Por Pagar'),
-        ('PA', 'Pagado'),
-        ('AC', 'Activo'),
-        ('CA', 'Cancelado')
-
-    )
-    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False)
-    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False)
-    fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
-    estado = models.CharField(max_length=2, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
 
