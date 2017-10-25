@@ -19,7 +19,7 @@ class Index(View):
         cooperativas = Cooperativa.objects.all()
         catalogo=Catalogo.objects.last()
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
+            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
@@ -33,7 +33,7 @@ class Index(View):
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_cooperativa__id=cooperativa_id) \
+            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
             .order_by(ordenar_por)
         categorias = Categoria.objects.all()
         cooperativas = Cooperativa.objects.all()
