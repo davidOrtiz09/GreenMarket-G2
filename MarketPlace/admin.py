@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from MarketPlace.models import Categoria, Producto, Oferta, Oferta_Producto, Cooperativa, Productor, Pedido, Cliente, \
-    Catalogo, Catalogo_Producto, PedidoProducto
+    Catalogo, Catalogo_Producto, PedidoProducto, Semana
 
 
 class CategoriaAdmin(admin.ModelAdmin):
@@ -40,6 +40,11 @@ class ProductorAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'nombre')
     search_fields = ('nombre',)
 
+class SemanaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'fecha_inicio', 'fecha_fin', 'fk_cooperativa')
+    list_display_links = ('id',)
+    search_fields = ('id', 'fk_cooperativa',)
+
 
 admin.site.register(Categoria, CategoriaAdmin)
 admin.site.register(Producto, ProductoAdmin)
@@ -52,3 +57,4 @@ admin.site.register(Cliente)
 admin.site.register(Catalogo)
 admin.site.register(Catalogo_Producto)
 admin.site.register(PedidoProducto)
+admin.site.register(Semana, SemanaAdmin)
