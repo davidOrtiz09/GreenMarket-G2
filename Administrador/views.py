@@ -7,7 +7,7 @@ from django.db.models import Sum, Min, Max
 from django.shortcuts import render, render_to_response, redirect
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa
+    Productor, Oferta, Cooperativa, Cliente
 from Administrador.utils import catalogo_actual
 
 
@@ -166,3 +166,8 @@ class RealizarOfertaView(View):
         oferta_producto.cantidad_aceptada = cantidad_aceptada
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
+
+class ClientesView(View):
+    def get(self, request):
+
+        return render(request, 'Administrador/clientes.html', {'clientes':Cliente.objects.all()})

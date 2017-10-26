@@ -1,0 +1,55 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center">
+                        <h1 class="text-center">Clientes</h1>
+                        <h2>{{ subtitulo }}</h2>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <table class="table table-responsive">
+                    <thead>
+                    <tr>
+                       <th class="text-white text-center" bgcolor="#228b22" colspan="6">
+                        Clientes
+                       </th>
+                    </tr>
+                    <tr bgcolor="#dbeb887">
+                        <th class="text-center">Cliente ID</th>
+                        <th class="text-center">Nombre</th>
+                        <th class="text-center">Correo</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in clientes %}
+                        <tr>
+                            <td>
+                                {{ item.fk_django_user_id }}
+                            </td>
+                            <td>
+                                {{ item.fk_django_user.first_name }}
+                            </td>
+                            <td>
+                                {{ item.fk_django_user.email }}
+                            </td>
+                            <td>
+                                <a href="{% url 'administrador:index' %}" class="btn btn-secondary">Ver Perfil</a>
+                                <a href="{% url 'administrador:index' %}" class="btn btn-primary">Ver Historial</a>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}

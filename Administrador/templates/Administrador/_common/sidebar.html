@@ -36,6 +36,12 @@
                         <i class="icon-list"></i> <span>Ofertas</span>
                     </a>
                 </li>
+                {% url 'administrador:clientes' as url_clientes %}
+                <li {% if request.path == url_clientes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:clientes' %}">
+                        <i class="icon-user"></i> <span>Clientes</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
