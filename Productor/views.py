@@ -3,14 +3,42 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-from django.db.models.expressions import ExpressionWrapper, F
-from django.shortcuts import render
+from django.db.models.expressions import F
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
-from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Categoria
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from MarketPlace.models import Oferta_Producto, Producto, Productor, Oferta, Categoria
+
+
+class Ingresar(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('productor:index'))
+        else:
+            return render(request, 'Productor/ingresar.html', {})
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('productor:index'))
+        else:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect(reverse('productor:index'))
+            else:
+                messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
+                return render(request, 'Productor/ingresar.html', {})
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect(reverse('productor:ingresar'))
 
 
 class Index(View):

@@ -10,7 +10,7 @@ from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, Pedi
     Productor, Oferta, Cooperativa
 from Administrador.utils import catalogo_actual
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, login
 
 
 class Ingresar(View):
@@ -28,6 +28,7 @@ class Ingresar(View):
             password = request.POST.get('password', '')
             user = authenticate(username=username, password=password)
             if user is not None:
+                login(request, user)
                 return redirect(reverse('administrador:index'))
             else:
                 messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
