@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^terminar-oferta$', views.RealizarOfertaView.as_view(), name='terminar-oferta'),
     # (?P<username>\w+) para recepcionar parametros desde el formulario d= digitos y w= string, el + signfica que se
     # esperan una o mas
+    url(r'^mejoresProductos', views.mejoresProductos.as_view(), name='mejoresProductos'),
 ]
