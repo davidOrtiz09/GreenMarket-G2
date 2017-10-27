@@ -55,15 +55,17 @@ class CatalogoView(View):
         cooperativa = Cooperativa.objects.first()
         if not (cooperativa is None):
             # Se valida que sea domingo para permitir crear el catalogo.
-            if dia_semana < 7:   # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
+            if dia_semana < 7:  # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
                 # Se valida que no se haya creado ya un catalogo para la semana.
                 catalogo = Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
                 if catalogo is None:
                     # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
                     # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
                     ofertas_pro = Oferta_Producto \
-                        .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
-                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
+                        .objects.filter(estado=1,
+                                        fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
+                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen',
+                                'fk_producto__unidad_medida') \
                         .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
                                   canAceptada=Sum('cantidad_aceptada')) \
                         .distinct()
@@ -83,7 +85,7 @@ class CatalogoView(View):
                 # Si no es domingo se muestra el ultimo catalogo que se haya creado.
                 info_catalogo = catalogo_actual()
         else:
-            info_catalogo.update({'ofertas_pro':[], 'subtitulo': 'No hay cooperativas registradas en el sistema!'})
+            info_catalogo.update({'ofertas_pro': [], 'subtitulo': 'No hay cooperativas registradas en el sistema!'})
 
         return render(request, 'Administrador/catalogo.html',
                       {'ofertas_pro': info_catalogo['ofertas_pro'],
@@ -195,3 +197,8 @@ class RealizarOfertaView(View):
         oferta_producto.cantidad_aceptada = cantidad_aceptada
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
+
+
+class Informes(View):
+    def get(self, request):
+        return render(request, 'Administrador/Informes/index.html', {})
