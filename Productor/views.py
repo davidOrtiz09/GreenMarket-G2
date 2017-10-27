@@ -11,6 +11,19 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from MarketPlace.models import Oferta_Producto, Producto, Productor, Oferta, Categoria
+from MarketPlace.utils import es_productor, redirect_user_to_home
+from django.utils.decorators import method_decorator
+
+
+class AbstractProductorLoggedView(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if es_productor(self.request.user):
+                return super(AbstractProductorLoggedView, self).dispatch(*args, **kwargs)
+            else:
+                return redirect_user_to_home(self.request)
+        else:
+            return redirect(reverse('productor:ingresar'))
 
 
 class Ingresar(View):
@@ -41,12 +54,14 @@ class Logout(View):
         return redirect(reverse('productor:ingresar'))
 
 
-class Index(View):
+class Index(AbstractProductorLoggedView):
+
     def get(self, request):
         return render(request, 'Productor/crear_oferta.html', {})
 
 
-class ProductosVendidosView(View):
+class ProductosVendidosView(AbstractProductorLoggedView):
+
     def get(self, request):
 
         dia_semana = datetime.date.today().weekday()
@@ -80,38 +95,43 @@ class ProductosVendidosView(View):
                       ,{'ofertas_pro':ofertas_pro, 'hay_ofertas':hay_ofertas, 'subtitulo':subtitulo})
 
 
-def crear_oferta(request):
-    context = {
-        'form': 'form'
-    }
-    return render(request, 'Productor/crear_oferta.html', context)
+class CrearOferta(AbstractProductorLoggedView):
+    def get(self, request):
+        context = {
+            'form': 'form'
+        }
+        return render(request, 'Productor/crear_oferta.html', context)
 
 
-def get_categorias_view(request):
-    categorias = Categoria.objects.all().values('nombre','id')
-    context = {"ListaCategorias":list(categorias)}
-    return JsonResponse(context)
+class GetCategorias(View):
+    def get(self, request):
+        categorias = Categoria.objects.all().values('nombre', 'id')
+        return JsonResponse({"ListaCategorias": list(categorias)})
 
 
-def get_productos_por_categoria(request):
-    idCategoria = request.GET['idCategoria']
-    productos = Producto.objects.filter(fk_categoria_id = idCategoria).values('nombre','id','unidad_medida')
-    context = {"ListaProductos":list(productos)}
-    return JsonResponse(context)
+class GetProductorPorCategoria(View):
+    def get(self, request):
+        idCategoria = request.GET['idCategoria']
+        productos = Producto.objects.filter(fk_categoria_id=idCategoria).values('nombre', 'id', 'unidad_medida')
+        return JsonResponse({"ListaProductos": list(productos)})
 
-@csrf_exempt
-def agregar_oferta_productor(request):
-    context = {}
-    if request.method == 'POST':
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AgregarOferta(AbstractProductorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-        productor = Productor.objects.all().first()
-        oferta = Oferta(fk_productor = productor)
+        productor = Productor.objects.filter(fk_django_user_id=request.user.id).first()
+        oferta = Oferta(fk_productor=productor)
         oferta.save()
-        for producto in  body:
+        for producto in body:
             productoObjeto = Producto.objects.filter(id=producto["idProducto"]).first()
-            ofertaProducto = Oferta_Producto(fk_oferta = oferta, fk_producto = productoObjeto,
-                                             cantidad_ofertada = producto["TotalProductos"], precioProvedor = producto["Precio"])
+            ofertaProducto = Oferta_Producto(fk_oferta=oferta, fk_producto=productoObjeto,
+                                             cantidad_ofertada=producto["TotalProductos"],
+                                             precioProvedor=producto["Precio"])
             ofertaProducto.save()
-        context = {"Mensaje":"Finalizó con exito"}
-    return JsonResponse(context)
+
+        return JsonResponse({"Mensaje": "Finalizó con exito"})
