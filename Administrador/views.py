@@ -4,11 +4,40 @@ from __future__ import unicode_literals
 import datetime
 import json
 from django.db.models import Sum, Min, Max
-from django.shortcuts import render, render_to_response, redirect
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa
 from Administrador.utils import catalogo_actual
+from django.contrib import messages
+from django.contrib.auth import authenticate, logout
+
+
+class Ingresar(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('administrador:index'))
+        else:
+            return render(request, 'Administrador/ingresar.html', {})
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('administrador:index'))
+        else:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                return redirect(reverse('administrador:index'))
+            else:
+                messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
+                return render(request, 'Administrador/ingresar.html', {})
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect(reverse('administrador:ingresar'))
 
 
 class Index(View):

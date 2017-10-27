@@ -44,11 +44,11 @@
                                             <i class="fa fa-building mr-2" aria-hidden="true"></i>
                                             Ciudad
                                         </span>
-                                        <select class="form-control" name="ciudad">
-                                            <option value="1">Bogota</option>
-                                            <option value="2">Tunja</option>
-                                            <option value="3">Bucaramanga</option>
-                                            <option value="4">Cartagena</option>
+                                        <select class="form-control" id="ciudad_select" name="ciudad" onchange="cambiar_departamento()">
+                                            <option value="0">Seleccione una ciudad</option>
+                                          {% for ciudad in ciudades %}
+                                         <option value="{{ciudad.valor}}">{{ ciudad.nombre }}</option>
+                                        {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -60,11 +60,11 @@
                                             <i class="fa fa-map-marker mr-2" aria-hidden="true"></i>
                                             Departamento
                                         </span>
-                                        <select class="form-control" name="departamento">
-                                            <option value="1">Cundinamarca</option>
-                                            <option value="2">Boyaca</option>
-                                            <option value="3">Santander</option>
-                                            <option value="4">Bolívar</option>
+                                        <select class="form-control" id="departamento_select" name="departamento" onchange="cambiar_ciudad()">
+                                            <option value="0">Seleccione un departamento</option>
+                                            {% for departamento in departamentos %}
+                                            <option value="{{departamento.valor}}">{{ departamento.nombre }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -183,6 +183,16 @@
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary">Registrarse</button>
                         </div>
+                    <script>
+                        function cambiar_ciudad(){
+                            var x = document.getElementById("departamento_select").value;
+                            document.getElementById("ciudad_select").value =  x;
+                        }
+                        function cambiar_departamento(){
+                                var x = document.getElementById("ciudad_select").value;
+                            document.getElementById("departamento_select").value =  x;
+                        }
+                    </script>
                     </form>
                 </div>
 

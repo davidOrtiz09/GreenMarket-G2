@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
+from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
     Oferta_Producto, Catalogo
 from django.contrib.auth.models import User
@@ -17,7 +18,7 @@ import json
 class Index(View):
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo=Catalogo.objects.last()
+        catalogo = Catalogo.objects.last()
         producto_catalogo = Catalogo_Producto.objects \
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
@@ -133,7 +134,10 @@ class DeleteProductFromShoppingCart(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterClientView(View):
     def get(self, request):
-        return render(request, 'Cliente/registrar_cliente.html', {'form': ClientForm()})
+        ciudades = Ciudad.get_all_ciudades()
+        departamentos = Departamento.get_all_departamentos()
+        return render(request, 'Cliente/registrar_cliente.html',
+                      {'form': ClientForm(), 'ciudades': ciudades, 'departamentos': departamentos})
 
     def post(self, request):
         form = ClientForm(request.POST)
