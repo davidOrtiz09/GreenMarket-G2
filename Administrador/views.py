@@ -171,7 +171,7 @@ class mejoresProductos(View):
     def get(self, request):
         semanasAll= Semana.objects.all()
         semanasCount=len(semanasAll)
-        semanas = []
+        semanas =[]
         if semanasCount >= 4:
             semanas.append((semanasAll[semanasCount-1]))
             semanas.append((semanasAll[semanasCount-2]))
