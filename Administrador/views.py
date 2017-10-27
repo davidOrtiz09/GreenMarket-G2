@@ -202,3 +202,8 @@ class RealizarOfertaView(View):
 class Informes(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/index.html', {})
+
+
+class InformesClientesMasRentables(View):
+    def get(self, request):
+        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
