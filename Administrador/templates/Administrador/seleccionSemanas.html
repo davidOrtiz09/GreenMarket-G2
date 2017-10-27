@@ -1,0 +1,24 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px" align="center">
+            <h1 class="text-center"> Mejores Productos </h1>
+            <br/>
+            <form method="post" action="{% url 'administrador:listarMejoresProductos' %}">
+                {% csrf_token %}
+                <div class="col-md-7 colu">
+                    <h4>Seleccione las semanas</h4>
+                    {% for semana in semanas %}
+                    <div class="funkyradio">
+                        <div class="funkyradio-success">
+                            <input id="{{ semana }}" name="semana" type="checkbox" value="{{ semana.id }}"/>
+                            <label for="{{ semana.id }}" class="label-primary">Semana {{ semana.id }} del {{ semana.fecha_inicio }} al {{ semana.fecha_fin }} </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                <input type="submit" class="btn btn-primary" value="Buscar"/>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

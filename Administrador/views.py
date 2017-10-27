@@ -167,7 +167,7 @@ class RealizarOfertaView(View):
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
-class mejoresProductos(View):
+class seleccionSemanas(View):
     def get(self, request):
         semanasAll= Semana.objects.all()
         semanasCount=len(semanasAll)
@@ -179,4 +179,10 @@ class mejoresProductos(View):
             semanas.append((semanasAll[semanasCount-4]))
         else:
             semanas=semanasAll
-        return render(request, 'Administrador/mejoresProductos.html',{'semanas':semanas})
+        return render(request, 'Administrador/seleccionSemanas.html',
+                      {'semanas':semanas})
+
+class listarMejoresProductos(View):
+    def post(self,request):
+        semanas = request.POST.getlist('semana',[])
+        return render(request, 'Administrador/mejoresProductos.html', {'semanas':semanas})
