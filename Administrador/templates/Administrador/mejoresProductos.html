@@ -7,11 +7,11 @@
             <form method="post" action="{% url 'administrador:mejoresProductos' %}">
                 {% csrf_token %}
                 <div class="col-md-7 colu">
-                    <h4>Selecciones las semanas</h4>
+                    <h4>Seleccione las semanas</h4>
                     {% for semana in semanas %}
                     <div class="funkyradio">
                         <div class="funkyradio-success">
-                            <input id="{{ semana.id }}" name="{{ semana.id }}" type="checkbox"/>
+                            <input id="{{ semana }}" name="{{ semana.id }}" type="checkbox"/>
                             <label for="{{ semana.id }}" class="label-primary">Semana {{ semana.id }} del {{ semana.fecha_inicio }} al {{ semana.fecha_fin }} </label>
                         </div>
                     </div>

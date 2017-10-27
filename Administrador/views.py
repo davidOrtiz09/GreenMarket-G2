@@ -169,5 +169,14 @@ class RealizarOfertaView(View):
 
 class mejoresProductos(View):
     def get(self, request):
-        semanas= Semana.objects.all()
+        semanasAll= Semana.objects.all()
+        semanasCount=len(semanasAll)
+        semanas = []
+        if semanasCount >= 4:
+            semanas.append((semanasAll[semanasCount-1]))
+            semanas.append((semanasAll[semanasCount-2]))
+            semanas.append((semanasAll[semanasCount-3]))
+            semanas.append((semanasAll[semanasCount-4]))
+        else:
+            semanas=semanasAll
         return render(request, 'Administrador/mejoresProductos.html',{'semanas':semanas})
