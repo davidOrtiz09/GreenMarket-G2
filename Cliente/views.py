@@ -61,6 +61,19 @@ class Logout(View):
 
 
 class Index(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            rol = 'productor' if es_productor(self.request.user) else 'administrador'
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                'Para acceder a las funcionalidades de cliente, por favor salga de su cuenta de {rol}'
+                    .format(rol=rol)
+            )
+            return redirect_user_to_home(self.request)
+        else:
+            return super(Index, self).dispatch(*args, **kwargs)
+
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
         catalogo = Catalogo.objects.last()
