@@ -3,9 +3,13 @@
     <section>
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Informes Green Market </h1>
-             <select class="form-control" name="tipo_identificacion">
+             <select class="form-control" id="tipo_informe">
                  <option value="0">Seleccione un tipo de informe</option>
                  <option value="1">Clientes Más Rentables</option>
              </select>
+            <main>
+                {% include 'Administrador/Informes/clientes_mas_rentables.html' %}
+            </main>
         </div>
+    </section>
 {% endblock %}
