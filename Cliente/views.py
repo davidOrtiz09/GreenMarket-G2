@@ -57,7 +57,7 @@ class Ingresar(View):
 class Logout(View):
     def get(self, request):
         logout(request)
-        return redirect(reverse('cliente:ingresar'))
+        return redirect(reverse('cliente:index'))
 
 
 class Index(View):
@@ -184,6 +184,12 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterClientView(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect_user_to_home(self.request)
+        else:
+            return super(RegisterClientView, self).dispatch(*args, **kwargs)
+
     def get(self, request):
         ciudades = Ciudad.get_all_ciudades()
         departamentos = Departamento.get_all_departamentos()
