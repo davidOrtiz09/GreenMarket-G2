@@ -40,7 +40,7 @@ class Ingresar(View):
             username = request.POST.get('username', '')
             password = request.POST.get('password', '')
             user = authenticate(username=username, password=password)
-            if user is not None:
+            if user is not None and es_productor(user):
                 login(request, user)
                 return redirect(reverse('productor:index'))
             else:
