@@ -11,6 +11,8 @@ urlpatterns = [
     url(r'^ofertas/(?P<id_oferta>\d+)/(?P<guardado_exitoso>\d+)$', views.DetalleOfertaView.as_view(), name='detalle-ofertas'),
     url(r'^terminar-oferta$', views.RealizarOfertaView.as_view(), name='terminar-oferta'),
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
+    url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
+    url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     # (?P<username>\w+) para recepcionar parametros desde el formulario d= digitos y w= string, el + signfica que se
     # esperan una o mas
 ]

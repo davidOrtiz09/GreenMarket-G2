@@ -32,7 +32,7 @@
                     {% for item in clientes %}
                         <tr>
                             <td>
-                                {{ item.fk_django_user_id }}
+                                {{ item.id }}
                             </td>
                             <td>
                                 {{ item.fk_django_user.first_name }}
@@ -42,7 +42,7 @@
                             </td>
                             <td class="text-center">
                                 <a href="{% url 'administrador:index' %}" class="btn btn-secondary">Ver Perfil</a>
-                                <a href="{% url 'administrador:index' %}" class="btn btn-primary">Ver Historial</a>
+                                <a href="{% url 'administrador:historial-cliente' %}/{{ item.id }}" class="btn btn-primary">Ver Historial</a>
                             </td>
                         </tr>
 
