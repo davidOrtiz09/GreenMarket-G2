@@ -1,7 +1,7 @@
 var JsonProductos = [];
 // var URLDomain = "http://localhost:8000/";
 var URLDomain = document.location.origin+"/";
-console.log(URLDomain);
+
 renderTable();
 
 $('#agregarProducto').click(function(){
