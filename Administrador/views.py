@@ -171,3 +171,10 @@ class ClientesView(View):
     def get(self, request):
 
         return render(request, 'Administrador/clientes.html', {'clientes':Cliente.objects.all()})
+
+class HistorialClienteView(View):
+    def get(self, request, id):
+
+        return render(request, 'Administrador/historial-cliente.html',
+                      {'pedidos':Pedido.objects.filter(fk_cliente_id=id).order_by('fecha_pedido').reverse(),
+                       'cliente':Cliente.objects.get(id=id)})
