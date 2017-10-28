@@ -13,7 +13,7 @@
                     <h3 class="text-secondary">Productores</h3>
                     <p>Ingresa a Green Market para que puedas realizar ofertas de tus productos y puedas ver como van tus productos esta semanana</p>
 
-                    <form action="{% url 'administrador:ingresar' %}" id="login-form" method="post">
+                    <form action="{% url 'productor:ingresar' %}" id="login-form" method="post">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="login-username" class="label-custom">Correo electrónico</label>
