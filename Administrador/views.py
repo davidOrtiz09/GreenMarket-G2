@@ -208,3 +208,8 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         oferta_producto.cantidad_aceptada = cantidad_aceptada
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
+
+
+class AdmministrarCanastas(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/canastas.html', {})
