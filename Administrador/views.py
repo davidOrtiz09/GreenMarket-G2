@@ -210,6 +210,11 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
 
-class AdmministrarCanastas(AbstractAdministradorLoggedView):
+class Canastas(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/canastas.html', {})
+
+
+class DetallesCanasta(AbstractAdministradorLoggedView):
+    def get(self, request, id_canasta):
+        return render(request, 'Administrador/detalles-canasta.html', {'canasta': id_canasta})

@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^ofertas$', views.ListarOfertasView.as_view(), name='ofertas'),
     url(r'^ofertas/(?P<id_oferta>\d+)/(?P<guardado_exitoso>\d+)$', views.DetalleOfertaView.as_view(), name='detalle-ofertas'),
     url(r'^terminar-oferta$', views.RealizarOfertaView.as_view(), name='terminar-oferta'),
-    url(r'^canastas$', views.AdmministrarCanastas.as_view(), name='canastas')
+    url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
+    url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta')
 ]
