@@ -15,3 +15,16 @@ $('.cerrarDetalle').click(function () {
     $("#detallePedido").modal('hide');
     $(".modal-backdrop").remove();
 });
+
+ $(document).ready(function(){
+        $("#sinPedido").modal('show');
+});
+
+$('.cerrarSinPedido').click(function () {
+    $("#sinPedido").modal('hide');
+    $(".modal-backdrop").remove();
+});
+
+$('#sinPedido').on('hide.bs.modal', function (e) {
+  $(location).attr('href','/administrador/clientes');
+});

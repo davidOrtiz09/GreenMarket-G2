@@ -2,29 +2,6 @@
 {% load static %}
 {% block main %}
     <section>
-        {% if compra %}
-            <div id="myModal" class="modal fade bootstrap-dialog type-warning in">
-                <div class="modal-dialog type-danger modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Green Market</h4>
-                        </div>
-                        <div id="detalles-pedido" class="collapse show" role="tabpanel"
-                             data-parent="#proceso-checkout">
-                            <div class="card-body">
-                                {% include 'Cliente/_elements/_pago-Exitoso.html' %}
-                            </div>
-                        </div>
-                        <div class="modal-body">
-
-                            <p>
-                            <h3 class="text-center">Tu compra fue Exitosa</h3></p>
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
 
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Historial Cliente: {{cliente.fk_django_user.first_name}} {{ cliente.fk_django_user.last_name }}</h1>
@@ -65,11 +42,17 @@
                     </tbody>
                 </table>
             </div>
+            <div class="container-fluid" style="width: 80%">
+                <a href="{% url 'administrador:clientes'%}" class="btn btn-primary">Volver a clientes</a>
+            </div>
         </div>
         <!-- Modal -->
         <div class="modal fade"  tabindex="-1" id="detallePedido" role="dialog">
 
         </div>
+        {% if pedidos.count == 0 %}
+            {% include 'Administrador/_elements/_modal_sin_pedidos.html'%}
+        {% endif %}
     </section>
 {% endblock %}
 
