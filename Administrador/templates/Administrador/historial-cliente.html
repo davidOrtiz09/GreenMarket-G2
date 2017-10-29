@@ -46,10 +46,12 @@
                 <a href="{% url 'administrador:clientes'%}" class="btn btn-primary">Volver a clientes</a>
             </div>
         </div>
-        <!-- Modal -->
+        <!-- Modales -->
+        <!-- Modal, aqui se cargara el modal con del detalle de un pedido-->
         <div class="modal fade"  tabindex="-1" id="detallePedido" role="dialog">
 
         </div>
+        <!-- Modal a mostar en caso de que no se encuentren pedidos para un cliente.-->
         {% if pedidos.count == 0 %}
             {% include 'Administrador/_elements/_modal_sin_pedidos.html'%}
         {% endif %}

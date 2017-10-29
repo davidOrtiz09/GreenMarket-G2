@@ -173,12 +173,14 @@ class ClientesView(View):
         return render(request, 'Administrador/clientes.html', {'clientes':Cliente.objects.all()})
 
 class HistorialClienteView(View):
+    # Retorna el template con todos los pedidos en orden descendentes pertenecientes a un cliente.
     def get(self, request, id):
 
         return render(request, 'Administrador/historial-cliente.html',
                       {'pedidos':Pedido.objects.filter(fk_cliente_id=id).order_by('fecha_pedido').reverse(),
                        'cliente':Cliente.objects.get(id=id)})
 class PedidoClienteView(View):
+    # Retorna el template con el detalle de un pedido en especifico.
     def get(self, request, id):
         return render(request, 'Administrador/_elements/_modal_pedido.html',
                       {'detallePedido':PedidoProducto.objects.filter(fk_pedido_id=id),
