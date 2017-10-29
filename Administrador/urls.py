@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),
+    url(r'^historial-cliente/pedido/(\d+)/$', views.PedidoClienteView.as_view(), name='pedido'),
     # (?P<username>\w+) para recepcionar parametros desde el formulario d= digitos y w= string, el + signfica que se
     # esperan una o mas
 ]

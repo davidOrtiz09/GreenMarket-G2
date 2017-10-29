@@ -1,4 +1,5 @@
 {% extends 'Administrador/_common/base.html' %}
+{% load static %}
 {% block main %}
     <section>
         {% if compra %}
@@ -26,11 +27,11 @@
         {% endif %}
 
         <div class="container-fluid" style="margin-top: 10px">
-            <h1 class="text-center"> Historial Cliente: {{cliente.fk_django_user.first_name}} </h1>
+            <h1 class="text-center"> Historial Cliente: {{cliente.fk_django_user.first_name}} {{ cliente.fk_django_user.last_name }}</h1>
             <br>
             <br>
             <div class="container-fluid">
-                <table id="misPedidosTableEntregados" class="table table-responsive" cellspacing="2" width="100%"
+                <table id="pedidosCliente" class="table table-responsive" cellspacing="2" style="width: 80%"
                        border="1"
                        align="center">
                     <thead>
@@ -50,14 +51,15 @@
                             <td class="text-center">
                                 {{ pedido.id }}
                             </td>
-                            <td>
+                            <td class="text-right">
                                 {{ pedido.valor_total }}
                             </td>
                             <td class="text-center">
                                 {{ pedido.fecha_pedido }}
                             </td>
                             <td class="text-center">
-                                <a href="{% url 'administrador:index' %}" class="btn btn-info">Ver</a>
+                                <button type="button" data-toggle="modal" data-target="#detallePedido">Ver Detalle</button>
+
                             </td>
                         </tr>
                     {% endfor %}
@@ -65,5 +67,56 @@
                 </table>
             </div>
         </div>
+        <!-- Modal -->
+        <button type="button" data-toggle="modal" data-target="#detallePedido">Ver Detalle</button>
+        <div class="modal fade"  tabindex="-1" id="detallePedido" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center">Producto agregado</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>El producto se agregó al carrito de compras exitosamente</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-success" data-dismiss="modal">Continuar comprando</button>
+                        <a href="#" class="btn btn-outline-primary">Ir a pagar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+              </div>
+              <div class="modal-body">
+                <p>Some text in the modal.</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
     </section>
+{% endblock %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{% static 'Administrador/historial-cliente/ver-detalle.js' %}"></script>
+
 {% endblock %}

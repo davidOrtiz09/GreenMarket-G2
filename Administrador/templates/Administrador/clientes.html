@@ -14,7 +14,7 @@
             <br>
             <br>
             <div class="container-fluid" style="width: 80%">
-                <table class="table table-responsive">
+                <table class="table table-responsive" border="1">
                     <thead>
                     <tr>
                        <th class="text-white text-center" bgcolor="#228b22" colspan="6">
@@ -31,18 +31,18 @@
                     <tbody>
                     {% for item in clientes %}
                         <tr>
-                            <td>
+                            <td class="text-center">
                                 {{ item.id }}
                             </td>
                             <td>
-                                {{ item.fk_django_user.first_name }}
+                                {{ item.fk_django_user.first_name }} {{ item.fk_django_user.last_name }}
                             </td>
                             <td>
                                 {{ item.fk_django_user.email }}
                             </td>
                             <td class="text-center">
                                 <a href="{% url 'administrador:index' %}" class="btn btn-info">Ver Perfil</a>
-                                <a href="{% url 'administrador:historial-cliente'  item.id %}" class="btn btn-primary">Ver Historial</a>
+                                <a href="{% url 'administrador:historial-cliente' item.id %}" class="btn btn-primary">Ver Historial</a>
                             </td>
                         </tr>
 

@@ -178,3 +178,6 @@ class HistorialClienteView(View):
         return render(request, 'Administrador/historial-cliente.html',
                       {'pedidos':Pedido.objects.filter(fk_cliente_id=id).order_by('fecha_pedido').reverse(),
                        'cliente':Cliente.objects.get(id=id)})
+class PedidoClienteView(View):
+    def get(self, request, id):
+        return render(request, 'Administrador/_elements/_modal_pedido.html',{})
