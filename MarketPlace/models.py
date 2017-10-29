@@ -56,7 +56,6 @@ class Categoria(models.Model):
         return self.nombre
 
 
-
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
         ('Kg', 'Kilogramos'),
@@ -84,8 +83,7 @@ class Semana(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
                                        blank=False)
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
-    fecha_fin =  models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
-
+    fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
 
     class Meta:
         verbose_name = 'Semana'
@@ -138,8 +136,9 @@ class Oferta_Producto(models.Model):
         ofertas_producto = list()
         for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
             producto = oferta.fk_producto
-            ofertas_producto.append((producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
-                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
+            ofertas_producto.append(
+                (producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+                 oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
         return ofertas_producto
 
 
@@ -226,20 +225,19 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    nombre_envio=models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
-    direccion_envio=models.CharField(max_length=150, null=False, blank=False)
-    email_envio=models.CharField(max_length=150, null=False, blank=False)
-    telefono_envio=models.CharField(max_length=150, null=False, blank=False)
-    observaciones_envio=models.CharField(max_length=150, null=False, blank=False)
+    nombre_envio = models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
+    direccion_envio = models.CharField(max_length=150, null=False, blank=False)
+    email_envio = models.CharField(max_length=150, null=False, blank=False)
+    telefono_envio = models.CharField(max_length=150, null=False, blank=False)
+    observaciones_envio = models.CharField(max_length=150, null=False, blank=False)
 
-    nombre_pago=models.CharField(max_length=150, null=False, blank=False)
-    tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
-    numero_identificacion=models.CharField(max_length=20)
+    nombre_pago = models.CharField(max_length=150, null=False, blank=False)
+    tipo_identificacion = models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
+    numero_identificacion = models.CharField(max_length=20)
+
 
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
-
-

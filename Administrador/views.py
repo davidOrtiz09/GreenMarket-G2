@@ -206,4 +206,5 @@ class Informes(View):
 
 class InformesClientesMasRentables(View):
     def get(self, request):
+
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
