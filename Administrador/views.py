@@ -180,4 +180,6 @@ class HistorialClienteView(View):
                        'cliente':Cliente.objects.get(id=id)})
 class PedidoClienteView(View):
     def get(self, request, id):
-        return render(request, 'Administrador/_elements/_modal_pedido.html',{})
+        return render(request, 'Administrador/_elements/_modal_pedido.html',
+                      {'detallePedido':PedidoProducto.objects.filter(fk_pedido_id=id),
+                       'pedidoId':id})
