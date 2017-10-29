@@ -10,7 +10,19 @@ from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, Pedi
     Productor, Oferta, Cooperativa
 from Administrador.utils import catalogo_actual
 from django.contrib import messages
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, logout, login
+from MarketPlace.utils import es_administrador, redirect_user_to_home
+
+
+class AbstractAdministradorLoggedView(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if es_administrador(self.request.user):
+                return super(AbstractAdministradorLoggedView, self).dispatch(*args, **kwargs)
+            else:
+                return redirect_user_to_home(self.request)
+        else:
+            return redirect(reverse('administrador:ingresar'))
 
 
 class Ingresar(View):
@@ -27,7 +39,8 @@ class Ingresar(View):
             username = request.POST.get('username', '')
             password = request.POST.get('password', '')
             user = authenticate(username=username, password=password)
-            if user is not None:
+            if user is not None and es_administrador(user):
+                login(request, user)
                 return redirect(reverse('administrador:index'))
             else:
                 messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
@@ -40,12 +53,12 @@ class Logout(View):
         return redirect(reverse('administrador:ingresar'))
 
 
-class Index(View):
+class Index(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/index.html', {})
 
 
-class CatalogoView(View):
+class CatalogoView(AbstractAdministradorLoggedView):
     def get(self, request):
         dia_semana = datetime.date.today().weekday()
         oferta_nueva = False
@@ -116,7 +129,7 @@ class CatalogoView(View):
         })
 
 
-class PedidosView(View):
+class PedidosView(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
@@ -133,7 +146,7 @@ class PedidosView(View):
         return render(request, 'Administrador/pedidos.html', {'pedidos': pedidos})
 
 
-class DetallePedidoView(View):
+class DetallePedidoView(AbstractAdministradorLoggedView):
     def get(self, request, id_pedido):
         detalle_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
         pedido = Pedido.objects.get(id=id_pedido)
@@ -148,7 +161,7 @@ class DetallePedidoView(View):
         })
 
 
-class ActualizarEstadoPedidoView(View):
+class ActualizarEstadoPedidoView(AbstractAdministradorLoggedView):
     def post(self, request):
         id_pedido = request.POST.get('id_pedido', '0')
         pedido = Pedido.objects.get(id=id_pedido)
@@ -157,7 +170,7 @@ class ActualizarEstadoPedidoView(View):
         return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
 
-class ListarOfertasView(View):
+class ListarOfertasView(AbstractAdministradorLoggedView):
     def get(self, request):
         ofertas = list()
         cantidad_ofertas = 0
@@ -171,7 +184,7 @@ class ListarOfertasView(View):
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
 
 
-class DetalleOfertaView(View):
+class DetalleOfertaView(AbstractAdministradorLoggedView):
     def get(self, request, id_oferta, guardado_exitoso):
         ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
 
@@ -182,7 +195,7 @@ class DetalleOfertaView(View):
         })
 
 
-class RealizarOfertaView(View):
+class RealizarOfertaView(AbstractAdministradorLoggedView):
     def post(self, request):
         id_oferta = request.POST.get('id_oferta')
         id_oferta_producto = request.POST.get('id_oferta_producto')

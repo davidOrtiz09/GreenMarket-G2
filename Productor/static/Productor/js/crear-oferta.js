@@ -1,6 +1,7 @@
 var JsonProductos = [];
 // var URLDomain = "http://localhost:8000/";
-var URLDomain = "https://green-market-dev.herokuapp.com/";
+var URLDomain = document.location.origin+"/";
+
 renderTable();
 
 $('#agregarProducto').click(function(){

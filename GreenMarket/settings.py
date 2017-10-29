@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'storages',
     'Administrador',
     'Cliente',
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -145,6 +147,17 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert alert-warning',
     messages.ERROR: 'alert alert-danger',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+'''
+CORS_ORIGIN_WHITELIST = (
+    'google.com',
+    'hostname.example.com',
+    'localhost:8000',
+    '127.0.0.1:9000'
+)
+'''
 
 if IS_DEPLOYED:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'

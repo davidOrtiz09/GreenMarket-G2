@@ -23,6 +23,6 @@ urlpatterns = [
     url(r'^administrador/', include('Administrador.urls', namespace='administrador')),
     url(r'^productor/', include('Productor.urls', namespace='productor')),
     url(r'^repartidor/', include('Repartidor.urls', namespace='repartidor')),
-    url(r'^marketplace', include('MarketPlace.urls', namespace='marketplace')),
+    url(r'^marketplace/', include('MarketPlace.urls', namespace='marketplace')),
     url(r'^', include('Cliente.urls', namespace='cliente')),
 ]
