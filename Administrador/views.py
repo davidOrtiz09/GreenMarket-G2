@@ -228,7 +228,13 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
 
 class EliminarCanasta(AbstractAdministradorLoggedView):
     def post(self, request):
-        messages.add_message(request, messages.SUCCESS, 'La canasta fue eliminada')
+        id_canasta = request.POST.get('id_canasta', '0')
+        canasta = Canasta.objects.filter(id=id_canasta).first()
+        if canasta:
+            canasta.delete()
+            messages.add_message(request, messages.SUCCESS, 'La canasta fue eliminada')
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás tratando de eliminar')
         return redirect(reverse('administrador:canastas'))
 
 
