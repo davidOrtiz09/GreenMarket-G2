@@ -30,6 +30,7 @@ class Cooperativa(models.Model):
 
 @python_2_unicode_compatible
 class Productor(models.Model):
+    fk_django_user = models.OneToOneField(User, verbose_name='Usuario tipo productor', null=False, blank=False)
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
                                        blank=False)
     nombre = models.CharField(max_length=150, verbose_name='Nombre del Productor', null=False, blank=False)
