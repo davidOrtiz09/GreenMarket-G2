@@ -1,0 +1,57 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Catalogo - Semanas</h1>
+            <br>
+            <br>
+            <div class="container-fluid">
+                <table id="semanas" class="table table-responsive" cellspacing="2" style="width: 80%"
+                       border="1"
+                       align="center">
+                    <thead>
+                        <tr>
+                            <th colspan="6" bgcolor="#228b22" class="text-white text-center">Semanas</th>
+                        </tr>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Semana Id</th>
+                            <th class="text-center">Fecha Inicio</th>
+                            <th class="text-center">Fecha Fin</th>
+                            <th class="text-center">Catálogo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for semana in semanas %}
+                        <tr>
+                            <td class="text-center">
+                                {{ semana.id }}
+                            </td>
+                            <td class="text-center">
+                                {{ semana.fecha_inicio }}
+                            </td>
+                            <td class="text-center">
+                                {{ semana.fecha_fin }}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'administrador:catalogo' semana.id  %}" class="btn btn-primary">Ver Catálogo</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Modales -->
+        <!-- Modal a mostar en caso de que no se encuentren semanas en el sistema.-->
+        {% if semanas.count == 0 %}
+            {% include 'Administrador/_elements/_modal_mensaje.html' with titulo='Catalogo - Semanas' mensaje='No hay semanas registradas en el sistema.' url_ir='/administrador/'%}
+        {% endif %}
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'Administrador/General/modal_mensaje.js' %}"></script>
+
+{% endblock %}
