@@ -7,48 +7,56 @@
                     <h1 class="text-center">Administra las canastas de la semana</h1>
                 </div>
                 <div class="col-12 text-right mb-3">
-                    <a href="#" class="btn btn-primary mr-2">
+                    <a href="{% url 'administrador:crear-canasta' %}" class="btn btn-primary mr-2">
                         <i class="fa fa-plus"></i>
                         Crear una nueva canasta
                     </a>
-                    <a href="" class="btn btn-info" data-toggle="modal" data-target="#publicar-canastas">
-                        <i class="fa fa-check">
-                        </i>
-                        Publicar canastas
-                    </a>
+                    {% if canastas %}
+                        <a href="" class="btn btn-info" data-toggle="modal" data-target="#publicar-canastas">
+                            <i class="fa fa-check">
+                            </i>
+                            Publicar canastas
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
-                {% for x in '1234567' %}
-                    <div class="col-12 col-sm-6 col-md-3 mb-3">
-                        {% include 'Administrador/_elements/canasta-preview.html' with counter=forloop.counter %}
+                {% if canastas %}
+                    {% for canasta in canastas %}
+                        <div class="col-12 col-sm-6 col-md-3 mb-3">
+                            {% include 'Administrador/_elements/canasta-preview.html' with canasta=canasta %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <p>Aún no hay canastas creadas</p>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </section>
 
     <div class="modal fade" id="publicar-canastas">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">¿Esta seguro que publicar las canastas?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    </div>
-                    <div class="col text-right">
-                        <button type="button" class="btn btn-info">Publicar</button>
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">¿Esta seguro que publicar las canastas?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        </div>
+                        <div class="col text-right">
+                            <button type="button" class="btn btn-info">Publicar</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock %}

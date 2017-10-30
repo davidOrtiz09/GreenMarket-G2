@@ -1,24 +1,25 @@
+{% load marketplace_filters %}
 <div class="card">
-    <img class="card-img-top img-fluid mx-auto d-block" src="https://placehold.it/50x50" alt="Card image cap">
+    <img class="card-img-top img-fluid mx-auto d-block" src="{{ canasta.imagen.url }}" alt="{{ canasta.nombre }}">
     <div class="card-body">
-        <h4 class="card-title text-center">Canasta</h4>
+        <h4 class="card-title text-center">{{ canasta.nombre }}</h4>
         <div class="row">
             <div class="col">
-                $ 1234.12
+                $ {{ canasta.precio|to_cop }}
             </div>
             <div class="col">
-                <h3 class="text-primary text-right"> -20%</h3>
+                <h3 class="text-primary text-right"> -{{ canasta.precio|to_cop }}%</h3>
             </div>
         </div>
 
         <div class="row">
             <div class="col">
-                <a href="{% url 'administrador:detalles-canasta' id_canasta=counter %}" class="btn btn-primary">
+                <a href="{% url 'administrador:detalles-canasta' id_canasta=canasta.id %}" class="btn btn-primary">
                     <i class="fa fa-pencil"></i>
                 </a>
             </div>
             <div class="col text-right">
-                <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#eliminar-canasta-{{ counter }}">
+                <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#eliminar-canasta-{{ canasta.id }}">
                     <i class="fa fa-times"></i>
                 </a>
             </div>
@@ -41,7 +42,11 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     </div>
                     <div class="col text-right">
-                        <button type="button" class="btn btn-danger">Eliminar</button>
+                        <form action="{% url 'administrador:eliminar-canasta' %}" method="post">
+                            <input name="id_canasta" value="{{ canasta.id }}" type="hidden" required>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+
                     </div>
                 </div>
             </div>

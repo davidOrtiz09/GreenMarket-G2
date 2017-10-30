@@ -7,7 +7,7 @@ from django.db.models import Sum, Min, Max
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa
+    Productor, Oferta, Cooperativa, Canasta
 from Administrador.utils import catalogo_actual
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -212,9 +212,26 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
 
 class Canastas(AbstractAdministradorLoggedView):
     def get(self, request):
-        return render(request, 'Administrador/canastas.html', {})
+        canastas = Canasta.objects.all()
+        return render(request, 'Administrador/canastas.html', {'canastas': canastas})
 
 
 class DetallesCanasta(AbstractAdministradorLoggedView):
     def get(self, request, id_canasta):
-        return render(request, 'Administrador/detalles-canasta.html', {'canasta': id_canasta})
+        canasta = Canasta.objects.filter(id=id_canasta).first()
+        if canasta:
+            return render(request, 'Administrador/detalles-canasta.html', {'canasta': canasta})
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
+            return redirect(reverse('administrador:canastas'))
+
+
+class EliminarCanasta(AbstractAdministradorLoggedView):
+    def post(self, request):
+        messages.add_message(request, messages.SUCCESS, 'La canasta fue eliminada')
+        return redirect(reverse('administrador:canastas'))
+
+
+class CrearCanasta(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/crear-canasta.html', {})

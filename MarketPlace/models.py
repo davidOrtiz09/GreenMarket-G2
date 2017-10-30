@@ -276,8 +276,8 @@ class Canasta(models.Model):
 
 
 class CanastaProducto(models.Model):
-    fk_canasta = models.ForeignKey(Canasta, on_delete=models.PROTECT, verbose_name='Canasta', null=False, blank=False)
-    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.PROTECT, verbose_name='Producto', null=False, blank=False)
+    fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
+    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
     cantidad = models.PositiveIntegerField(verbose_name='Cantidad', null=False, blank=False)
 
     class Meta:
