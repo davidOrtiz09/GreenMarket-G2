@@ -1,10 +1,8 @@
-{% extends 'Administrador/_common/base.html' %}
 {% block main %}
     <section>
         <div class="container-fluid" style="margin-top: 10px" align="center">
-            <h1 class="text-center"> Mejores Productos </h1>
-            <br/>
-            <form method="post" action="{% url 'administrador:listarMejoresProductos' %}">
+        <br>
+            <form method="post" action="{% url 'administrador:informes/listarMejoresProductos' %}">
                 {% csrf_token %}
                 <div class="col-md-7 colu">
                     <h4>Seleccione las semanas</h4>

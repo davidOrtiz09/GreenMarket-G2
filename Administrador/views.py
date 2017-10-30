@@ -167,6 +167,10 @@ class RealizarOfertaView(View):
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
+class Informes(View):
+    def get(self, request):
+        return render(request, 'Administrador/Informes/index.html', {})
+
 class seleccionSemanas(View):
     def get(self, request):
         semanasAll= Semana.objects.all()
@@ -179,10 +183,27 @@ class seleccionSemanas(View):
             semanas.append((semanasAll[semanasCount-4]))
         else:
             semanas=semanasAll
-        return render(request, 'Administrador/seleccionSemanas.html',
+        return render(request, 'Administrador/Informes/seleccionSemanas.html',
                       {'semanas':semanas})
 
 class listarMejoresProductos(View):
     def post(self,request):
-        semanas = request.POST.getlist('semana',[])
-        return render(request, 'Administrador/mejoresProductos.html', {'semanas':semanas})
+        """   semanas = request.POST.getlist('semana',[])
+   catalogos=[]
+   catalogosProductosAll=[]
+   pedidoProductoAll=[]
+   for sem in semanas:
+       catalogoSem=Catalogo.objects.filter(fk_semana=sem)
+       catalogos.append(catalogoSem)
+   for cat in catalogos:
+       cataloProductos=Catalogo_Producto.objects.filter(fk_catalogo=cat)
+       catalogosProductosAll.append(cataloProductos)
+   for catProd in catalogosProductosAll:
+       pedidoProducto=PedidoProducto.objects.filter(catProd)
+       pedidoProductoAll.append(pedidoProducto)
+       pedidoProductoAll"""
+        return render(request, 'Administrador/Informes/mejoresProductos.html')
+
+class InformesClientesMasRentables(View):
+    def get(self, request):
+        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})

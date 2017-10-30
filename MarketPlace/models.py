@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 
 
+
 @python_2_unicode_compatible
 class Cooperativa(models.Model):
     nombre = models.CharField(max_length=150, verbose_name='Nombre de la Cooperativa', null=False, blank=False)
@@ -46,7 +47,7 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombre
 
-
+@python_2_unicode_compatible
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     descripcion = models.TextField(max_length=300, verbose_name='Descripción', null=False, blank=False)
@@ -55,6 +56,9 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+    class Meta:
+        verbose_name = 'Categoria'
+        verbose_name_plural = 'Categorias'
 
 
 class Producto(models.Model):
@@ -241,5 +245,4 @@ class PedidoProducto(models.Model):
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
-
 
