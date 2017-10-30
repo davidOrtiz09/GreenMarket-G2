@@ -166,6 +166,7 @@ class Catalogo_Producto(models.Model):
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'
+        unique_together = (('fk_catalogo', 'fk_producto'),)
 
     def __str__(self):
         return '{0}'.format(self.id)
@@ -236,6 +237,7 @@ class Pedido(models.Model):
     tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
     numero_identificacion=models.CharField(max_length=20)
 
+
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
@@ -243,3 +245,42 @@ class PedidoProducto(models.Model):
                                              verbose_name='CatalogoProducto', null=False, blank=False)
 
 
+@python_2_unicode_compatible
+class Canasta(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
+    precio = models.FloatField(verbose_name='Precio', null=False, blank=False)
+    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
+
+    def __str__(self):
+        return self.nombre
+
+    @property
+    def productos(self):
+        return CanastaProducto.objects.filter(fk_canasta_id=self.id)
+
+    @property
+    def precio_sin_descuento(self):
+        precio = 0.0
+        for producto in self.productos:
+            precio += producto.fk_producto_catalogo.pprecio
+        return precio
+
+    @property
+    def descuento(self):
+        descuento = (self.precio - self.precio_sin_descuento) / self.precio
+        return '{descuento}%'.format(descuento=str(descuento))
+
+    class Meta:
+        verbose_name = 'Canasta'
+        verbose_name_plural = 'Canastas'
+
+
+class CanastaProducto(models.Model):
+    fk_canasta = models.ForeignKey(Canasta, on_delete=models.PROTECT, verbose_name='Canasta', null=False, blank=False)
+    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.PROTECT, verbose_name='Producto', null=False, blank=False)
+    cantidad = models.PositiveIntegerField(verbose_name='Cantidad', null=False, blank=False)
+
+    class Meta:
+        verbose_name = 'Producto de canasta'
+        verbose_name_plural = 'Productos de canastas'
+        unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
