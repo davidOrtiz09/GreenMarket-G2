@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Administrador - Green Market</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="{% static 'MarketPlace/bootstrap/css/bootstrap.min.css' %}">
+    <!-- Google fonts - Roboto -->
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="{% static 'Administrador/theme/css/style.default.css' %}" id="theme-stylesheet">
+     <!-- jQuery Circle-->
+    <link rel="stylesheet" href="{% static 'Administrador/theme/css/grasp_mobile_progress_circle-1.0.0.min.css' %}">
+
+    <!-- Font Awesome CDN-->
+    <link href="{% static 'MarketPlace/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- Font Icons CSS-->
+    <link rel="stylesheet" href="{% static 'Administrador/theme/myfontastic/icons.css' %}">
+
+</head>
+<body>
+
+{% block page %}
+
+{% endblock %}
+
+
+<script src="{% static 'MarketPlace/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/tether.min.js' %}"></script>
+<script src="{% static 'MarketPlace/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/jquery.cookie.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/grasp_mobile_progress_circle-1.0.0.min.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/jquery.nicescroll.min.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/jquery.validate.min.js' %}"></script>
+<script src="{% static 'Administrador/theme/js/front.js' %}"></script>
+
+{% block scripts %}
+
+{% endblock %}
+</body>
+</html>
