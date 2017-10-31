@@ -7,7 +7,7 @@ from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Semana
+    Productor, Oferta, Cooperativa, Semana, Cliente
 from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -212,3 +212,22 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         oferta_producto.cantidad_aceptada = cantidad_aceptada
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
+
+class ClientesView(View):
+    def get(self, request):
+
+        return render(request, 'Administrador/clientes.html', {'clientes':Cliente.objects.all()})
+
+class HistorialClienteView(View):
+    # Retorna el template con todos los pedidos en orden descendentes pertenecientes a un cliente.
+    def get(self, request, id):
+
+        return render(request, 'Administrador/historial-cliente.html',
+                      {'pedidos':Pedido.objects.filter(fk_cliente_id=id).order_by('fecha_pedido').reverse(),
+                       'cliente':Cliente.objects.get(id=id)})
+class PedidoClienteView(View):
+    # Retorna el template con el detalle de un pedido en especifico.
+    def get(self, request, id):
+        return render(request, 'Administrador/_elements/_modal_pedido.html',
+                      {'detallePedido':PedidoProducto.objects.filter(fk_pedido_id=id),
+                       'pedidoId':id})
