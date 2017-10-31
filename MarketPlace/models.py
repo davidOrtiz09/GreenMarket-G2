@@ -79,7 +79,7 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
-
+   
 class Semana(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
                                        blank=False)

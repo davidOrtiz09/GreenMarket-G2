@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from GreenMarket.local_settings import IS_DEPLOYED
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -26,3 +27,6 @@ urlpatterns = [
     url(r'^marketplace/', include('MarketPlace.urls', namespace='marketplace')),
     url(r'^', include('Cliente.urls', namespace='cliente')),
 ]
+
+if IS_DEPLOYED != 'True':
+    urlpatterns = urlpatterns  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
