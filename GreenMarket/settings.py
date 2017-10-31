@@ -159,7 +159,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 
 
-if IS_DEPLOYED:
+if IS_DEPLOYED == 'True':
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
     AWS_S3_ACCESS_KEY_ID = os.environ.get('AWS_S3_ACCESS_KEY_ID', '')

@@ -8,6 +8,8 @@ from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Semana
+from Administrador.utils import catalogo_actual
+    Productor, Oferta, Cooperativa, Semana
 from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -57,63 +59,59 @@ class Index(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/index.html', {})
 
-class CatalogoSemanasView(AbstractAdministradorLoggedView):
-    def get(self, request):
-
-        return render(request, 'Administrador/catalogo-semanas.html',
-                      {'semanas': Semana.objects.all().order_by('-fecha_inicio')})
-
 
 class CatalogoView(AbstractAdministradorLoggedView):
-    def get(self, request, semana_id):
-        info_catalogo = {}
+    def get(self, request):
+        dia_semana = datetime.date.today().weekday()
         oferta_nueva = False
+        info_catalogo = {}
 
-        resp = catalogo_validaciones(semana_id)
+        # Se valida que exista por lo menos una cooperativa.
+        cooperativa = Cooperativa.objects.first()
+        if not (cooperativa is None):
+            # Se valida que sea domingo para permitir crear el catalogo.
+            if dia_semana < 7:   # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
+                # Se valida que no se haya creado ya un catalogo para la semana.
+                catalogo = Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
+                if catalogo is None:
+                    # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
+                    # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
+                    ofertas_pro = Oferta_Producto \
+                        .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
+                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
+                        .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
+                                  canAceptada=Sum('cantidad_aceptada')) \
+                        .distinct()
 
+                    oferta_nueva = ofertas_pro.count() > 0
 
-        if (resp['mensaje'] == ''):
-            semana = resp['semana']
+                    if oferta_nueva:
+                        subtitulo = datetime.date.today().strftime("%d/%m/%y")
+                    else:
+                        subtitulo = "No hay ofertas disponibles para crear el catálogo"
 
-            # Se valida que no se haya creado ya un catalogo para la semana.
-            catalogo = Catalogo.objects.filter(fk_semana_id=semana_id).first()
-            if catalogo is None:
-                # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
-                # Solo se toman las ofertas aceptadas y correspondientes a la semana.
-                ofertas_pro = Oferta_Producto \
-                    .objects.filter(estado=1, fk_oferta__fk_semana_id=semana_id) \
-                    .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
-                    .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
-                              canAceptada=Sum('cantidad_aceptada')) \
-                    .distinct()
-
-                oferta_nueva = ofertas_pro.count() > 0
-
-                if oferta_nueva:
-                    subtitulo = semana.fecha_inicio.strftime("%d/%m/%y") + '-' + semana.fecha_fin.strftime("%d/%m/%y")
+                    info_catalogo.update({'ofertas_pro': ofertas_pro, 'subtitulo': subtitulo})
                 else:
-                    subtitulo = "No hay ofertas disponibles para crear el catálogo"
-
-                info_catalogo.update({'ofertas_pro': ofertas_pro, 'subtitulo': subtitulo})
+                    # Se muestra el catalogo ya creado.
+                    info_catalogo = catalogo_actual()
             else:
-                # Se muestra el catalogo ya creado.
+                # Si no es domingo se muestra el ultimo catalogo que se haya creado.
                 info_catalogo = catalogo_actual()
         else:
-            info_catalogo.update({'ofertas_pro': [], 'subtitulo': resp['mensaje']})
+            info_catalogo.update({'ofertas_pro':[], 'subtitulo': 'No hay cooperativas registradas en el sistema!'})
 
         return render(request, 'Administrador/catalogo.html',
                       {'ofertas_pro': info_catalogo['ofertas_pro'],
                        'subtitulo': info_catalogo['subtitulo'],
-                       'oferta_nueva': oferta_nueva,
-                       'semana_id':semana_id})
+                       'oferta_nueva': oferta_nueva})
 
-    def post(self, request, semana_id):
+    def post(self, request):
         # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
         precios_recibidos = json.loads(request.POST.get('precios_enviar'))
 
         # Se crea el catalogo
         fecha_cierre = datetime.date.today() + datetime.timedelta(days=3)
-        catalogo = Catalogo.objects.create(fk_semana_id=semana_id, fecha_cierre=fecha_cierre)
+        catalogo = Catalogo.objects.create(fecha_cierre=fecha_cierre)
         catalogo.save()
 
         # Se agregan los  productos al catalogo
