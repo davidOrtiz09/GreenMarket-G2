@@ -3,12 +3,14 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-from django.db.models import Sum, Min, Max
+from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Semana
 from Administrador.utils import catalogo_actual
+    Productor, Oferta, Cooperativa, Semana
+from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home
