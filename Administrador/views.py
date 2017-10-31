@@ -3,71 +3,117 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-from django.db.models import Sum, Min, Max
-from django.shortcuts import render, render_to_response, redirect
+from django.db.models import Sum, Min, Max, QuerySet
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Cliente
-from Administrador.utils import catalogo_actual
+    Productor, Oferta, Cooperativa, Semana, Cliente
+from Administrador.utils import catalogo_actual, catalogo_validaciones
+from django.contrib import messages
+from django.contrib.auth import authenticate, logout, login
+from MarketPlace.utils import es_administrador, redirect_user_to_home
 
 
-class Index(View):
+class AbstractAdministradorLoggedView(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if es_administrador(self.request.user):
+                return super(AbstractAdministradorLoggedView, self).dispatch(*args, **kwargs)
+            else:
+                return redirect_user_to_home(self.request)
+        else:
+            return redirect(reverse('administrador:ingresar'))
+
+
+class Ingresar(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('administrador:index'))
+        else:
+            return render(request, 'Administrador/ingresar.html', {})
+
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect(reverse('administrador:index'))
+        else:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            user = authenticate(username=username, password=password)
+            if user is not None and es_administrador(user):
+                login(request, user)
+                return redirect(reverse('administrador:index'))
+            else:
+                messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
+                return render(request, 'Administrador/ingresar.html', {})
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect(reverse('administrador:ingresar'))
+
+
+class Index(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/index.html', {})
 
-
-class CatalogoView(View):
+class CatalogoSemanasView(AbstractAdministradorLoggedView):
     def get(self, request):
-        dia_semana = datetime.date.today().weekday()
-        oferta_nueva = False
+
+        return render(request, 'Administrador/catalogo-semanas.html',
+                      {'semanas': Semana.objects.all().order_by('-fecha_inicio')})
+
+
+class CatalogoView(AbstractAdministradorLoggedView):
+    def get(self, request, semana_id):
         info_catalogo = {}
+        oferta_nueva = False
 
-        # Se valida que exista por lo menos una cooperativa.
-        cooperativa = Cooperativa.objects.first()
-        if not (cooperativa is None):
-            # Se valida que sea domingo para permitir crear el catalogo.
-            if dia_semana < 7:   # Se hace que la validacion siempre sea verdadera para que puedan realizar purebas
-                # Se valida que no se haya creado ya un catalogo para la semana.
-                catalogo = Catalogo.objects.filter(fecha_creacion__gte=datetime.date.today()).first()
-                if catalogo is None:
-                    # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
-                    # Solo se toman las ofertas de los 3 dias anteriores(jueves, viernes, sabado)
-                    ofertas_pro = Oferta_Producto \
-                        .objects.filter(estado=1, fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-3)) \
-                        .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
-                        .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
-                                  canAceptada=Sum('cantidad_aceptada')) \
-                        .distinct()
+        resp = catalogo_validaciones(semana_id)
 
-                    oferta_nueva = ofertas_pro.count() > 0
 
-                    if oferta_nueva:
-                        subtitulo = datetime.date.today().strftime("%d/%m/%y")
-                    else:
-                        subtitulo = "No hay ofertas disponibles para crear el catálogo"
+        if (resp['mensaje'] == ''):
+            semana = resp['semana']
 
-                    info_catalogo.update({'ofertas_pro': ofertas_pro, 'subtitulo': subtitulo})
+            # Se valida que no se haya creado ya un catalogo para la semana.
+            catalogo = Catalogo.objects.filter(fk_semana_id=semana_id).first()
+            if catalogo is None:
+                # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
+                # Solo se toman las ofertas aceptadas y correspondientes a la semana.
+                ofertas_pro = Oferta_Producto \
+                    .objects.filter(estado=1, fk_oferta__fk_semana_id=semana_id) \
+                    .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
+                    .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
+                              canAceptada=Sum('cantidad_aceptada')) \
+                    .distinct()
+
+                oferta_nueva = ofertas_pro.count() > 0
+
+                if oferta_nueva:
+                    subtitulo = semana.fecha_inicio.strftime("%d/%m/%y") + '-' + semana.fecha_fin.strftime("%d/%m/%y")
                 else:
-                    # Se muestra el catalogo ya creado.
-                    info_catalogo = catalogo_actual()
+                    subtitulo = "No hay ofertas disponibles para crear el catálogo"
+
+                info_catalogo.update({'ofertas_pro': ofertas_pro, 'subtitulo': subtitulo})
             else:
-                # Si no es domingo se muestra el ultimo catalogo que se haya creado.
+                # Se muestra el catalogo ya creado.
                 info_catalogo = catalogo_actual()
         else:
-            info_catalogo.update({'ofertas_pro':[], 'subtitulo': 'No hay cooperativas registradas en el sistema!'})
+            info_catalogo.update({'ofertas_pro': [], 'subtitulo': resp['mensaje']})
 
         return render(request, 'Administrador/catalogo.html',
                       {'ofertas_pro': info_catalogo['ofertas_pro'],
                        'subtitulo': info_catalogo['subtitulo'],
-                       'oferta_nueva': oferta_nueva})
+                       'oferta_nueva': oferta_nueva,
+                       'semana_id':semana_id})
 
-    def post(self, request):
+    def post(self, request, semana_id):
         # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
         precios_recibidos = json.loads(request.POST.get('precios_enviar'))
 
         # Se crea el catalogo
         fecha_cierre = datetime.date.today() + datetime.timedelta(days=3)
-        catalogo = Catalogo.objects.create(fecha_cierre=fecha_cierre)
+        catalogo = Catalogo.objects.create(fk_semana_id=semana_id, fecha_cierre=fecha_cierre)
         catalogo.save()
 
         # Se agregan los  productos al catalogo
@@ -87,7 +133,7 @@ class CatalogoView(View):
         })
 
 
-class PedidosView(View):
+class PedidosView(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
@@ -104,7 +150,7 @@ class PedidosView(View):
         return render(request, 'Administrador/pedidos.html', {'pedidos': pedidos})
 
 
-class DetallePedidoView(View):
+class DetallePedidoView(AbstractAdministradorLoggedView):
     def get(self, request, id_pedido):
         detalle_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
         pedido = Pedido.objects.get(id=id_pedido)
@@ -119,7 +165,7 @@ class DetallePedidoView(View):
         })
 
 
-class ActualizarEstadoPedidoView(View):
+class ActualizarEstadoPedidoView(AbstractAdministradorLoggedView):
     def post(self, request):
         id_pedido = request.POST.get('id_pedido', '0')
         pedido = Pedido.objects.get(id=id_pedido)
@@ -128,7 +174,7 @@ class ActualizarEstadoPedidoView(View):
         return render(request, 'Administrador/pedidos.html', {'pedidos': Pedido.objects.all()})
 
 
-class ListarOfertasView(View):
+class ListarOfertasView(AbstractAdministradorLoggedView):
     def get(self, request):
         ofertas = list()
         cantidad_ofertas = 0
@@ -142,7 +188,7 @@ class ListarOfertasView(View):
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
 
 
-class DetalleOfertaView(View):
+class DetalleOfertaView(AbstractAdministradorLoggedView):
     def get(self, request, id_oferta, guardado_exitoso):
         ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
 
@@ -153,7 +199,7 @@ class DetalleOfertaView(View):
         })
 
 
-class RealizarOfertaView(View):
+class RealizarOfertaView(AbstractAdministradorLoggedView):
     def post(self, request):
         id_oferta = request.POST.get('id_oferta')
         id_oferta_producto = request.POST.get('id_oferta_producto')

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
+from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
     Oferta_Producto, Catalogo
 from django.contrib.auth.models import User
@@ -12,12 +13,70 @@ from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor
+from django.contrib.auth import logout, login, authenticate
+
+
+class AbstractClienteLoggedView(View):
+    logged_out_message = 'Por favor ingresa para acceder a ésta página'
+
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            if es_cliente(self.request.user):
+                return super(AbstractClienteLoggedView, self).dispatch(*args, **kwargs)
+            else:
+                rol = 'productor' if es_productor(self.request.user) else 'administrador'
+                messages.add_message(
+                    self.request,
+                    messages.INFO,
+                    'Para acceder a las funcionalidades de cliente, por favor salga de su cuenta de {rol}'
+                        .format(rol=rol)
+                )
+                return redirect_user_to_home(self.request)
+        else:
+            messages.add_message(self.request, messages.INFO, self.logged_out_message)
+            return redirect(reverse('cliente:index'))
+
+
+class Ingresar(View):
+    def post(self, request):
+        if request.user.is_authenticated:
+            return redirect(self.request.META.get('HTTP_REFERER', reverse('cliente:index')))
+        else:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+            user = authenticate(username=username, password=password)
+            if user is not None and es_cliente(user):
+                login(request, user)
+                return redirect(self.request.META.get('HTTP_REFERER', reverse('cliente:index')))
+            else:
+                messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
+                return redirect(self.request.META.get('HTTP_REFERER', reverse('cliente:index')))
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect(reverse('cliente:index'))
 
 
 class Index(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated and not es_cliente(self.request.user):
+            rol = 'productor' if es_productor(self.request.user) else 'administrador'
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                'Para acceder a las funcionalidades de cliente, por favor salga de su cuenta de {rol}'
+                    .format(rol=rol)
+            )
+            return redirect_user_to_home(self.request)
+        else:
+            return super(Index, self).dispatch(*args, **kwargs)
+
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo=Catalogo.objects.last()
+        catalogo = Catalogo.objects.last()
         producto_catalogo = Catalogo_Producto.objects \
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
@@ -45,7 +104,9 @@ class Index(View):
         })
 
 
-class Checkout(View):
+class Checkout(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para ir al checkout'
+
     def get(self, request):
         # Obtenemos el carrito y sus items
         # Si no encontramos nada, redirijimos el usuario al home y le notificamos que no tiene items en el carrito
@@ -62,7 +123,9 @@ class Checkout(View):
             return render(request, 'Cliente/checkout/checkout.html', {})
 
 
-class UpdateShoppingCart(View):
+class UpdateShoppingCart(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para agregar items a tu carrito'
+
     def post(self, request):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
@@ -108,7 +171,9 @@ class UpdateShoppingCart(View):
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-class DeleteProductFromShoppingCart(View):
+class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para poder eliminar items a tu carrito'
+
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
@@ -132,8 +197,17 @@ class DeleteProductFromShoppingCart(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterClientView(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect_user_to_home(self.request)
+        else:
+            return super(RegisterClientView, self).dispatch(*args, **kwargs)
+
     def get(self, request):
-        return render(request, 'Cliente/registrar_cliente.html', {'form': ClientForm()})
+        ciudades = Ciudad.get_all_ciudades()
+        departamentos = Departamento.get_all_departamentos()
+        return render(request, 'Cliente/registrar_cliente.html',
+                      {'form': ClientForm(), 'ciudades': ciudades, 'departamentos': departamentos})
 
     def post(self, request):
         form = ClientForm(request.POST)
@@ -173,10 +247,11 @@ class RegisterClientView(View):
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
 
 
-class MisPedidosView(View):
+class MisPedidosView(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para poder ver tus pedidos'
+
     def get(self, request):
-        user_model = User.objects.get(username=request.user.username)
-        cliente = Cliente.objects.filter(fk_django_user=user_model)
+        cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
         pedidos_cliente = Pedido.objects.filter(fk_cliente=cliente)
         return render(request, 'Cliente/mis_pedidos.html', {
             'pedidos_entregados': pedidos_cliente.filter(estado='EN'),
@@ -185,7 +260,9 @@ class MisPedidosView(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class DoPayment(View):
+class DoPayment(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para realizar el pago de tu pedido'
+
     def get(self, request):
         return render(request, 'Cliente/checkout/checkout.html', {'form': PaymentForm()})
 
@@ -204,8 +281,7 @@ class DoPayment(View):
         numero_identificacion = informacion_pago.get('numero_documento')
         tipo_identificacion = informacion_pago.get('tipo_documento')
 
-        # user_model = User.objects.first() #TODO La consulta del usuario se haría con request.user
-        cliente_model = Cliente.objects.first()
+        cliente_model = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
         pedido_model = Pedido(
             fk_cliente=cliente_model,
             fecha_pedido=datetime.now(),

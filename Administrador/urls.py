@@ -3,7 +3,10 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
-    url(r'^catalogo$', views.CatalogoView.as_view(), name='catalogo'),
+    url(r'^ingresar$', views.Ingresar.as_view(), name='ingresar'),
+    url(r'^logout$', views.Logout.as_view(), name='logout'),
+    url(r'^catalogo$', views.CatalogoSemanasView.as_view(), name='catalogo-semanas'),
+    url(r'^catalogo/semana/(\d+)/$', views.CatalogoView.as_view(), name='catalogo'),
     url(r'^pedidos/$', views.PedidosView.as_view(), name='pedidos'),
     url(r'^pedidos/(?P<id_pedido>\d+)$', views.DetallePedidoView.as_view(), name='detalle-pedido'),
     url(r'^actualizar-estado-pedido$', views.ActualizarEstadoPedidoView.as_view(), name='actualizar-estado-pedido'),
@@ -14,6 +17,4 @@ urlpatterns = [
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/pedido/(\d+)/$', views.PedidoClienteView.as_view(), name='pedido'),
-    # (?P<username>\w+) para recepcionar parametros desde el formulario d= digitos y w= string, el + signfica que se
-    # esperan una o mas
 ]
