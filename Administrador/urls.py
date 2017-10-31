@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
     url(r'^elimimnar-canasta$', views.EliminarCanasta.as_view(), name='eliminar-canasta'),
     url(r'^crear-canasta$', views.CrearCanasta.as_view(), name='crear-canasta'),
+    url(r'^publicar-canastas$', views.PublicarCanastas.as_view, name='publicar-canastas'),
     url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta')
 ]

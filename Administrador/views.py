@@ -241,3 +241,11 @@ class EliminarCanasta(AbstractAdministradorLoggedView):
 class CrearCanasta(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/crear-canasta.html', {})
+
+
+class PublicarCanastas(AbstractAdministradorLoggedView):
+    def post(self, request):
+        canastas = Canasta.objects.all()
+        canastas.update(esta_publicada=True)
+        messages.add_message(request, messages.SUCCESS, 'Las canastas fueron publicadas exitosamente')
+        return redirect(reverse('administrador:canastas'))
