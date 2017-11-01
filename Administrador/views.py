@@ -241,6 +241,13 @@ def obtener_cantidad_vendida(semana, id_producto):
         cantidad = cantidad + pro.cantidad_vendida
     return cantidad
 
+def obtener_valor_compra(semana, id_producto):
+    ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+    sumPrecios=0
+    for ofertaProd in ofertaProducto:
+        sumPrecios = sumPrecios + ofertaProd.precioProvedor
+    valorPromedio = sumPrecios / len(ofertaProducto)
+    return valorPromedio
 
 
 """ class listarMejoresProductos(View):
