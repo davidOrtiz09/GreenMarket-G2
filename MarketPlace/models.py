@@ -84,7 +84,7 @@ class Semana(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
                                        blank=False)
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
-    fecha_fin =  models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
+    fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
 
 
     class Meta:
@@ -169,7 +169,7 @@ class Catalogo_Producto(models.Model):
         unique_together = (('fk_catalogo', 'fk_producto'),)
 
     def __str__(self):
-        return '{0}'.format(self.id)
+        return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
 
 
 class Cliente(models.Model):
@@ -247,6 +247,7 @@ class PedidoProducto(models.Model):
 
 @python_2_unicode_compatible
 class Canasta(models.Model):
+    fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     precio = models.FloatField(verbose_name='Precio', null=False, blank=False)
     imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
@@ -263,13 +264,13 @@ class Canasta(models.Model):
     def precio_sin_descuento(self):
         precio = 0.0
         for producto in self.productos:
-            precio += producto.fk_producto_catalogo.pprecio
+            precio += producto.fk_producto_catalogo.precio
         return precio
 
     @property
     def descuento(self):
         descuento = (self.precio - self.precio_sin_descuento) / self.precio
-        return '{descuento}%'.format(descuento=str(descuento))
+        return '{descuento}%'.format(descuento=str(descuento * 100.0))
 
     class Meta:
         verbose_name = 'Canasta'
