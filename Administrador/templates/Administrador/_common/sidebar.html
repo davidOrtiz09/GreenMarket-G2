@@ -19,7 +19,7 @@
                         <i class="icon-home"></i> <span>Home</span>
                     </a>
                 </li>
-                {% url 'administrador:catalogo' as url_catalogo %}
+                {% url 'administrador:catalogo-semanas' as url_catalogo %}
                 <li {% if request.path == url_catalogo %}class="active"{% endif %}>
                     <a href="{{ url_catalogo }}">
                         <i class="icon-padnote"></i> <span>Catálogo</span>
@@ -41,6 +41,12 @@
                 <li {% if request.path == url_ofertas %}class="active"{% endif %}>
                     <a href="{% url 'administrador:ofertas' %}">
                         <i class="fa fa-apple"></i> <span>Ofertas</span>
+                    </a>
+                </li>
+                {% url 'administrador:clientes' as url_clientes %}
+                <li {% if request.path == url_clientes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:clientes' %}">
+                        <i class="icon-user"></i> <span>Clientes</span>
                     </a>
                 </li>
             </ul>

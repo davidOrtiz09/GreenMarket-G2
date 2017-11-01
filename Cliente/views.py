@@ -62,7 +62,7 @@ class Logout(View):
 
 class Index(View):
     def dispatch(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
+        if self.request.user.is_authenticated and not es_cliente(self.request.user):
             rol = 'productor' if es_productor(self.request.user) else 'administrador'
             messages.add_message(
                 self.request,
