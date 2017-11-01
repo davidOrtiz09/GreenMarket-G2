@@ -1,5 +1,6 @@
 {% extends 'Administrador/_common/base.html' %}
 {% load static %}
+{% load app_filters %}
 {% block main %}
     <section>
         <div class="container-fluid">
@@ -65,7 +66,7 @@
 
             <div class="row">
                 {% if oferta_nueva %}
-                    <form id="fcatalogo" method="post">
+                    <form id="fcatalogo"  method="post">
                         {% csrf_token %}
                         <input id="precios_enviar" type="hidden" name="precios_enviar">
                         <button class="btn btn-primary" type="submit">Publicar catálogo</button>
@@ -76,9 +77,15 @@
 
             </div>
         </div>
+         <!-- Modales -->
+        <!-- Modal a mostar en caso de que no se encuentren semanas en el sistema.-->
+        {% if ofertas_pro|get_len == 0 %}
+            {% include 'Administrador/_elements/_modal_mensaje.html' with titulo='Catálogo' mensaje=subtitulo url_ir='/administrador/catalogo'%}
+        {% endif %}
     </section>
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'Administrador/catalogo/catalogo.js' %}"></script>
+    <script src="{% static 'Administrador/general/modal_mensaje.js' %}"></script>
 {% endblock %}

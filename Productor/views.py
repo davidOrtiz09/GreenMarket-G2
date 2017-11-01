@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from MarketPlace.models import Oferta_Producto, Producto, Productor, Oferta, Categoria
+from MarketPlace.models import Oferta_Producto, Producto, Productor, Oferta, Categoria, Semana
 from MarketPlace.utils import es_productor, redirect_user_to_home
 from django.utils.decorators import method_decorator
 
@@ -125,7 +125,8 @@ class AgregarOferta(AbstractProductorLoggedView):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         productor = Productor.objects.filter(fk_django_user_id=request.user.id).first()
-        oferta = Oferta(fk_productor=productor)
+        semana = Semana.objects.filter(id=11).first()
+        oferta = Oferta(fk_productor=productor, fk_semana=semana)
         oferta.save()
         for producto in body:
             productoObjeto = Producto.objects.filter(id=producto["idProducto"]).first()

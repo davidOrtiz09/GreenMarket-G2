@@ -18,7 +18,7 @@
                         <i class="icon-home"></i> <span>Home</span>
                     </a>
                 </li>
-                {% url 'administrador:catalogo' as url_catalogo %}
+                {% url 'administrador:catalogo-semanas' as url_catalogo %}
                 <li {% if request.path == url_catalogo %}class="active"{% endif %}>
                     <a href="{{ url_catalogo }}">
                         <i class="icon-padnote"></i> <span>Catálogo</span>
@@ -34,6 +34,12 @@
                 <li {% if request.path == url_ofertas %}class="active"{% endif %}>
                     <a href="{% url 'administrador:ofertas' %}">
                         <i class="icon-list"></i> <span>Ofertas</span>
+                    </a>
+                </li>
+            {% url 'administrador:informes' as url_informes %}
+                <li {% if request.path == url_informes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:informes' %}">
+                        <i class="icon-padnote"></i> <span>Informes</span>
                     </a>
                 </li>
             </ul>
