@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import datetime
 import json
+from operator import itemgetter
+
 from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
@@ -232,9 +234,18 @@ class seleccionSemanas(View):
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
                       {'semanas':semanas})
 
-class listarMejoresProductos(View):
+def obtener_cantidad_vendida(semana, id_producto):
+    productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+    cantidad = 0
+    for pro in productos_vendidos:
+        cantidad = cantidad + pro.cantidad_vendida
+    return cantidad
+
+
+
+""" class listarMejoresProductos(View):
     def post(self,request):
-        """   semanas = request.POST.getlist('semana',[])
+          semanas = request.POST.getlist('semana',[])
    catalogos=[]
    catalogosProductosAll=[]
    pedidoProductoAll=[]
@@ -247,8 +258,8 @@ class listarMejoresProductos(View):
    for catProd in catalogosProductosAll:
        pedidoProducto=PedidoProducto.objects.filter(catProd)
        pedidoProductoAll.append(pedidoProducto)
-       pedidoProductoAll"""
-        return render(request, 'Administrador/Informes/mejoresProductos.html')
+       pedidoProductoAll
+        return render(request, 'Administrador/Informes/mejoresProductos.html')"""
 
 class InformesClientesMasRentables(View):
     def get(self, request):

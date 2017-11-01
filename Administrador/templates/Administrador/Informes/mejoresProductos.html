@@ -4,44 +4,25 @@
         <div class="container-fluid" style="margin-top: 10px" align="center">
             <h1 class="text-center"> Mejores Productos </h1>
             <br/>
-            <form method="post" action="{% url 'administrador:informes/listarMejoresProductos' %}">
+            <form method="post" action="{% url 'administrador:informes/obtener_mejores_productos' %}">
                 <div>
                     <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2"
                                    width="100%"
                                    border="1" align="center">
                                 <thead>
-                                <th colspan="7" bgcolor="#228b22" class="text-white text-center">Mejores Productos semanas {% for semana in semanas %} {{ semana }}, {% endfor %}</th>
+                                <th colspan="8" bgcolor="#228b22" class="text-white text-center">Mejores Productos semanas</th>
                                 <tr bgcolor="#deb887">
                                     <th class="text-center">Categoria</th>
                                     <th class="text-center">Descripcion del producto</th>
                                     <th class="text-center">Imagen del producto</th>
                                     <th class="text-center">Cantidad Vendida</th>
                                     <th class="text-center">Valor promedio</th>
+                                    <th class="text-center">Valor de venta</th>
                                     <th class="text-center">Ganancias producidas</th>
                                     <th class="text-center">Porcentaje de ganancia</th>
                                 </tr>
                                 </thead>
 
-                                <tr>
-                                    <th class="text-center">Frutas</th>
-                                    <th class="text-center">Manzana</th>
-                                    <th class="text-center">Imagen del producto</th>
-                                    <th class="text-center">3.500</th>
-                                    <th class="text-center">$ 1.500 Und</th>
-                                    <th class="text-center">$ 1.050.000</th>
-                                    <th class="text-center">30%</th>
-
-                                </tr>
-
-                                <tr>
-                                    <th class="text-center">Frutas</th>
-                                    <th class="text-center">Pera</th>
-                                    <th class="text-center">Imagen del producto</th>
-                                    <th class="text-center">500</th>
-                                    <th class="text-center">$ 2000 Und</th>
-                                    <th class="text-center">$ 250.000</th>
-                                    <th class="text-center">35%</th>
-                                </tr>
 
                     </table>
                 </div>

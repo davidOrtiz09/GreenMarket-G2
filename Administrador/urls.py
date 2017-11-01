@@ -19,5 +19,5 @@ urlpatterns = [
     url(r'^informes/clientes-mas-rentables$', views.InformesClientesMasRentables.as_view(),
         name='informes/clientes-mas-rentables'),
     url(r'^informes/seleccionSemanas', views.seleccionSemanas.as_view(), name='informes/seleccionSemanas'),
-    url(r'^informes/listarMejoresProductos', views.listarMejoresProductos.as_view(), name='informes/listarMejoresProductos'),
+    url(r'^informes/obtener_mejores_productos', views.obtener_mejores_productos.as_view(), name='informes/obtener_mejores_productos'),
 ]

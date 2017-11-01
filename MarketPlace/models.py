@@ -127,7 +127,7 @@ class Oferta_Producto(models.Model):
     fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta', null=True, blank=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True,
                                           blank=False)
-    precioProvedor = models.FloatField(verbose_name='Precio del producto', null=False, blank=False)
+    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10, decimal_places=2)
     estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
 
     class Meta:
@@ -173,6 +173,7 @@ class Catalogo_Producto(models.Model):
 
     def __str__(self):
         return '{0}'.format(self.id)
+
 
 
 class Cliente(models.Model):
