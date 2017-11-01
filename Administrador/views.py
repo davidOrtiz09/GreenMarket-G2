@@ -68,9 +68,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
     def get(self, request, semana_id):
         info_catalogo = {}
         oferta_nueva = False
-
         resp = catalogo_validaciones(semana_id)
-
 
         if (resp['mensaje'] == ''):
             semana = resp['semana']
