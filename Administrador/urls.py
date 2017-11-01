@@ -17,9 +17,12 @@ urlpatterns = [
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/pedido/(\d+)/$', views.PedidoClienteView.as_view(), name='pedido'),
+
     url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
     url(r'^elimimnar-canasta$', views.EliminarCanasta.as_view(), name='eliminar-canasta'),
     url(r'^crear-canasta$', views.CrearCanasta.as_view(), name='crear-canasta'),
     url(r'^publicar-canastas$', views.PublicarCanastas.as_view, name='publicar-canastas'),
-    url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta')
+    url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta'),
+    url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
+    url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta')
 ]

@@ -1,24 +1,76 @@
+{% load marketplace_filters %}
 <div class="card">
-    <img class="card-img-top img-fluid mx-auto d-block" src="https://placehold.it/50x50" alt="Card image cap">
+    <div class="card-header">
+        <div class="col text-right">
+            <a href="#" class="btn btn-danger mb-2" data-toggle="modal"
+               data-target="#eliminar-producto-canasta-{{ canasta_producto.id }}">
+                <i class="fa fa-times"></i>
+            </a>
+        </div>
+    </div>
+    <img class="card-img-top img-fluid mx-auto d-block" src="{{ canasta_producto.imagen_producto }}"
+         alt="{{ canasta_producto.nombre_producto }}">
     <div class="card-body">
-        <h4 class="card-title text-center">Producto</h4>
+        <h4 class="card-title text-center">{{ canasta_producto.nombre_producto }}</h4>
 
-        <p class="card-text">$ 1234.12</p>
-        <div class="form-group row">
-            <label class="col-5 col-form-label">Cantidad</label>
-            <div class="col-7">
-                <div class="input-group input-group-sm">
+        <p class="card-text">$ {{ canasta_producto.precio_producto|to_cop }}
+            / {{ canasta_producto.unidad_producto }}</p>
+        <form method="post" action="{% url 'administrador:cambiar-cantidad-producto-canasta' %}">
+            {% csrf_token %}
+            <input name="id_producto_canasta" value="{{ canasta_producto.id }}" type="hidden" required>
+
+            <div class="form-group row">
+                <label class="col-5 col-form-label">Cantidad</label>
+                <div class="col-7">
+                    <div class="input-group input-group-sm">
                 <span class="input-group-btn">
-                    <button type="button" class="btn btn-danger" disabled>
+                    <button type="button" class="btn btn-danger product-minus">
                         <i class="fa fa-minus-circle"></i>
                     </button>
                 </span>
-                <input name="quantity" class="form-control" type="number" min="0" step="1" pattern="\d*">
-                    <span class="input-group-btn">
+                        <input name="cantidad" class="form-control product-quantity" type="number" min="1" step="1"
+                               pattern="\d*"
+                               value="{{ canasta_producto.cantidad }}">
+                        <span class="input-group-btn">
                         <button type="button" class="btn btn-success product-plus">
                             <i class="fa fa-plus-circle"></i>
                         </button>
                     </span>
+                    </div>
+                </div>
+                <div class="col-12 text-center">
+                    <button class="btn btn-success mt-3">
+                        <i class="fa fa-save"></i>
+                        Actualizar cantidad
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="eliminar-producto-canasta-{{ canasta_producto.id }}">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">¿Esta seguro que desea eliminar este producto de la canasta?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    </div>
+                    <div class="col text-right">
+                        <form action="{% url 'administrador:eliminar-producto-canasta' %}" method="post">
+                            {% csrf_token %}
+                            <input name="id_producto_canasta" value="{{ canasta_producto.id }}" type="hidden" required>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+
+                    </div>
                 </div>
             </div>
         </div>

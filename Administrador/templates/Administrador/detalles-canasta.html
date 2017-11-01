@@ -1,4 +1,5 @@
 {% extends 'Administrador/_common/base.html' %}
+{% load static %}
 {% block main %}
     <section class="mt-3">
         <div class="container-fluid">
@@ -11,7 +12,7 @@
                     </a>
                 </div>
                 <div class="col-12">
-                    <h1 class="text-center">Canasta {{ canasta }}</h1>
+                    <h1 class="text-center">Editar la canasta</h1>
                 </div>
             </div>
             <div class="row mt-2">
@@ -19,7 +20,7 @@
                     <div class="form-group row">
                         <label class="col-4 col-sm-2 col-form-label">Nombre de la canasta</label>
                         <div class="col-8 col-sm-4">
-                            <input type="text" class="form-control">
+                            <input name="nombre" type="text" class="form-control" value="{{ canasta.nombre }}" required>
                         </div>
 
                         <label class="col-4 col-sm-2 col-form-label">Imagen</label>
@@ -30,12 +31,12 @@
                     <div class="form-group row">
                         <label class="col-4 col-sm-2 col-form-label">Precio (sin descuento)</label>
                         <div class="col-8 col-sm-4">
-                            <input type="number" class="form-control" readonly>
+                            <input type="number" class="form-control" readonly value="{{ canasta.get_precio_sin_descuento }}">
                         </div>
 
                         <label class="col-4 col-sm-2 col-form-label">Precio (con descuento)</label>
                         <div class="col-8 col-sm-4">
-                            <input type="number" class="form-control">
+                            <input name="precio" type="number" value="{{ canasta.get_precio }}" class="form-control" required>
                         </div>
                     </div>
                 </div>
@@ -61,21 +62,17 @@
                 </div>
             </div>
             <div class="row">
-                {% for x in '123456' %}
+                {% for canasta_producto in canasta.productos %}
                     <div class="col-12 col-sm-6 col-md-3 mb-3">
-                        {% include 'Administrador/_elements/producto-canasta-preview.html' %}
+                        {% include 'Administrador/_elements/producto-canasta-preview.html' with canasta_producto=canasta_producto %}
                     </div>
                 {% endfor %}
-            </div>
-            <div class="row">
-                <div class="col text-right">
-                    <button class="btn btn-info">
-                        <i class="fa fa-save"></i>
-                        Guardar cambios
-                    </button>
-                </div>
             </div>
         </div>
     </section>
 
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
 {% endblock %}

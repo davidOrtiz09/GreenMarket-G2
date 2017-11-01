@@ -8,7 +8,7 @@
                 $ {{ canasta.precio|to_cop }}
             </div>
             <div class="col">
-                <h3 class="text-primary text-right"> -{{ canasta.descuento }}</h3>
+                <h3 class="text-primary text-right">{{ canasta.descuento }}</h3>
             </div>
         </div>
 
@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="eliminar-canasta-{{ counter }}">
+<div class="modal fade" id="eliminar-canasta-{{ canasta.id }}">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -43,6 +43,7 @@
                     </div>
                     <div class="col text-right">
                         <form action="{% url 'administrador:eliminar-canasta' %}" method="post">
+                            {% csrf_token %}
                             <input name="id_canasta" value="{{ canasta.id }}" type="hidden" required>
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
