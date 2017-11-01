@@ -234,6 +234,28 @@ class seleccionSemanas(View):
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
                       {'semanas':semanas})
 
+class obtener_mejores_productos(View):
+    def post(self, request):
+        semanas = request.POST.getlist('semana', [])
+        respuesta = []
+        catalogoProd= Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in= semanas)
+        for pro in catalogoProd:
+            valor_compra = obtener_valor_compra(semanas,pro.fk_producto)
+            valor_venta = pro.precio
+            cantVendida = obtener_cantidad_vendida(semanas,pro.fk_producto)
+            producto=Producto.objects.filter(id=pro.fk_producto.id).first()
+            respuesta.append({
+                'producto': producto,
+                'cantidad_vendida':cantVendida,
+                'valor_compra': valor_compra,
+                'valor_venta': valor_venta,
+                'ganancia': valor_venta - valor_compra * cantVendida,
+                'porcentaje': (valor_venta * cantVendida * 100) / (valor_compra * cantVendida)
+
+            })
+        ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
+        return  render(request, 'Administrador/Informes/mejoresProductos.html', {'datos':ordenado})
+
 def obtener_cantidad_vendida(semana, id_producto):
     productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
     cantidad = 0
