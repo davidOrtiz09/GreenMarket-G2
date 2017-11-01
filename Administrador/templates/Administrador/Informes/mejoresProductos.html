@@ -13,10 +13,10 @@
                                 <th colspan="8" bgcolor="#228b22" class="text-white text-center">Mejores Productos semanas</th>
                                 <tr bgcolor="#deb887">
                                     <th class="text-center">Categoria</th>
-                                    <th class="text-center">Descripcion del producto</th>
+                                    <th class="text-center">Producto</th>
                                     <th class="text-center">Imagen del producto</th>
                                     <th class="text-center">Cantidad Vendida</th>
-                                    <th class="text-center">Valor promedio</th>
+                                    <th class="text-center">Valor de compra promedio</th>
                                     <th class="text-center">Valor de venta</th>
                                     <th class="text-center">Ganancias producidas</th>
                                     <th class="text-center">Porcentaje de ganancia</th>
@@ -27,26 +27,26 @@
                                 <td class="text-center">
                                     {{ mejProd.producto.fk_categoria.descripcion }}
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     {{ mejProd.producto.descripcion }}
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     <img src="{{ mejProd.producto.imagen.url }}" class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.cantidad_vendida }}
+                                    {{ mejProd.cantidad_vendida }} {{ mejProd.producto.unidad_medida }}
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.valor_compra }}
+                                    ${{ mejProd.valor_compra }}
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.valor_venta }}
+                                    ${{ mejProd.valor_venta }}
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.ganancia }}
+                                    ${{ mejProd.ganancia }}
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.porcentaje }}
+                                    {{ mejProd.porcentaje }}%
                                 </td>
                             </tr>
                         {% endfor %}

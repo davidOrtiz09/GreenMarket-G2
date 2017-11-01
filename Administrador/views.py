@@ -244,13 +244,18 @@ class obtener_mejores_productos(View):
             valor_venta = pro.precio
             cantVendida = obtener_cantidad_vendida(semanas,pro.fk_producto)
             producto=Producto.objects.filter(id=pro.fk_producto.id).first()
+            porcentaje=int
+            if cantVendida !=0:
+                porcentaje = int((((valor_venta - valor_compra) * cantVendida) * 100) / (valor_compra * cantVendida))
+            else:
+                porcentaje = 0
             respuesta.append({
                 'producto': producto,
                 'cantidad_vendida':cantVendida,
                 'valor_compra': valor_compra,
                 'valor_venta': valor_venta,
-                'ganancia': valor_venta - valor_compra * cantVendida,
-                'porcentaje': (valor_venta * cantVendida * 100) / (valor_compra * cantVendida)
+                'ganancia': (valor_venta - valor_compra) * cantVendida,
+                'porcentaje': porcentaje
 
             })
         ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
