@@ -22,6 +22,34 @@
                                     <th class="text-center">Porcentaje de ganancia</th>
                                 </tr>
                                 </thead>
+                                {% for mejProd in datos %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ mejProd.producto.fk_categoria.descripcion }}
+                                </td>
+                                <td>
+                                    {{ mejProd.producto.descripcion }}
+                                </td>
+                                <td>
+                                    <img src="{{ mejProd.producto.imagen.url }}" class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.cantidad_vendida }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.valor_compra }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.valor_venta }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.ganancia }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.porcentaje }}
+                                </td>
+                            </tr>
+                        {% endfor %}
 
 
                     </table>
