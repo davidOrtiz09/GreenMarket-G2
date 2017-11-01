@@ -17,36 +17,44 @@
             </div>
             <div class="row mt-2">
                 <div class="col-12">
-                    <div class="form-group row">
-                        <label class="col-4 col-sm-2 col-form-label">Nombre de la canasta</label>
-                        <div class="col-8 col-sm-4">
-                            <input name="nombre" type="text" class="form-control" value="{{ canasta.nombre }}" required>
-                        </div>
+                    <form action="{% url 'administrador:detalles-canasta' id_canasta=canasta.id %}" method="post"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
 
-                        <label class="col-4 col-sm-2 col-form-label">Imagen</label>
-                        <div class="col-8 col-sm-4">
-                            <input type="file" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-4 col-sm-2 col-form-label">Precio (sin descuento)</label>
-                        <div class="col-8 col-sm-4">
-                            <input type="number" class="form-control" readonly value="{{ canasta.get_precio_sin_descuento }}">
-                        </div>
+                        <div class="form-group row">
+                            <label class="col-4 col-sm-2 col-form-label">Nombre de la canasta</label>
+                            <div class="col-8 col-sm-4">
+                                <input name="nombre" type="text" class="form-control" value="{{ canasta.nombre }}"
+                                       required>
+                            </div>
 
-                        <label class="col-4 col-sm-2 col-form-label">Precio (con descuento)</label>
-                        <div class="col-8 col-sm-4">
-                            <input name="precio" type="number" value="{{ canasta.get_precio }}" class="form-control" required>
+                            <label class="col-4 col-sm-2 col-form-label">Imagen</label>
+                            <div class="col-8 col-sm-4">
+                                <input name="imagen" type="file" class="form-control">
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col text-right">
+                        <div class="form-group row">
+                            <label class="col-4 col-sm-2 col-form-label">Precio (sin descuento)</label>
+                            <div class="col-8 col-sm-4">
+                                <input type="number" class="form-control" readonly
+                                       value="{{ canasta.get_precio_sin_descuento }}">
+                            </div>
+
+                            <label class="col-4 col-sm-2 col-form-label">Precio (con descuento)</label>
+                            <div class="col-8 col-sm-4">
+                                <input name="precio" type="number" value="{{ canasta.get_precio }}" class="form-control"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col text-right">
                     <button class="btn btn-info">
                         <i class="fa fa-save"></i>
                         Guardar cambios
                     </button>
+                </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

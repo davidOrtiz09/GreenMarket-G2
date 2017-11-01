@@ -250,8 +250,31 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
             messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
             return redirect(reverse('administrador:canastas'))
 
+    @atomic
+    def post(self, request, id_canasta):
+        nombre = request.POST.get('nombre', '')
+        precio_str = request.POST.get('precio', '0.0')
+        precio = Decimal(precio_str) if precio_str != '' else Decimal()
+        imagen = request.FILES.get('imagen', None)
+
+        canasta = Canasta.objects.filter(id=id_canasta).first()
+        if canasta:
+            canasta.nombre = nombre
+            canasta.precio = precio
+            if imagen:
+                canasta.imagen = imagen
+
+            canasta.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Los datos principales de la canasta se actualizaron correctamente')
+            return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
+            return redirect(reverse('administrador:canastas'))
+
 
 class EliminarCanasta(AbstractAdministradorLoggedView):
+    @atomic
     def post(self, request):
         id_canasta = request.POST.get('id_canasta', '0')
         canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
@@ -275,11 +298,13 @@ class CrearCanasta(AbstractAdministradorLoggedView):
         imagen = request.FILES.get('imagen', None)
         nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, precio=precio, imagen=imagen)
         nueva.save()
-        messages.add_message(request, messages.SUCCESS, 'La canasta fue creada exitosamente. Ahora puede agregar los productos que desee')
+        messages.add_message(request, messages.SUCCESS,
+                             'La canasta fue creada exitosamente. Ahora puede agregar los productos que desee')
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': nueva.id}))
 
 
 class PublicarCanastas(AbstractAdministradorLoggedView):
+    @atomic
     def post(self, request):
         canastas = Canasta.objects.filter(fk_semana=get_or_create_week())
         canastas.update(esta_publicada=True)
@@ -288,6 +313,7 @@ class PublicarCanastas(AbstractAdministradorLoggedView):
 
 
 class EliminarProductoCanasta(AbstractAdministradorLoggedView):
+    @atomic
     def post(self, request):
         id_producto_canasta = request.POST.get('id_producto_canasta', '0')
         producto_canasta = CanastaProducto.objects.filter(id=id_producto_canasta).first()
@@ -301,6 +327,7 @@ class EliminarProductoCanasta(AbstractAdministradorLoggedView):
 
 
 class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
+    @atomic
     def post(self, request):
         id_producto_canasta = request.POST.get('id_producto_canasta', '0')
         cantidad_str = request.POST.get('cantidad', '0')
@@ -310,6 +337,8 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
         if producto_canasta:
             producto_canasta.cantidad = cantidad if cantidad > 0 else 1
             producto_canasta.save()
-            messages.add_message(request, messages.SUCCESS, 'La cantidad del producto {producto} fue actualziado en esta canasta'.format(producto=producto_canasta.nombre_producto))
+            messages.add_message(request, messages.SUCCESS,
+                                 'La cantidad del producto {producto} fue actualziado en esta canasta'.format(
+                                     producto=producto_canasta.nombre_producto))
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
