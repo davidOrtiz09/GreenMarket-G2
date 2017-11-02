@@ -5,5 +5,15 @@
     <div class="card-body">
         <h4 class="card-title text-center">{{ producto.fk_producto.nombre }}</h4>
         <p class="card-text">$ {{ producto.precio|to_cop }} / {{ producto.fk_producto.unidad_medida }}</p>
+        <div class="text-right">
+            <form method="post" action="{% url 'administrador:agregar-producto-canasta' id_canasta=id_canasta %}">
+                {% csrf_token %}
+                <input type="hidden" name="id_producto_catalogo" value="{{ producto.id }}">
+                <button class="btn btn-outline-primary btn-agregar-producto">
+                    <i class="fa fa-plus"></i>
+                    Agregar producto
+                </button>
+            </form>
+        </div>
     </div>
 </div>

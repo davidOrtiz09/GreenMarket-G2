@@ -65,6 +65,14 @@ class AgregarProductoCanasataTest(TestCase):
         )
         canasta.save()
 
+        canasta2 = Canasta(
+            nombre='Canasta de pruebas2',
+            imagen='canastas/canasta-uvas.jpg',
+            precio=Decimal('22000'),
+            fk_semana_id=semana.id
+        )
+        canasta2.save()
+
         if platform.system() == 'Darwin':
             self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver'))
         else:
@@ -105,16 +113,14 @@ class AgregarProductoCanasataTest(TestCase):
         ).distinct()
         return productos_disponibles
 
-
-
     def test_contar_productos_disponibles(self):
         self.do_login()
-        primer_canasta = Canasta.objects.first()
+        canasta = Canasta.objects.last()
 
-        self.browser.get('http://127.0.0.1:8000/administrador/canastas/{id_canasta}'.format(id_canasta=primer_canasta.id))
+        self.browser.get('http://127.0.0.1:8000/administrador/canastas/2')
 
         divs_productos_disponibles = self.browser.find_elements_by_class_name('producto-disponible')
-        productos_disponibles = self.productos_disponibles_canasta(primer_canasta)
+        productos_disponibles = self.productos_disponibles_canasta(canasta)
 
         self.assertEquals(len(divs_productos_disponibles), productos_disponibles.count())
 
@@ -135,5 +141,5 @@ class AgregarProductoCanasataTest(TestCase):
         divs_productos_disponibles2 = self.browser.find_elements_by_class_name('producto-disponible')
         divs_productos_agregados2 = self.browser.find_elements_by_class_name('producto-agregado')
 
-        self.assertEqual(len(divs_productos_disponibles), len(divs_productos_disponibles2) - 1)
-        self.assertEqual(len(divs_productos_agregados), len(divs_productos_agregados2) + 1)
+        self.assertEqual(len(divs_productos_disponibles), len(divs_productos_disponibles2) + 1)
+        self.assertEqual(len(divs_productos_agregados), len(divs_productos_agregados2) - 1)

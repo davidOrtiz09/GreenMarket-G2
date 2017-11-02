@@ -60,43 +60,47 @@
         </div>
     </section>
 
-    <hr>
+    {% if canasta.productos %}
+        <hr>
 
-    <section class="mt-2">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-12">
-                    <h2>Productos agregados</h2>
+        <section class="mt-2">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <h2>Productos agregados</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for canasta_producto in canasta.productos %}
+                        <div class="col-12 col-sm-6 col-md-3 mb-3">
+                            {% include 'Administrador/_elements/producto-canasta-preview.html' with canasta_producto=canasta_producto %}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            <div class="row">
-                {% for canasta_producto in canasta.productos %}
-                    <div class="col-12 col-sm-6 col-md-3 mb-3">
-                        {% include 'Administrador/_elements/producto-canasta-preview.html' with canasta_producto=canasta_producto %}
+        </section>
+    {% endif %}
+
+    {% if productos_disponibles %}
+        <hr>
+
+        <section class="mt-2">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <h2>Productos disponibles</h2>
                     </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <hr>
-
-    <section class="mt-2">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-12">
-                    <h2>Productos disponibles</h2>
+                </div>
+                <div class="row">
+                    {% for producto in productos_disponibles %}
+                        <div class="col-12 col-sm-6 col-md-3 mb-3">
+                            {% include 'Administrador/_elements/producto_disponible_canasta.html' with producto=producto id_canasta=canasta.id %}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
-            <div class="row">
-                {% for producto in productos_disponibles %}
-                    <div class="col-12 col-sm-6 col-md-3 mb-3">
-                        {% include 'Administrador/_elements/producto_disponible_canasta.html' with producto=producto %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 
 {% endblock %}
 

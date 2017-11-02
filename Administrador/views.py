@@ -253,7 +253,7 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
 
             productos_disponibles = Catalogo_Producto.objects\
                 .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id)\
-                .exclude(fk_producto_id__in=ids_productos_canasta)\
+                .exclude(id__in=ids_productos_canasta)\
                 .distinct()
             return render(request, 'Administrador/detalles-canasta.html', {
                 'canasta': canasta, 'productos_disponibles': productos_disponibles
@@ -336,6 +336,34 @@ class EliminarProductoCanasta(AbstractAdministradorLoggedView):
         else:
             messages.add_message(request, messages.ERROR, 'El producto que desea elimimnar no existe en esta canasta')
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+
+class AgregarProductoCanasta(AbstractAdministradorLoggedView):
+    @atomic
+    def post(self, request, id_canasta):
+        canasta = Canasta.objects.filter(id=id_canasta).first()
+        if canasta:
+            id_producto_catalogo = request.POST.get('id_producto_catalogo', '0')
+            producto_catalogo = Catalogo_Producto.objects.filter(
+                id=id_producto_catalogo,
+                fk_catalogo__fk_semana_id=canasta.fk_semana_id
+            ).first()
+
+            if producto_catalogo:
+                nuevo = CanastaProducto(
+                    fk_canasta_id=canasta.id,
+                    fk_producto_catalogo_id=producto_catalogo.id,
+                    cantidad=1
+                )
+                nuevo.save()
+                messages.add_message(request, messages.SUCCESS, 'El producto fue agregado a la canasta exitosamente')
+            else:
+                messages.add_message(request, messages.ERROR, 'En el catalogo correspondiente de la cansata, no encontramos el producto que deseabas agregar')
+            return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás tratando de editar')
+            return redirect(reverse('administrador:canastas'))
 
 
 class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):

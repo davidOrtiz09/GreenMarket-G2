@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^crear-canasta$', views.CrearCanasta.as_view(), name='crear-canasta'),
     url(r'^publicar-canastas$', views.PublicarCanastas.as_view, name='publicar-canastas'),
     url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta'),
+    url(r'^canastas/(?P<id_canasta>\d+)/agregar-producto$', views.AgregarProductoCanasta.as_view(), name='agregar-producto-canasta'),
     url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
     url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta')
 ]
