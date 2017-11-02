@@ -29,4 +29,4 @@ urlpatterns = [
 ]
 
 if IS_DEPLOYED != 'True':
-    urlpatterns = urlpatterns  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

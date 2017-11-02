@@ -150,14 +150,15 @@ MESSAGE_TAGS = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-
+'''
 CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8000',
     'localhost:8000',
     'green-market-master.herokuapp.com',
-    'green-market-develop.herokuapp.com'
+    'green-market-develop.herokuapp.com',
+    '127.0.0.1:9000'
 )
-
+'''
 
 if IS_DEPLOYED == 'True':
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
