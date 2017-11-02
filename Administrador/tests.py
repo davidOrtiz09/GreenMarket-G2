@@ -93,6 +93,20 @@ class AgregarProductoCanasataTest(TestCase):
         self.do_login()
         self.assertIn('Administrador - Green Market', self.browser.title)
 
+    def productos_disponibles_canasta(self, canasta):
+        ids_productos_canasta = CanastaProducto.objects.filter(
+            fk_canasta_id=canasta.id,
+        ).values_list('fk_producto_catalogo_id', flat=True)
+
+        productos_disponibles = Catalogo_Producto.objects.filter(
+            fk_catalogo__fk_semana_id=canasta.fk_semana_id,
+        ).exclude(
+            fk_producto_id__in=ids_productos_canasta
+        ).distinct()
+        return productos_disponibles
+
+
+
     def test_contar_productos_disponibles(self):
         self.do_login()
         primer_canasta = Canasta.objects.first()
@@ -100,15 +114,26 @@ class AgregarProductoCanasataTest(TestCase):
         self.browser.get('http://127.0.0.1:8000/administrador/canastas/{id_canasta}'.format(id_canasta=primer_canasta.id))
 
         divs_productos_disponibles = self.browser.find_elements_by_class_name('producto-disponible')
-
-        ids_productos_canasta = CanastaProducto.objects.filter(
-            fk_canasta_id=primer_canasta.id,
-        ).values_list('fk_producto_catalogo_id', flat=True)
-
-        productos_disponibles = Catalogo_Producto.objects.filter(
-            fk_catalogo__fk_semana_id=primer_canasta.fk_semana_id,
-        ).exclude(
-            fk_producto_id__in=ids_productos_canasta
-        ).distinct()
+        productos_disponibles = self.productos_disponibles_canasta(primer_canasta)
 
         self.assertEquals(len(divs_productos_disponibles), productos_disponibles.count())
+
+    def test_agregar_producto(self):
+        self.do_login()
+        primer_canasta = Canasta.objects.first()
+
+        self.browser.get(
+            'http://127.0.0.1:8000/administrador/canastas/{id_canasta}'.format(id_canasta=primer_canasta.id))
+
+        divs_productos_disponibles = self.browser.find_elements_by_class_name('producto-disponible')
+        divs_productos_agregados = self.browser.find_elements_by_class_name('producto-agregado')
+
+        boton = self.browser.find_element_by_class_name('btn-agregar-producto')
+        boton.click()
+        self.browser.implicitly_wait(5)
+
+        divs_productos_disponibles2 = self.browser.find_elements_by_class_name('producto-disponible')
+        divs_productos_agregados2 = self.browser.find_elements_by_class_name('producto-agregado')
+
+        self.assertEqual(len(divs_productos_disponibles), len(divs_productos_disponibles2) - 1)
+        self.assertEqual(len(divs_productos_agregados), len(divs_productos_agregados2) + 1)
