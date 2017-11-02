@@ -53,12 +53,13 @@
         </div>
         <!-- Modal a mostar en caso de que no se encuentren pedidos para un cliente.-->
         {% if pedidos.count == 0 %}
-            {% include 'Administrador/_elements/_modal_sin_pedidos.html'%}
+            {% include 'Administrador/_elements/_modal_mensaje.html' with titulo='Historial pedidos - Green Market' mensaje='No hay pedidos para el cliente' url_ir='/administrador/clientes'%}
         {% endif %}
     </section>
 {% endblock %}
 
 {% block scripts %}
     <script src="{% static 'Administrador/historial-cliente/ver-detalle.js' %}"></script>
+    <script src="{% static 'Administrador/general/modal_mensaje.js' %}"></script>
 
 {% endblock %}
