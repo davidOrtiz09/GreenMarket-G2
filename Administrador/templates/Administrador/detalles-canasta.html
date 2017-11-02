@@ -79,6 +79,27 @@
         </div>
     </section>
 
+    <hr>
+
+    <section class="mt-2">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h2>Productos disponibles</h2>
+                </div>
+            </div>
+            <div class="row">
+                {% for producto in '1234567891' %}
+                    <div class="col-12 col-sm-6 col-md-3 mb-3">
+                    <div class="producto-disponible">
+                        producto
+                    </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
 {% endblock %}
 
 {% block scripts %}
