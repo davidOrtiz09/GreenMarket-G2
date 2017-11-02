@@ -62,7 +62,7 @@ class Logout(View):
 
 class Index(View):
     def dispatch(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
+        if self.request.user.is_authenticated and not es_cliente(self.request.user):
             rol = 'productor' if es_productor(self.request.user) else 'administrador'
             messages.add_message(
                 self.request,
@@ -78,7 +78,7 @@ class Index(View):
         cooperativas = Cooperativa.objects.all()
         catalogo = Catalogo.objects.last()
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
+            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
@@ -92,7 +92,7 @@ class Index(View):
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_cooperativa__id=cooperativa_id) \
+            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
             .order_by(ordenar_por)
         categorias = Categoria.objects.all()
         cooperativas = Cooperativa.objects.all()
