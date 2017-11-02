@@ -9,8 +9,8 @@ import os
 
 class AgregarProductoCanasataTest(TestCase):
     def setUp(self):
-        # self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver'))
-        self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver.exe'))
+        self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver'))
+        #self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver.exe'))
         self.browser.implicitly_wait(2)
 
     def tearDown(self):
