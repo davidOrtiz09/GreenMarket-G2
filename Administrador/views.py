@@ -7,13 +7,15 @@ from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Categoria
 from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
 from decimal import Decimal
+from django.utils import timezone
+from datetime import timedelta
 
 
 class AbstractAdministradorLoggedView(View):
@@ -245,7 +247,17 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
     def get(self, request, id_canasta):
         canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
         if canasta:
-            return render(request, 'Administrador/detalles-canasta.html', {'canasta': canasta})
+            ids_productos_canasta = CanastaProducto.objects\
+                .filter(fk_canasta_id=canasta.id)\
+                .values_list('fk_producto_catalogo_id', flat=True)
+
+            productos_disponibles = Catalogo_Producto.objects\
+                .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id)\
+                .exclude(fk_producto_id__in=ids_productos_canasta)\
+                .distinct()
+            return render(request, 'Administrador/detalles-canasta.html', {
+                'canasta': canasta, 'productos_disponibles': productos_disponibles
+            })
         else:
             messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
             return redirect(reverse('administrador:canastas'))
