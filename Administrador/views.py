@@ -235,6 +235,7 @@ class InformesClientesMasRentables(View):
                 mejores_clientes.append(
                     MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
                 )
+        clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html',
-                      {'mejores_clientes': mejores_clientes
+                      {'mejores_clientes': clientes_ordenados
                        })
