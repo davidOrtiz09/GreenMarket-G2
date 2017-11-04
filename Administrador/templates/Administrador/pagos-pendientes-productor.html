@@ -1,0 +1,56 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Generar Orden de Pago</h1>
+            <br/>
+            <br>
+            <div class="panel panel panel-success">
+                <div class="panel-heading">Generar Orden de Pago</div>
+                <div class="container-fluid" style="height: 400px;overflow: auto">
+                    <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Imagen</th>
+                            <th class="text-center">Productor</th>
+                            <th class="text-center">Productos Por Pagar</th>
+                            <th class="text-center">Precio Total</th>
+                            <th class="text-center">Detalle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for productor in productores %}
+                            <form method="post" action="{% url 'administrador:generar-orden-compra' %}">
+                                {% csrf_token %}
+                                <tr>
+                                    <td class="text-center">
+                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">
+                                    </td>
+                                    <td class="text-center">
+                                        {{ productor.nombre }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{ productor.descripcion }}
+                                    </td>
+                                    <td class="text-center">
+                                        {{ productor.nombre }}
+                                    </td>
+                                    <td class="text-center">
+                                      <a href="{% url 'administrador:generar-orden-compra' id_productor=productor.id %}" class="btn btn-info">
+                                        Ver detalle
+                                    </a>
+                                </td>
+                                </tr>
+                            </form>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
