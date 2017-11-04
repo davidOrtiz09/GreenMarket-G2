@@ -55,6 +55,12 @@
                         <i class="icon-padnote"></i> <span>Informes</span>
                     </a>
                 </li>
+            {% url 'administrador:informes' as url_informes %}
+                <li {% if request.path == url_informes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:informes' %}">
+                        <i class="icon-padnote"></i> <span>Informes</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

@@ -49,7 +49,6 @@ class Productor(models.Model):
         return self.nombre
 
 
-@python_2_unicode_compatible
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     descripcion = models.TextField(max_length=300, verbose_name='Descripción', null=False, blank=False)
@@ -58,12 +57,7 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
-    class Meta:
-        verbose_name = 'Categoria'
-        verbose_name_plural = 'Categorias'
 
-
-@python_2_unicode_compatible
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
         ('Kg', 'Kilogramos'),
@@ -93,7 +87,6 @@ class Semana(models.Model):
                                        blank=False)
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
     fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
-
 
     class Meta:
         verbose_name = 'Semana'
@@ -146,8 +139,9 @@ class Oferta_Producto(models.Model):
         ofertas_producto = list()
         for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
             producto = oferta.fk_producto
-            ofertas_producto.append((producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
-                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
+            ofertas_producto.append(
+                (producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+                 oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
         return ofertas_producto
 
 
@@ -165,7 +159,6 @@ class Catalogo(models.Model):
         return '{0}'.format(self.id)
 
 
-@python_2_unicode_compatible
 class Catalogo_Producto(models.Model):
     fk_catalogo = models.ForeignKey(Catalogo, on_delete=models.CASCADE, verbose_name='Catálogo', null=False,
                                     blank=False)
@@ -176,13 +169,11 @@ class Catalogo_Producto(models.Model):
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'
-        unique_together = (('fk_catalogo', 'fk_producto'),)
 
     def __str__(self):
-        return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
+        return '{0}'.format(self.id)
 
 
-@python_2_unicode_compatible
 class Cliente(models.Model):
     TIPO_DOCUMENTOS = (
         ('CC', 'Cédula de Ciudadanía'),
@@ -218,8 +209,6 @@ class Cliente(models.Model):
         pass
         # unique_together = ('numero_identificacion', 'tipo_identificacion',)
 
-    def __str__(self):
-        return self.fk_django_user.get_full_name()
 
 
 @python_2_unicode_compatible
@@ -242,15 +231,15 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    nombre_envio=models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
-    direccion_envio=models.CharField(max_length=150, null=False, blank=False)
-    email_envio=models.CharField(max_length=150, null=False, blank=False)
-    telefono_envio=models.CharField(max_length=150, null=False, blank=False)
-    observaciones_envio=models.CharField(max_length=150, null=False, blank=False)
+    nombre_envio = models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
+    direccion_envio = models.CharField(max_length=150, null=False, blank=False)
+    email_envio = models.CharField(max_length=150, null=False, blank=False)
+    telefono_envio = models.CharField(max_length=150, null=False, blank=False)
+    observaciones_envio = models.CharField(max_length=150, null=False, blank=False)
 
-    nombre_pago=models.CharField(max_length=150, null=False, blank=False)
-    tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
-    numero_identificacion=models.CharField(max_length=20)
+    nombre_pago = models.CharField(max_length=150, null=False, blank=False)
+    tipo_identificacion = models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
+    numero_identificacion = models.CharField(max_length=20)
 
     def __str__(self):
         return '{cliente} (Pedido {fecha})'.format(cliente=self.fk_cliente, fecha=self.fecha_pedido)
