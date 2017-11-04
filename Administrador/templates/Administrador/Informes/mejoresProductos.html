@@ -25,10 +25,10 @@
                                 {% for mejProd in datos %}
                             <tr>
                                 <td class="text-center">
-                                    {{ mejProd.producto.fk_categoria.descripcion }}
+                                    {{ mejProd.producto.fk_categoria.nombre }}
                                 </td>
                                 <td class="text-center">
-                                    {{ mejProd.producto.descripcion }}
+                                    {{ mejProd.producto.nombre }}
                                 </td>
                                 <td class="text-center">
                                     <img src="{{ mejProd.producto.imagen.url }}" class="img-responsive center-block" style="max-height: 200px; max-width: 200px">

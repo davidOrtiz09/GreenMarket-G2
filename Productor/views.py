@@ -71,13 +71,10 @@ class ProductosVendidosView(AbstractProductorLoggedView):
         else:
             dias_restar = dia_semana + 4
 
-        # Por el momento se toma el primer productor que devuelve la consulta.
-        productor = Productor.objects.first()
-
         # Se obtienen las ofertas  realizadas por un productor y que fueron aceptadas
         # Solo se toman las ofertas de realizadas desde el día actual al jueves anterior.
         ofertas_pro = Oferta_Producto \
-            .objects.filter(estado=1, fk_oferta__fk_productor=productor ,
+            .objects.filter(estado=1, fk_oferta__fk_productor__fk_django_user= request.user,
                             fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-dias_restar)) \
             .values('fk_producto__nombre', 'fk_producto__unidad_medida', 'cantidad_aceptada',
                     'cantidad_vendida', 'precioProvedor', cantidad_disponible= F('cantidad_aceptada') - F('cantidad_vendida'))
