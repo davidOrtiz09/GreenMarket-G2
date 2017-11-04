@@ -3,15 +3,15 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-from django.contrib.auth.models import User
 from operator import itemgetter
+from django.contrib.auth.models import User
 from django.db.models import Sum, Min, Max
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from Administrador.models import MejoresClientes
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
-from Administrador.utils import catalogo_actual, catalogo_validaciones
+from Administrador.utils import catalogo_actual, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
@@ -218,9 +218,11 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
+
 class Informes(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/index.html', {})
+
 
 class InformesClientesMasRentables(View):
     def get(self, request):
@@ -237,44 +239,45 @@ class InformesClientesMasRentables(View):
                     MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
                 )
         clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
-        return render(request, 'Administrador/Informes/clientes_mas_rentables.html',
-                      {'mejores_clientes': clientes_ordenados
-                       })
+        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {
+            'mejores_clientes': clientes_ordenados
+        })
 
 
-class seleccionSemanas(View):
+class SeleccionSemanas(View):
     def get(self, request):
-        semanasAll= Semana.objects.all()
-        semanasCount=len(semanasAll)
-        semanas =[]
+        semanasAll = Semana.objects.all()
+        semanasCount = len(semanasAll)
+        semanas = []
         if semanasCount >= 4:
-            semanas.append((semanasAll[semanasCount-1]))
-            semanas.append((semanasAll[semanasCount-2]))
-            semanas.append((semanasAll[semanasCount-3]))
-            semanas.append((semanasAll[semanasCount-4]))
+            semanas.append((semanasAll[semanasCount - 1]))
+            semanas.append((semanasAll[semanasCount - 2]))
+            semanas.append((semanasAll[semanasCount - 3]))
+            semanas.append((semanasAll[semanasCount - 4]))
         else:
-            semanas=semanasAll
+            semanas = semanasAll
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
-                      {'semanas':semanas})
+                      {'semanas': semanas})
 
-class obtener_mejores_productos(View):
+
+class ObtenerMejoresProductos(View):
     def post(self, request):
         semanas = request.POST.getlist('semana', [])
         respuesta = []
-        catalogoProd= Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in= semanas)
+        catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas)
         for pro in catalogoProd:
-            valor_compra = obtener_valor_compra(semanas,pro.fk_producto)
+            valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
-            cantVendida = obtener_cantidad_vendida(semanas,pro.fk_producto)
-            producto=Producto.objects.filter(id=pro.fk_producto.id).first()
-            porcentaje=int
-            if cantVendida !=0:
+            cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto)
+            producto = Producto.objects.filter(id=pro.fk_producto.id).first()
+            porcentaje = int
+            if cantVendida != 0:
                 porcentaje = int((((valor_venta - valor_compra) * cantVendida) * 100) / (valor_compra * cantVendida))
             else:
                 porcentaje = 0
             respuesta.append({
                 'producto': producto,
-                'cantidad_vendida':cantVendida,
+                'cantidad_vendida': cantVendida,
                 'valor_compra': valor_compra,
                 'valor_venta': valor_venta,
                 'ganancia': (valor_venta - valor_compra) * cantVendida,
@@ -282,31 +285,13 @@ class obtener_mejores_productos(View):
 
             })
         ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
-        return  render(request, 'Administrador/Informes/mejoresProductos.html', {'datos':ordenado})
+        return render(request, 'Administrador/Informes/mejoresProductos.html', {'datos': ordenado})
 
-
-def obtener_cantidad_vendida(semana, id_producto):
-    productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
-    cantidad = 0
-    for pro in productos_vendidos:
-        cantidad = cantidad + pro.cantidad_vendida
-    return cantidad
-
-def obtener_valor_compra(semana, id_producto):
-    ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
-    sumPrecios=0
-    for ofertaProd in ofertaProducto:
-        sumPrecios = sumPrecios + ofertaProd.precioProvedor
-    valorPromedio = sumPrecios / len(ofertaProducto)
-    return valorPromedio
-
-class InformesClientesMasRentables(View):
-    def get(self, request):
-        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
 
 class ClientesView(View):
     def get(self, request):
         return render(request, 'Administrador/clientes.html', {'clientes': Cliente.objects.all()})
+
 
 class PerfilClienteView(View):
     def get(self, request, id):
@@ -431,9 +416,11 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
         if producto_canasta:
             producto_canasta.cantidad = cantidad if cantidad > 0 else 1
             producto_canasta.save()
-            messages.add_message(request, messages.SUCCESS,
-                                 'La cantidad del producto {producto} fue actualziado en esta canasta'.format(
-                                     producto=producto_canasta.nombre_producto))
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'La cantidad del producto {producto} fue actualziado en esta canasta'
+                    .format(producto=producto_canasta.nombre_producto)
+            )
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
-

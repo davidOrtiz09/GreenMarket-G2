@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from MarketPlace.models import Catalogo, Semana, Cooperativa
+from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto
 
 
 # Se obtiene el catalogo más reciente creado
@@ -34,3 +34,20 @@ def catalogo_validaciones(semana_id):
 
     return({'mensaje': '',
             'semana':semana, 'cooperativa': cooperativa})
+
+
+def obtener_cantidad_vendida(semana, id_producto):
+    productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+    cantidad = 0
+    for pro in productos_vendidos:
+        cantidad = cantidad + pro.cantidad_vendida
+    return cantidad
+
+
+def obtener_valor_compra(semana, id_producto):
+    ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+    sumPrecios=0
+    for ofertaProd in ofertaProducto:
+        sumPrecios = sumPrecios + ofertaProd.precioProvedor
+    valorPromedio = sumPrecios / len(ofertaProducto)
+    return valorPromedio
