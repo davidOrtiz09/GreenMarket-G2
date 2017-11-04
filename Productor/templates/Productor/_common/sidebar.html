@@ -16,7 +16,7 @@
 
                 {% url 'productor:crearOferta' as url_crear_oferta %}
                 <li {% if request.path == url_crear_oferta %}class="active"{% endif %}>
-                    <a href="{{ url_index }}">
+                    <a href="{{ url_crear_oferta }}">
                         <i class="fa fa-shopping-basket"></i>
                         <span>Realizar oferta</span>
                     </a>
