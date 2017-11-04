@@ -1,6 +1,7 @@
 {% extends 'MarketPlace/_common/base.html' %}
 {% load static %}
 {% block main %}
+    <link href="{% static '/theme/css/style_cliente.css' %}" rel="stylesheet">
     <section>
         <div class="container">
             <div class="row">
@@ -63,4 +64,6 @@
             </div>
         </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="{% static  '/js/cliente.js' %}"></script>
 {% endblock %}
