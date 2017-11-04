@@ -1,11 +1,12 @@
+{% load static %}
 <nav class="side-navbar">
     <div class="side-navbar-wrapper">
         <div class="sidenav-header d-flex align-items-center justify-content-center">
             <div class="sidenav-header-inner text-center">
-                <img src="https://placehold.it/400x200" alt="person" class="img-fluid">
+                <img src="{% static 'Administrador/logo.png' %}" alt="person" class="img-fluid">
             </div>
             <div class="sidenav-header-logo">
-                <a href="#" class="brand-small text-center">
+                <a href="{% url 'administrador:index' %}" class="brand-small text-center">
                     <strong>G</strong><strong class="text-primary">M</strong>
                 </a>
             </div>
@@ -24,16 +25,28 @@
                         <i class="icon-padnote"></i> <span>Catálogo</span>
                     </a>
                 </li>
+                {% url 'administrador:canastas' as url_canastas %}
+                <li {% if url_canastas in request.path %}class="active"{% endif %}>
+                    <a href="{{ url_canastas }}">
+                        <i class="fa fa-shopping-basket"></i> <span>Canastas</span>
+                    </a>
+                </li>
                 {% url 'administrador:pedidos' as url_pedidos %}
                 <li {% if request.path == url_pedidos %}class="active"{% endif %}>
                     <a href="{% url 'administrador:pedidos' %}">
                         <i class="icon-list"></i> <span>Pedidos</span>
                     </a>
                 </li>
-            {% url 'administrador:ofertas' as url_ofertas %}
+                {% url 'administrador:ofertas' as url_ofertas %}
                 <li {% if request.path == url_ofertas %}class="active"{% endif %}>
                     <a href="{% url 'administrador:ofertas' %}">
-                        <i class="icon-list"></i> <span>Ofertas</span>
+                        <i class="fa fa-apple"></i> <span>Ofertas</span>
+                    </a>
+                </li>
+                {% url 'administrador:clientes' as url_clientes %}
+                <li {% if request.path == url_clientes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:clientes' %}">
+                        <i class="icon-user"></i> <span>Clientes</span>
                     </a>
                 </li>
             {% url 'administrador:informes' as url_informes %}

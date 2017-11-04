@@ -9,11 +9,13 @@ from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Semana
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
 from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
-from MarketPlace.utils import es_administrador, redirect_user_to_home
+from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
+from django.db.transaction import atomic
+from decimal import Decimal
 
 
 class AbstractAdministradorLoggedView(View):
@@ -59,9 +61,9 @@ class Index(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/index.html', {})
 
+
 class CatalogoSemanasView(AbstractAdministradorLoggedView):
     def get(self, request):
-
         return render(request, 'Administrador/catalogo-semanas.html',
                       {'semanas': Semana.objects.all().order_by('-fecha_inicio')})
 
@@ -70,9 +72,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
     def get(self, request, semana_id):
         info_catalogo = {}
         oferta_nueva = False
-
         resp = catalogo_validaciones(semana_id)
-
 
         if (resp['mensaje'] == ''):
             semana = resp['semana']
@@ -107,7 +107,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
                       {'ofertas_pro': info_catalogo['ofertas_pro'],
                        'subtitulo': info_catalogo['subtitulo'],
                        'oferta_nueva': oferta_nueva,
-                       'semana_id':semana_id})
+                       'semana_id': semana_id})
 
     def post(self, request, semana_id):
         # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
@@ -233,7 +233,7 @@ class seleccionSemanas(View):
             semanas=semanasAll
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
                       {'semanas':semanas})
-
+      
 class obtener_mejores_productos(View):
     def post(self, request):
         semanas = request.POST.getlist('semana', [])
@@ -261,6 +261,7 @@ class obtener_mejores_productos(View):
         ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
         return  render(request, 'Administrador/Informes/mejoresProductos.html', {'datos':ordenado})
 
+      
 def obtener_cantidad_vendida(semana, id_producto):
     productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
     cantidad = 0
@@ -275,26 +276,137 @@ def obtener_valor_compra(semana, id_producto):
         sumPrecios = sumPrecios + ofertaProd.precioProvedor
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
-
-
-""" class listarMejoresProductos(View):
-    def post(self,request):
-          semanas = request.POST.getlist('semana',[])
-   catalogos=[]
-   catalogosProductosAll=[]
-   pedidoProductoAll=[]
-   for sem in semanas:
-       catalogoSem=Catalogo.objects.filter(fk_semana=sem)
-       catalogos.append(catalogoSem)
-   for cat in catalogos:
-       cataloProductos=Catalogo_Producto.objects.filter(fk_catalogo=cat)
-       catalogosProductosAll.append(cataloProductos)
-   for catProd in catalogosProductosAll:
-       pedidoProducto=PedidoProducto.objects.filter(catProd)
-       pedidoProductoAll.append(pedidoProducto)
-       pedidoProductoAll
-        return render(request, 'Administrador/Informes/mejoresProductos.html')"""
-
+  
 class InformesClientesMasRentables(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
+
+class ClientesView(View):
+    def get(self, request):
+        return render(request, 'Administrador/clientes.html', {'clientes': Cliente.objects.all()})
+
+
+class HistorialClienteView(View):
+    # Retorna el template con todos los pedidos en orden descendentes pertenecientes a un cliente.
+    def get(self, request, id):
+        return render(request, 'Administrador/historial-cliente.html',
+                      {'pedidos': Pedido.objects.filter(fk_cliente_id=id).order_by('fecha_pedido').reverse(),
+                       'cliente': Cliente.objects.get(id=id)})
+
+
+class PedidoClienteView(View):
+    # Retorna el template con el detalle de un pedido en especifico.
+    def get(self, request, id):
+        return render(request, 'Administrador/_elements/_modal_pedido.html',
+                      {'detallePedido': PedidoProducto.objects.filter(fk_pedido_id=id),
+                       'pedidoId': id})
+
+
+class Canastas(AbstractAdministradorLoggedView):
+    def get(self, request):
+        canastas = Canasta.objects.filter(fk_semana=get_or_create_week())
+        return render(request, 'Administrador/canastas.html', {'canastas': canastas})
+
+
+class DetallesCanasta(AbstractAdministradorLoggedView):
+    def get(self, request, id_canasta):
+        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
+        if canasta:
+            return render(request, 'Administrador/detalles-canasta.html', {'canasta': canasta})
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
+            return redirect(reverse('administrador:canastas'))
+
+    @atomic
+    def post(self, request, id_canasta):
+        nombre = request.POST.get('nombre', '')
+        precio_str = request.POST.get('precio', '0.0')
+        precio = Decimal(precio_str) if precio_str != '' else Decimal()
+        imagen = request.FILES.get('imagen', None)
+
+        canasta = Canasta.objects.filter(id=id_canasta).first()
+        if canasta:
+            canasta.nombre = nombre
+            canasta.precio = precio
+            if imagen:
+                canasta.imagen = imagen
+
+            canasta.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Los datos principales de la canasta se actualizaron correctamente')
+            return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
+            return redirect(reverse('administrador:canastas'))
+
+
+class EliminarCanasta(AbstractAdministradorLoggedView):
+    @atomic
+    def post(self, request):
+        id_canasta = request.POST.get('id_canasta', '0')
+        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
+        if canasta:
+            canasta.delete()
+            messages.add_message(request, messages.SUCCESS, 'La canasta fue eliminada')
+        else:
+            messages.add_message(request, messages.ERROR, 'No existe la canasta que estás tratando de eliminar')
+        return redirect(reverse('administrador:canastas'))
+
+
+class CrearCanasta(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/crear-canasta.html', {})
+
+    @atomic
+    def post(self, request):
+        nombre = request.POST.get('nombre', '')
+        precio_str = request.POST.get('precio', '0.0')
+        precio = Decimal(precio_str) if precio_str != '' else Decimal()
+        imagen = request.FILES.get('imagen', None)
+        nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, precio=precio, imagen=imagen)
+        nueva.save()
+        messages.add_message(request, messages.SUCCESS,
+                             'La canasta fue creada exitosamente. Ahora puede agregar los productos que desee')
+        return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': nueva.id}))
+
+
+class PublicarCanastas(AbstractAdministradorLoggedView):
+    @atomic
+    def post(self, request):
+        canastas = Canasta.objects.filter(fk_semana=get_or_create_week())
+        canastas.update(esta_publicada=True)
+        messages.add_message(request, messages.SUCCESS, 'Las canastas fueron publicadas exitosamente')
+        return redirect(reverse('administrador:canastas'))
+
+
+class EliminarProductoCanasta(AbstractAdministradorLoggedView):
+    @atomic
+    def post(self, request):
+        id_producto_canasta = request.POST.get('id_producto_canasta', '0')
+        producto_canasta = CanastaProducto.objects.filter(id=id_producto_canasta).first()
+        canasta = producto_canasta.fk_canasta
+        if producto_canasta:
+            producto_canasta.delete()
+            messages.add_message(request, messages.SUCCESS, 'El producto fue eliminado de esta canasta')
+        else:
+            messages.add_message(request, messages.ERROR, 'El producto que desea elimimnar no existe en esta canasta')
+        return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+
+class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
+    @atomic
+    def post(self, request):
+        id_producto_canasta = request.POST.get('id_producto_canasta', '0')
+        cantidad_str = request.POST.get('cantidad', '0')
+        cantidad = int(cantidad_str)
+        producto_canasta = CanastaProducto.objects.filter(id=id_producto_canasta).first()
+        canasta = producto_canasta.fk_canasta
+        if producto_canasta:
+            producto_canasta.cantidad = cantidad if cantidad > 0 else 1
+            producto_canasta.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'La cantidad del producto {producto} fue actualziado en esta canasta'.format(
+                                     producto=producto_canasta.nombre_producto))
+
+        return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
