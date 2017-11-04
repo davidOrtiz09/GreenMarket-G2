@@ -55,9 +55,8 @@ class Logout(View):
 
 
 class Index(AbstractProductorLoggedView):
-
     def get(self, request):
-        return render(request, 'Productor/crear_oferta.html', {})
+        return redirect(reverse('productor:crearOferta'))
 
 
 class ProductosVendidosView(AbstractProductorLoggedView):

@@ -14,9 +14,9 @@
         <div class="main-menu">
             <ul id="side-main-menu" class="side-menu list-unstyled">
 
-                {% url 'productor:index' as url_index %}
-                <li {% if request.path == url_index %}class="active"{% endif %}>
-                    <a href="{{ url_index }}">
+                {% url 'productor:crearOferta' as url_crear_oferta %}
+                <li {% if request.path == url_crear_oferta %}class="active"{% endif %}>
+                    <a href="{{ url_crear_oferta }}">
                         <i class="fa fa-shopping-basket"></i>
                         <span>Realizar oferta</span>
                     </a>
