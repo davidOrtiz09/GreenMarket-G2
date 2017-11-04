@@ -228,10 +228,10 @@ class InformesClientesMasRentables(View):
     def get(self, request):
         mejores_clientes = list()
         for cliente in Cliente.objects.all():
-            pedidos = Pedido.objects.filter(fk_cliente=cliente.id)
+            pedidos = Pedido.objects.filter(fk_cliente=cliente)
             cantidad_pedidos = pedidos.count()
             if cantidad_pedidos > 0:
-                django_user = User.objects.get(id=cliente.fk_django_user.id)
+                django_user = User.objects.get(id=cliente.fk_django_user_id)
                 nombre = django_user.first_name + ' ' + django_user.last_name
                 total_compras = pedidos.aggregate(Sum('valor_total'))
                 ultima_fecha = pedidos.order_by('fecha_pedido')[0]
@@ -269,7 +269,7 @@ class ObtenerMejoresProductos(View):
             valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
             cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto)
-            producto = Producto.objects.filter(id=pro.fk_producto.id).first()
+            producto = Producto.objects.filter(id=pro.fk_producto_id).first()
             porcentaje = int
             if cantVendida != 0:
                 porcentaje = int((((valor_venta - valor_compra) * cantVendida) * 100) / (valor_compra * cantVendida))
