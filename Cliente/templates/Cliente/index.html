@@ -4,18 +4,7 @@
     <section>
         <div class="container">
             <div class="row">
-                <div class="col-lg-3">
-                    <h1 class="my-4">Green Market</h1>
-                    {% comment %}
-                    <div class="list-group">
-                        <a href="#" class="list-group-item">Category 1</a>
-                        <a href="#" class="list-group-item">Category 2</a>
-                        <a href="#" class="list-group-item">Category 3</a>
-                    </div>
-                    {% endcomment %}
-                </div>
-
-                <div class="col-lg-9">
+                <div class="col-12">
                     <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
                         <ol class="carousel-indicators">
                             <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -23,7 +12,9 @@
                         </ol>
                         <div class="carousel-inner" role="listbox">
                             <div class="carousel-item active">
-                                <img class="d-block img-fluid" src="http://organicshop.in/organic-insights/wp-content/uploads/2017/06/certification-organic-02.jpg" alt="First slide">
+                                <img class="d-block img-fluid"
+                                     src="http://organicshop.in/organic-insights/wp-content/uploads/2017/06/certification-organic-02.jpg"
+                                     alt="First slide">
                             </div>
                         </div>
                         <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button"
@@ -59,15 +50,16 @@
 
                         </div>
                     </form>
-
-                    <div class="row">
-                        {% for producto in productos_catalogo %}
-                            <div class="col-lg-4 col-md-6 mb-4">
-                                {% include 'Cliente/_elements/_producto-preview.html' with product=producto %}
-                            </div>
-                        {% endfor %}
-                    </div>
                 </div>
+
+            </div>
+
+            <div class="row">
+                {% for producto in productos_catalogo %}
+                    <div class="col-12 col-md-6 col-lg-3 mb-4">
+                        {% include 'Cliente/_elements/_producto-preview.html' with product=producto %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </section>

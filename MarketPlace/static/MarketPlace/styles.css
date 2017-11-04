@@ -149,3 +149,7 @@ th.cantidad{
 .clickable, .clickable *{
     cursor: pointer;
 }
+
+img.product-preview{
+  max-height: 150px
+}
