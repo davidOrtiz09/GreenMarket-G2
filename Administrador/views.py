@@ -421,12 +421,26 @@ class ConsultarPagosPendientes(View):
                       {'ofteras_por_pagar': ofteras_por_pagar,
                        'productores': productor})
 
+class DetalleOrdenPagoProductores(View):
+    def get(self, request, id_productor):
+        print id_productor
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
+                                                           fk_oferta__fk_productor_id=id_productor)
+
+        productor = Productor.objects.filter(id=id_productor)
+        print ofertas_por_pagar[0]
+        return render(request, 'Administrador/detalle-productos-orden-pago.html', {
+            'ofertas_por_pagar': ofertas_por_pagar,
+            'productor': productor
+        })
 
 class GenerarOrdenPagoProductores(View):
-    def get(self, request):
-        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)
-        productor = Productor.objects.filter(oferta__oferta_producto__fk_orden_compra__isnull=True).distinct('id')
+    def post(self, request):
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)
+        orden_pago_Json = json.loads(request.POST.get('orden-pago_form'))
 
-        return render(request, 'Administrador/generar-pago-productor.html',
-                      {'ofteras_por_pagar': ofteras_por_pagar,
-                       'productores': productor})
+        for item in orden_pago_Json:
+            print item
+        return render(request, 'Administrador/pagos-pendientes-productor.html', {
+            'ofertas_por_pagar': ofertas_por_pagar,
+        })

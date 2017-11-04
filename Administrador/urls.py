@@ -31,5 +31,7 @@ urlpatterns = [
     url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
     url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta'),
     url(r'^pagos-pendientes-productor$', views.ConsultarPagosPendientes.as_view(), name='pagos-pendientes-productor'),
-    url(r'^generar-orden-pago-productores/(?P<id_productor>\d+)/$', views.GenerarOrdenPagoProductores.as_view(), name='generar-orden-pago-productores'),
+    url(r'^detalle-producto-orden-pago/(?P<id_productor>\d+)$', views.DetalleOrdenPagoProductores.as_view(), name='detalle-producto-orden-pago'),
+    url(r'^generar-orden-pago-productores$', views.GenerarOrdenPagoProductores.as_view(), name='generar-orden-pago-productores'),
+
 ]
