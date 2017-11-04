@@ -422,3 +422,11 @@ class ConsultarPagosPendientes(View):
                        'productores': productor})
 
 
+class GenerarOrdenPagoProductores(View):
+    def get(self, request):
+        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)
+        productor = Productor.objects.filter(oferta__oferta_producto__fk_orden_compra__isnull=True).distinct('id')
+
+        return render(request, 'Administrador/generar-pago-productor.html',
+                      {'ofteras_por_pagar': ofteras_por_pagar,
+                       'productores': productor})
