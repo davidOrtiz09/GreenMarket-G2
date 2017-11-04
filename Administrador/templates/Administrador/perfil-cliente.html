@@ -1,0 +1,86 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Perfil Cliente: {{cliente.fk_django_user.first_name}} {{ cliente.fk_django_user.last_name }}</h1>
+            <br>
+            <br>
+            <div class="container-fluid">
+                <table id="perfilCliente" class="table table-responsive" cellspacing="2" style="width: 80%"
+                       border="1"
+                       align="center">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Nombre:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.fk_django_user.first_name}} {{ cliente.fk_django_user.last_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Identificación:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.numero_identificacion}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Correo:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.fk_django_user.email}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Teléfono:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.telefono_contacto}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Ciudad/Departamento:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.ciudad}}/{{cliente.departamento}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Dirección:
+                        </td>
+                        <td class="text-left">
+                            {{cliente.direccion}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-right encabezado">
+                            Información Adicional:
+                        </td>
+                        <td class="text-left">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="container-fluid" style="width: 80%">
+                <a href="{% url 'administrador:clientes'%}" class="btn btn-primary">Volver a clientes</a>
+            </div>
+        </div>
+
+    </section>
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+
+{% endblock %}
