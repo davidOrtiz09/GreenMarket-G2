@@ -179,13 +179,15 @@ class ActualizarEstadoPedidoView(AbstractAdministradorLoggedView):
 class ListarOfertasView(AbstractAdministradorLoggedView):
     def get(self, request):
         ofertas = list()
-        cantidad_ofertas = 0
-        id_oferta = 0
         for productor in Productor.objects.all():
+            cantidad_ofertas = 0
+            id_oferta = 0
             for oferta in Oferta.objects.filter(fk_productor=productor):
                 cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta).count()
                 id_oferta = oferta.id
-            ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
+
+            if cantidad_ofertas > 0:
+                ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
 
