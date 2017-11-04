@@ -410,3 +410,15 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
 
+
+
+class ConsultarPagosPendientes(View):
+    def get(self, request):
+        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)
+        productor = Productor.objects.filter(oferta__oferta_producto__fk_orden_compra__isnull=True).distinct('id')
+
+        return render(request, 'Administrador/pagos-pendientes-productor.html',
+                      {'ofteras_por_pagar': ofteras_por_pagar,
+                       'productores': productor})
+
+
