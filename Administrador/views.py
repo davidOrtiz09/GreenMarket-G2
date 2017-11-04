@@ -182,7 +182,7 @@ class ListarOfertasView(AbstractAdministradorLoggedView):
         cantidad_ofertas = 0
         id_oferta = 0
         for productor in Productor.objects.all():
-            for oferta in Oferta.objects.filter(fk_productor=productor.id):
+            for oferta in Oferta.objects.filter(fk_productor=productor):
                 cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta.id).count()
                 id_oferta = oferta.id
             ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
