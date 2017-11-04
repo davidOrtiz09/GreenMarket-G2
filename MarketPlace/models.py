@@ -6,6 +6,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 
 
+
 @python_2_unicode_compatible
 class Cooperativa(models.Model):
     nombre = models.CharField(max_length=150, verbose_name='Nombre de la Cooperativa', null=False, blank=False)
@@ -48,7 +49,7 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombre
 
-
+@python_2_unicode_compatible
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     descripcion = models.TextField(max_length=300, verbose_name='Descripción', null=False, blank=False)
@@ -57,6 +58,9 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
+    class Meta:
+        verbose_name = 'Categoria'
+        verbose_name_plural = 'Categorias'
 
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
@@ -124,7 +128,7 @@ class Oferta_Producto(models.Model):
     fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta', null=True, blank=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True,
                                           blank=False)
-    precioProvedor = models.FloatField(verbose_name='Precio del producto', null=False, blank=False)
+    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10, decimal_places=2)
     estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
 
     class Meta:
@@ -171,6 +175,7 @@ class Catalogo_Producto(models.Model):
 
     def __str__(self):
         return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
+
 
 
 class Cliente(models.Model):
@@ -316,3 +321,4 @@ class CanastaProducto(models.Model):
         verbose_name = 'Producto de canasta'
         verbose_name_plural = 'Productos de canastas'
         unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
+
