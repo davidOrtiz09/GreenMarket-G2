@@ -55,6 +55,12 @@
                         <i class="icon-padnote"></i> <span>Informes</span>
                     </a>
                 </li>
+            {% url 'administrador:generar-orden-compra' as url_pago %}
+                <li {% if request.path == url_pago %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:generar-orden-compra' %}">
+                        <i class="fa fa-money"></i> <span>Pago a Productores</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
