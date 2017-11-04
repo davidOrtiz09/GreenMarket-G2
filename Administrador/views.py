@@ -207,7 +207,7 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         id_oferta_producto = request.POST.get('id_oferta_producto')
         aprobar = request.POST.get('aprobar')
         cantidad_aceptada = request.POST.get('cantidad_aceptada')
-        if aprobar == '0' and cantidad_aceptada > 0:
+        if aprobar == '0' and int(cantidad_aceptada) > 0:
             cantidad_aceptada = 0
         oferta_producto = Oferta_Producto.objects.get(pk=id_oferta_producto)
         oferta_producto.estado = aprobar
