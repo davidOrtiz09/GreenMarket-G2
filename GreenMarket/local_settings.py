@@ -2,13 +2,13 @@
 import os
 import dj_database_url
 
-# Ya no es necesario cambiar esto
-if os.environ.get('is_deployed', 'False') == 'True':
+IS_DEPLOYED = os.environ.get('is_deployed', 'False')
+if IS_DEPLOYED == 'True':
     DATABASE_DICT = dj_database_url.config(default=os.environ.get('DATABASE_URL', ''))
 else:
     DATABASE_DICT = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'green_market',
+        'NAME': 'green_market3',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',

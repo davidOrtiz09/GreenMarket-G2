@@ -30,6 +30,7 @@ class Cooperativa(models.Model):
 
 @python_2_unicode_compatible
 class Productor(models.Model):
+    fk_django_user = models.OneToOneField(User, verbose_name='Usuario tipo productor', null=False, blank=False)
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
                                        blank=False)
     nombre = models.CharField(max_length=150, verbose_name='Nombre del Productor', null=False, blank=False)
@@ -46,6 +47,7 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombre
 
+@python_2_unicode_compatible
 
 
 class Orden_Compra(models.Model):
@@ -72,7 +74,9 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
-
+    class Meta:
+        verbose_name = 'Categoria'
+        verbose_name_plural = 'Categorias'
 
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
@@ -97,8 +101,24 @@ class Producto(models.Model):
         return self.nombre
 
 
+class Semana(models.Model):
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
+                                       blank=False)
+    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
+    fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
+
+
+    class Meta:
+        verbose_name = 'Semana'
+        verbose_name_plural = 'Semanas'
+
+    def __str__(self):
+        return '{0}'.format(self.id)
+
+
 @python_2_unicode_compatible
 class Oferta(models.Model):
+    fk_semana = models.ForeignKey(Semana, verbose_name='Semana', null=False, blank=False)
     fk_productor = models.ForeignKey(Productor, verbose_name='Productor de la oferta', null=False, blank=False)
     fecha = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación', editable=False, null=False,
                                  blank=False)
@@ -125,7 +145,7 @@ class Oferta_Producto(models.Model):
     fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta', null=True, blank=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True,
                                           blank=False)
-    precioProvedor = models.FloatField(verbose_name='Precio del producto', null=False, blank=False)
+    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10, decimal_places=2)
     estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
 
     class Meta:
@@ -146,11 +166,10 @@ class Oferta_Producto(models.Model):
 
 
 class Catalogo(models.Model):
-    productor_id = models.IntegerField(null=False, blank=False)
+    fk_semana = models.ForeignKey(Semana, verbose_name='Semana', null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
     fecha_cierre = models.DateTimeField(verbose_name="Fecha de Cierre", null=False, blank=False)
-    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa del productor', null=False,
-                                       blank=False)
+
     class Meta:
         verbose_name = 'Catálogo'
         verbose_name_plural = 'Catálogos'
@@ -169,9 +188,11 @@ class Catalogo_Producto(models.Model):
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'
+        unique_together = (('fk_catalogo', 'fk_producto'),)
 
     def __str__(self):
-        return '{0}'.format(self.id)
+        return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
+
 
 
 class Cliente(models.Model):
@@ -239,10 +260,82 @@ class Pedido(models.Model):
     tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
     numero_identificacion=models.CharField(max_length=20)
 
+
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
 
+
+@python_2_unicode_compatible
+class Canasta(models.Model):
+    fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
+    nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Precio', null=False, blank=False)
+    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
+    esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False, blank=False)
+
+    def __str__(self):
+        return self.nombre
+
+    @property
+    def productos(self):
+        return CanastaProducto.objects.filter(fk_canasta_id=self.id)
+
+    @property
+    def get_precio(self):
+        return '{0:.2f}'.format(self.precio)
+
+    @property
+    def precio_sin_descuento(self):
+        precio = Decimal('0')
+        for producto in self.productos:
+            precio += Decimal(str(producto.fk_producto_catalogo.precio))
+        return precio
+
+    @property
+    def get_precio_sin_descuento(self):
+        return '{0:.2f}'.format(self.precio_sin_descuento)
+
+    @property
+    def descuento(self):
+        if self.precio > 0:
+            descuento = Decimal('100') * ((self.precio - self.precio_sin_descuento) / self.precio)
+            return '- {descuento}%'.format(descuento='{0:.2f}'.format(descuento))
+        else:
+            return 'Descuento sin definir'
+
+    class Meta:
+        verbose_name = 'Canasta'
+        verbose_name_plural = 'Canastas'
+
+
+class CanastaProducto(models.Model):
+    fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
+    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    cantidad = models.PositiveIntegerField(verbose_name='Cantidad', null=False, blank=False)
+
+    @property
+    def nombre_producto(self):
+        return self.fk_producto_catalogo.fk_producto.nombre
+
+    @property
+    def precio_producto(self):
+        return self.fk_producto_catalogo.precio
+
+    @property
+    def unidad_producto(self):
+        return self.fk_producto_catalogo.fk_producto.unidad_medida
+
+
+    @property
+    def imagen_producto(self):
+        imagen = self.fk_producto_catalogo.fk_producto.imagen
+        return imagen.url if imagen else ''
+
+    class Meta:
+        verbose_name = 'Producto de canasta'
+        verbose_name_plural = 'Productos de canastas'
+        unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
 
