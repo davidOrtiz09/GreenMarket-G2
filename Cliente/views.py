@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor
 from django.contrib.auth import logout, login, authenticate
-
+from django.db.transaction import atomic
 
 class AbstractClienteLoggedView(View):
     logged_out_message = 'Por favor ingresa para acceder a ésta página'
@@ -266,6 +266,7 @@ class DoPayment(AbstractClienteLoggedView):
     def get(self, request):
         return render(request, 'Cliente/checkout/checkout.html', {'form': PaymentForm()})
 
+    @atomic
     def post(self, request):
         checkout_Json = json.loads(request.POST.get('checkout_form'))
         detalles_pedido = checkout_Json.get('detalles_pedido')
