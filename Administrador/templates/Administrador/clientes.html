@@ -41,7 +41,7 @@
                                 {{ item.fk_django_user.email }}
                             </td>
                             <td class="text-center">
-                                <a href="{% url 'administrador:index' %}" class="btn btn-info">Ver Perfil</a>
+                                <a href="{% url 'administrador:perfil_cliente' item.id %}" class="btn btn-info">Ver Perfil</a>
                                 <a href="{% url 'administrador:historial-cliente' item.id %}" class="btn btn-primary">Ver Historial</a>
                             </td>
                         </tr>
