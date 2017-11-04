@@ -6,7 +6,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
 
 
-
 @python_2_unicode_compatible
 class Cooperativa(models.Model):
     nombre = models.CharField(max_length=150, verbose_name='Nombre de la Cooperativa', null=False, blank=False)
@@ -49,6 +48,7 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombre
 
+
 @python_2_unicode_compatible
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
@@ -62,6 +62,8 @@ class Categoria(models.Model):
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
 
+
+@python_2_unicode_compatible
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
         ('Kg', 'Kilogramos'),
@@ -84,7 +86,8 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
-   
+
+@python_2_unicode_compatible
 class Semana(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
                                        blank=False)
@@ -148,6 +151,7 @@ class Oferta_Producto(models.Model):
         return ofertas_producto
 
 
+@python_2_unicode_compatible
 class Catalogo(models.Model):
     fk_semana = models.ForeignKey(Semana, verbose_name='Semana', null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
@@ -161,6 +165,7 @@ class Catalogo(models.Model):
         return '{0}'.format(self.id)
 
 
+@python_2_unicode_compatible
 class Catalogo_Producto(models.Model):
     fk_catalogo = models.ForeignKey(Catalogo, on_delete=models.CASCADE, verbose_name='Catálogo', null=False,
                                     blank=False)
@@ -177,7 +182,7 @@ class Catalogo_Producto(models.Model):
         return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
 
 
-
+@python_2_unicode_compatible
 class Cliente(models.Model):
     TIPO_DOCUMENTOS = (
         ('CC', 'Cédula de Ciudadanía'),
@@ -213,7 +218,11 @@ class Cliente(models.Model):
         pass
         # unique_together = ('numero_identificacion', 'tipo_identificacion',)
 
+    def __str__(self):
+        return self.fk_django_user.get_full_name()
 
+
+@python_2_unicode_compatible
 class Pedido(models.Model):
     TIPO_DOCUMENTOS = (
         ('CC', 'Cédula de Ciudadanía'),
@@ -243,12 +252,19 @@ class Pedido(models.Model):
     tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
     numero_identificacion=models.CharField(max_length=20)
 
+    def __str__(self):
+        return '{cliente} (Pedido {fecha})'.format(cliente=self.fk_cliente, fecha=self.fecha_pedido)
 
+
+@python_2_unicode_compatible
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
-    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
+
+    def __str__(self):
+        return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad), producto=self.fk_catalogo_producto.fk_producto.nombre)
 
 
 @python_2_unicode_compatible
@@ -294,6 +310,7 @@ class Canasta(models.Model):
         verbose_name_plural = 'Canastas'
 
 
+@python_2_unicode_compatible
 class CanastaProducto(models.Model):
     fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
     fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
@@ -321,4 +338,7 @@ class CanastaProducto(models.Model):
         verbose_name = 'Producto de canasta'
         verbose_name_plural = 'Productos de canastas'
         unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
+
+    def __str__(self):
+        return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre, producto=self.fk_producto_catalogo.fk_producto)
 
