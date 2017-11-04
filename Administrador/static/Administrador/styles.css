@@ -1,3 +1,5 @@
 td.encabezado{
     width: 30%;
+    background-color: rgba(190,184,135,13);
+    font-weight: bold;
 }
