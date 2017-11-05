@@ -18,6 +18,7 @@ urlpatterns = [
         name='informes/clientes-mas-rentables'),
     url(r'^informes/seleccionSemanas', views.seleccionSemanas.as_view(), name='informes/seleccionSemanas'),
     url(r'^informes/obtener_mejores_productos', views.obtener_mejores_productos.as_view(), name='informes/obtener_mejores_productos'),
+    url(r'^informes/inventario', views.InventarioView.as_view(), name='informes/inventario'),
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),

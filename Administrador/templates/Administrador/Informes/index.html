@@ -25,6 +25,11 @@
                                $('#informe').html(data)
                                 });
                             }
+                            else if(x === "3") {
+                             $.get('{% url 'administrador:informes/inventario' %}', function(data, status){
+                               $('#informe').html(data)
+                                });
+                            }
                         }
     </script>
     </section>

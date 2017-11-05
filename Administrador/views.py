@@ -410,3 +410,6 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
 
+class InventarioView(View):
+    def get(self, request):
+        return  render(request, 'Administrador/Informes/inventario.html', {})
