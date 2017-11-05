@@ -1,4 +1,5 @@
 {% block main %}
+    {% load humanize %}
     <section>
         <div class="container-fluid" style="margin-top: 10px">
              <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
@@ -27,7 +28,7 @@
                                     {{ clientes.cantidad_comprada }}
                                 </td>
                                 <td class="text-center">
-                                    {{ clientes.total_compras.valor_total__sum }}
+                                    {{ clientes.total_compras.valor_total__sum|intcomma }}
                                 </td>
                                 <td class="text-center">
                                     {{ clientes.ultima_fecha_de_compra.fecha_pedido }}
