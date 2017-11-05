@@ -48,8 +48,7 @@
                     <strong class="col-md-6 col-sm-12">Defina la ubicación de la finca del productor</strong>
                     <div class="col-md-6 col-sm-12 row" style="margin-left: 0px;margin-right: 0px;">
                         <button onclick="verMapa();" class="col-md-6 col-sm-12 btn btn-success" type="button">Mapa</button>
-                        <p class="col-md-6" style="line-height: 45px; margin-bottom: 0px !important;">
-                            -720000000,40000000
+                        <p id="coordenadasMapa" class="col-md-6" style="line-height: 45px; margin-bottom: 0px !important;">
                         </p>
                     </div>
                 </div>
@@ -72,14 +71,16 @@
                 </div>
                 <div class="bodyPopUpDescripcion col-md-12 row" style="margin-left: 0; margin-right: 0;">
                     <div id="mapa">
-
                     </div>
+                    <button type="button" onclick="seleccionarUbicacion();" class="btn btn-primary" style="position: absolute; top: 5px; left: 21px;">Seleccionar Ubicación</button>
                 </div>
             </div>
         </div>
     </section>
 {% endblock %}
 {% block scripts %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBW8AoH_Jh_QtuL0d-BC0RUAIMckKEZYiM"
+    async defer></script>
     <script src="{% static 'Administrador/productores/js/productores.js' %}"></script>
 {% endblock %}
 {% block styles %}
