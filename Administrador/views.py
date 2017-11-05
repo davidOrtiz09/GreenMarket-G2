@@ -461,15 +461,12 @@ class GetCooperativaPorCiudad(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class AgregarProductor(AbstractAdministradorLoggedView):
     def get(self, request):
-        print 'holaGet'
         return JsonResponse({})
 
     def post(self, request):
-        print 'holaPost'
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         cooperativa = Cooperativa.objects.filter(id=body["cooperativaId"]).first()
-        print 'hola'
 
         nombre = body["nombre"]
         apellido = body["apellido"]
