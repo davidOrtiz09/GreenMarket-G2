@@ -9,7 +9,7 @@ from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto,Orden_Compra
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
 from Administrador.utils import catalogo_actual, catalogo_validaciones
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -233,7 +233,7 @@ class seleccionSemanas(View):
             semanas=semanasAll
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
                       {'semanas':semanas})
-      
+
 class obtener_mejores_productos(View):
     def post(self, request):
         semanas = request.POST.getlist('semana', [])
@@ -261,7 +261,7 @@ class obtener_mejores_productos(View):
         ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
         return  render(request, 'Administrador/Informes/mejoresProductos.html', {'datos':ordenado})
 
-      
+
 def obtener_cantidad_vendida(semana, id_producto):
     productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
     cantidad = 0
@@ -276,7 +276,7 @@ def obtener_valor_compra(semana, id_producto):
         sumPrecios = sumPrecios + ofertaProd.precioProvedor
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
-  
+
 class InformesClientesMasRentables(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
@@ -423,12 +423,10 @@ class ConsultarPagosPendientes(View):
 
 class DetalleOrdenPagoProductores(View):
     def get(self, request, id_productor):
-        print id_productor
         ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
                                                            fk_oferta__fk_productor_id=id_productor)
 
         productor = Productor.objects.filter(id=id_productor)[0]
-        print ofertas_por_pagar[0]
         return render(request, 'Administrador/detalle-productos-orden-pago.html', {
             'ofertas_por_pagar': ofertas_por_pagar,
             'productor': productor
@@ -438,17 +436,25 @@ class GenerarOrdenPagoProductores(View):
     def post(self, request):
 
         orden_compra_Json = json.loads(request.POST.get('orden-pago-form'))
-        orden_compra=orden_compra_Json.get('orden_compra')
-        valor_total_json=orden_compra.get('valor_total')
+        orden_compra = orden_compra_Json.get('orden_compra')
+        valor_total_json = orden_compra.get('valor_total')
         productor = Productor.objects.filter(id=orden_compra.get('productor_id'))[0]
-        orden_compra = Orden_Compra.objects\
+        orden_compra = Orden_Compra.objects \
             .create(fk_productor=productor, valor_total=valor_total_json, estado='PA')
 
         for oferta_producto in orden_compra_Json.get('oferta_productos'):
             ofertas_por_pagar = Oferta_Producto.objects.filter(id=oferta_producto.get('oferta_profucto'))[0]
-            ofertas_por_pagar.fk_orden_compra=orden_compra
-            #ofertas_por_pagar.save()
+            ofertas_por_pagar.fk_orden_compra = orden_compra
+            ofertas_por_pagar.save()
 
         return render(request, 'Administrador/pagos-pendientes-productor.html', {
             # 'ofertas_por_pagar': ofertas_por_pagar,
         })
+
+
+class OrdenesPagoProductores(View):
+    def get(self, request, id_productor):
+        orden_compra = Orden_Compra.objects.filter(fk_productor=id_productor)
+        return render(request, 'Administrador/ordenes-pago-productor.html',
+                      {'ordenes_compra': orden_compra})
+
