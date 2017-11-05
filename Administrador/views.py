@@ -234,7 +234,7 @@ class InformesClientesMasRentables(View):
                 django_user = User.objects.get(id=cliente.fk_django_user_id)
                 nombre = django_user.first_name + ' ' + django_user.last_name
                 total_compras = pedidos.aggregate(Sum('valor_total'))
-                ultima_fecha = pedidos.latest('fecha_pedido').__str__()
+                ultima_fecha = pedidos.latest('fecha_pedido')
                 mejores_clientes.append(
                     MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
                 )
