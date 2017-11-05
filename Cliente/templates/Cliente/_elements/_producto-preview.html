@@ -1,7 +1,7 @@
 <div class="box-product">
     <div class="img-wrapper">
         <a href="#" style="cursor: pointer;">
-            <img id="product-image-index-{{ product.fk_producto.id }}" alt="Product" onclick="verDetalleCarrito({{ product.fk_producto.id }});" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block">
+            <img id="product-image-index-{{ product.fk_producto.id }}" alt="Product" onclick="verDetalleCarrito({{ product.fk_producto.id }});" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block product-preview">
         </a>
 
         <div class="option" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">
