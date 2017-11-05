@@ -9,11 +9,13 @@
             <div class="panel panel panel-success">
                 <div class="panel-heading">Generar Orden de Pago</div>
                 <div class="container-fluid" style="height: 400px;overflow: auto">
-                    <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
+                    <table id="pagosPendientesTable" class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
                         <br/>
-                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Pago Pendientes de
+                            Productores
+                        </th>
                         <tr bgcolor="#deb887">
                             <th class="text-center">Imagen</th>
                             <th class="text-center">Productor</th>
@@ -24,7 +26,7 @@
                         </thead>
                         <tbody>
                         {% for productor in productores %}
-                            <form method="post" action="{% url 'administrador:generar-orden-compra' %}">
+                            <form method="post" action="{% url 'administrador:pagos-pendientes-productor' %}">
                                 {% csrf_token %}
                                 <tr>
                                     <td class="text-center">
@@ -40,10 +42,11 @@
                                         {{ productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                      <a href="{% url 'administrador:generar-orden-compra' id_productor=productor.id %}" class="btn btn-info">
-                                        Ver detalle
-                                    </a>
-                                </td>
+                                        <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=productor.id %}"
+                                           class="btn btn-info">
+                                            Pagar
+                                        </a>
+                                    </td>
                                 </tr>
                             </form>
                         {% endfor %}
