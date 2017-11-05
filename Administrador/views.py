@@ -7,7 +7,11 @@ from operator import itemgetter
 
 from django.db.models import Sum, Min, Max, QuerySet
 from django.shortcuts import render, redirect, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
 from Administrador.utils import catalogo_actual, catalogo_validaciones
@@ -17,6 +21,8 @@ from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_cr
 from django.db.transaction import atomic
 from django.http import JsonResponse
 from decimal import Decimal
+
+from Productor.views import AbstractProductorLoggedView
 
 
 class AbstractAdministradorLoggedView(View):
@@ -441,3 +447,42 @@ class GetCooperativaPorCiudad(View):
         idCooperativa= request.GET['ciudad']
         cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre','id')
         return JsonResponse({"ListaCooperativas": list(cooperativas)})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AgregarProductor(AbstractProductorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        cooperativa = Cooperativa.objects.filter(id=request.cooperativa.id).first()
+
+
+        nombre = request.productor.nombre
+        apellido = request.productor.apellido
+        contrasena = request.productor.contrasena
+        correo = request.productor.correo
+
+        direccion = request.productor.direccion
+        descripcion = request.productor.descripcion
+        coordenadas= request.productor.coordenadas
+
+        user_model = User.objects.create_user(
+            username=correo,
+            password=contrasena,
+            first_name=nombre,
+            last_name=apellido,
+            email=correo
+        )
+        user_model.save()
+        productor_model = Productor(
+            fk_django_user=user_model,
+            fk_cooperativa=cooperativa,
+            nombre=nombre,
+            direccion=direccion,
+            descripcion=descripcion,
+            coordenadas_gps=coordenadas
+        )
+        productor_model.save()
+        return JsonResponse({"Mensaje": "Finalizó con exito"})

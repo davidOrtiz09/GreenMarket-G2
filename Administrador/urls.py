@@ -38,4 +38,7 @@ urlpatterns = [
     url(r'^getDepartamentos/$', views.GetDepartamentos.as_view(), name='get-Departamentos'),
     url(r'^getCiudadPorDepto/$', views.GetCiudadPorDepto.as_view(), name='get-ciudad-depto'),
     url(r'^getCooperativaPorCiudad/$', views.GetCooperativaPorCiudad.as_view(), name='get-cooperativa-ciudad'),
+    url(r'^AgregarProductor/$', views.AgregarProductor.as_view(), name='agregar-productor'),
+
+
 ]
