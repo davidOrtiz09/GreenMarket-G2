@@ -15,7 +15,8 @@ from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor
 from django.contrib.auth import logout, login, authenticate
-from django.db.transaction import atomic
+from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
+
 
 class AbstractClienteLoggedView(View):
     logged_out_message = 'Por favor ingresa para acceder a ésta página'
@@ -298,7 +299,7 @@ class DoPayment(AbstractClienteLoggedView):
             tipo_identificacion=tipo_identificacion,
             numero_identificacion=numero_identificacion
         )
-
+        checkpoint = savepoint()
         pedido_model.save()
 
         valor_total = 0
@@ -313,25 +314,39 @@ class DoPayment(AbstractClienteLoggedView):
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
             cantidad_disponible = 0
-            while cantidad != 0:
-                if cantidad_disponible > cantidad:
-                    oferta_producto.cantidad_vendida = cantidad
-                    oferta_producto.save()
-                    cantidad = 0
 
-                elif cantidad_disponible > 0:
-                    oferta_producto.cantidad_vendida = oferta_producto.cantidad_aceptada
-                    oferta_producto.save()
-                    cantidad = cantidad - cantidad_disponible
-                else:
-                    oferta_producto = Oferta_Producto \
-                        .objects.filter(fk_producto=producto_catalogo.fk_producto) \
-                        .exclude(cantidad_vendida=F('cantidad_aceptada')) \
-                        .order_by('precioProvedor').first()
-                    cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
+            try:
+                while cantidad != 0:
+                    if cantidad_disponible > cantidad:
+                        oferta_producto.cantidad_vendida = cantidad
+                        oferta_producto.save()
+                        cantidad = 0
+
+                    elif cantidad_disponible > 0:
+                        oferta_producto.cantidad_vendida = oferta_producto.cantidad_aceptada
+                        oferta_producto.save()
+                        cantidad = cantidad - cantidad_disponible
+                    else:
+                        oferta_producto = Oferta_Producto \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto) \
+                            .exclude(cantidad_vendida=F('cantidad_aceptada')) \
+                            .order_by('precioProvedor').first()
+                        cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
+            except:
+                cart = request.session.get('cart', None)
+                if cart:
+                    items = cart.get('items', [])
+                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
+                    request.session['cart'] = cart
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'El producto {producto} ya no se encuentra disponible'.format(producto=producto_catalogo.fk_producto.nombre)
+                )
+                savepoint_rollback(checkpoint)
+                return redirect(reverse('cliente:checkout'))
 
         pedido_model.valor_total = valor_total
         pedido_model.save()
-
-        return render(request, 'Cliente/mis_pedidos.html',
-                      {'compra': True})
+        savepoint_commit(checkpoint)
+        return render(request, 'Cliente/mis_pedidos.html', {'compra': True})
