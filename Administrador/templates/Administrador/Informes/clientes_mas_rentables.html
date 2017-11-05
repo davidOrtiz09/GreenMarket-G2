@@ -7,7 +7,7 @@
                         <br/>
                         <th colspan="6" bgcolor="#228b22" class="text-white text-center">Clientes Más Rentables</th>
                         <tr bgcolor="#deb887">
-                            <th class="text-center">Cliente IDr</th>
+                            <th class="text-center">Cliente ID</th>
                             <th class="text-center">Nombre</th>
                             <th class="text-center">Cantidad Comprada</th>
                             <th class="text-center">Total Compras</th>
@@ -15,6 +15,7 @@
                         </tr>
                         </thead>
                         <tbody>
+                        {{ mejores_clientes }}
                         {% for clientes in mejores_clientes %}
                             <tr>
                                 <td class="text-center">
