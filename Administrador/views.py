@@ -12,7 +12,7 @@ from django.views import View
 from Administrador.models import MejoresClientes
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
 from Administrador.utils import catalogo_actual, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -537,3 +537,80 @@ class AgregarProductor(AbstractAdministradorLoggedView):
         )
         productor_model.save()
         return JsonResponse({"Mensaje": "Finalizó con exito"})
+
+
+class ConsultarPagosPendientes(View):
+    def get(self, request):
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)\
+            .distinct('fk_oferta__fk_productor')
+        productor = Productor.objects.all()
+
+        return render(request, 'Administrador/pagos-pendientes-productor.html',
+                      {'ofertas_por_pagar': ofertas_por_pagar,
+                       'productores': productor})
+
+class DetalleOrdenPagoProductores(View):
+    def get(self, request, id_productor):
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
+                                                           fk_oferta__fk_productor_id=id_productor)
+
+        productor = Productor.objects.filter(id=id_productor)[0]
+        return render(request, 'Administrador/detalle-productos-orden-pago.html', {
+            'ofertas_por_pagar': ofertas_por_pagar,
+            'productor': productor
+        })
+
+class GenerarOrdenPagoProductores(View):
+    def post(self, request):
+        orden_compra_Json = json.loads(request.POST.get('orden-pago-form'))
+        orden_compra = orden_compra_Json.get('orden_compra')
+        valor_total_json = orden_compra.get('valor_total')
+        productor = Productor.objects.filter(id=orden_compra.get('productor_id'))[0]
+        orden_compra = Orden_Compra.objects \
+            .create(fk_productor=productor, valor_total=valor_total_json, estado='PA')
+
+        for oferta_producto in orden_compra_Json.get('oferta_productos'):
+            ofertas_por_pagar = Oferta_Producto.objects.filter(id=oferta_producto.get('oferta_profucto'))[0]
+            ofertas_por_pagar.fk_orden_compra = orden_compra
+            ofertas_por_pagar.save()
+
+        return render(request, 'Administrador/detalle-orden-pago.html', {
+            'ofertas_producto': Oferta_Producto.objects.filter(fk_orden_compra=orden_compra)
+        })
+
+    def get(self, request):
+        productores_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True) \
+            .distinct('fk_oferta__fk_productor')
+
+        for productor in productores_pagar:
+            pagar_ofertas=Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
+                                           fk_oferta__fk_productor=productor.fk_oferta.fk_productor)
+
+            valor_total=pagar_ofertas.aggregate(Sum('precioProvedor')).get('precioProvedor__sum')
+            orden_compra = Orden_Compra.objects\
+                .create(fk_productor=productor.fk_oferta.fk_productor, valor_total=valor_total, estado='PA')
+
+            for pagar_oferta in pagar_ofertas:
+                pagar_oferta.fk_orden_compra = orden_compra
+                pagar_oferta.save()
+
+        return render(request, 'Administrador/pagos-pendientes-productor.html',
+                      {'ofertas_por_pagar': productores_pagar,
+                       'productores': Productor.objects.all()})
+
+class OrdenesPagoProductores(View):
+    def get(self, request, id_productor):
+        orden_compra = Orden_Compra.objects.filter(fk_productor=id_productor).order_by('-id')
+        return render(request, 'Administrador/ordenes-pago-productor.html',
+                      {'ordenes_compra': orden_compra})
+
+
+class DetalleOrdenPago(View):
+    def get(self, request, orden_compra_id):
+        orden_compra = Orden_Compra.objects.filter(id=orden_compra_id)
+
+        ofertas_producto = Oferta_Producto.objects.\
+            filter(fk_orden_compra=orden_compra)
+        return render(request, 'Administrador/detalle-orden-pago.html', {
+            'ofertas_producto': ofertas_producto
+        })

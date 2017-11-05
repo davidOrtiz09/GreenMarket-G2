@@ -21,6 +21,14 @@ def multiply_cop(value, arg):
         return 0
 
 
+# Funcionalidad para multiplicar en templates y retornar el resultado
+@register.filter(name='multiply')
+def multiply(value, arg):
+    try:
+        return float(value * arg)
+    except (ValueError, ZeroDivisionError):
+        return 0  # Cuenta los items del carrito
+
 # Cuenta los items del carrito
 @register.filter(name='count_cart_products')
 def count_cart_products(request):

@@ -1,0 +1,96 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Productos Pendientes de Pago para {{ productor.nombre }}</h1>
+                    <br/>
+                    <div class="container-fluid" id="orden-Pago-detalle">
+                        <table id="detallePedidoTable" class="table dataTable" cellspacing="2"
+                               width="100%"
+                               border="1" align="center">
+                            <thead>
+                            <th colspan="6" bgcolor="#228b22" class="text-white text-center">Productos Pendientes de
+                                Pago
+                            </th>
+                            <tr bgcolor="#deb887">
+                                <th class="text-center">Imagen del producto</th>
+                                <th class="text-center">Descripcion del producto</th>
+                                <th class="text-center">Cantidad Vendida</th>
+                                <th class="text-center">Unidad de medida</th>
+                                <th class="text-center">Valor Total</th>
+                                <th class="text-center">Pagar</th>
+                            </tr>
+                            </thead>
+                            <tbody onload="actualizarTotalPagar();">
+                            <input class="productor-id" type="hidden" value="{{ productor.id }}" readonly disabled></td>
+                            {% for oferta in ofertas_por_pagar %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <tr class="product-orden-pago">
+                                        <td>
+                                            <img src="{{ oferta.fk_producto.imagen.url }}"
+                                                 style="width:100px;height:100px;">
+                                        </td>
+                                        <td class="text-center">{{ oferta.fk_producto.nombre }}
+                                        <td class="text-center">{{ oferta.cantidad_vendida }}</td>
+                                        <td class="text-center">{{ oferta.fk_producto.unidad_medida }}</td>
+                                        <td class="text-center">
+                                            ${{ oferta.cantidad_vendida|multiply_cop:oferta.precioProvedor }}
+                                            <input class="price-productor" type="hidden"
+                                                   value="{{ oferta.cantidad_vendida|multiply:oferta.precioProvedor }}"
+                                                   readonly disabled>
+                                        </td>
+                                        <td>
+                                            <input class="oferta-producto-id" type="hidden" value="{{ oferta.id }}"
+                                                   readonly disabled>
+                                            <input class="check-pago change-check" type="radio" name="pagar" value="1"
+                                                   checked> Pagar<br>
+                                            <input class="change-check" type="radio" name="pagar" value="0">
+                                            Rechazar<br>
+                                        </td>
+                                    </tr>
+                                </form>
+                            {% endfor %}
+                            <tfoot>
+                            <tr>
+                                <td colspan="4">
+                                    <h1 class="text-right">Total a pagar</h1>
+                                </td>
+                                <td colspan="2">
+                                    <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
+                                    <input class="total-a-pagar" type="hidden" readonly disabled>
+                                </td>
+                            </tr>
+                            </tfoot>
+                            </tbody>
+                        </table>
+                        <br>
+                        <form method="post" id="form-orden-pago"
+                              action="{% url 'administrador:generar-orden-pago-productores' %}">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="orden-pago-form" id="json-form-orden">
+                            <button id="ordenPago" class="btn btn-success"><i
+                                    class="fa fa-money mr-2"></i> Generar Orden Pago
+                            </button>
+                            {#                        <input type="submit" class="btn btn-primary" value="Generar Pago"/>#}
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/scripts.js' %}"></script>
+
+{% endblock %}

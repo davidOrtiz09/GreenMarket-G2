@@ -1,0 +1,74 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Detalle de Orden de Pago Nro:{{ ofertas_producto.0.fk_orden_compra.id}} </h1>
+                    <br/>
+                    <div class="container-fluid" id="orden-Pago-detalle">
+                        <table class="table dataTable" cellspacing="2"
+                               width="100%"
+                               border="1" align="center">
+                            <thead>
+                            <th colspan="6" bgcolor="#228b22" class="text-white text-center">Productos Pendientes de
+                                Pago - Nro comprobante: {{ ofertas_producto.0.fk_orden_compra.id}}
+                            </th>
+                            <tr bgcolor="#deb887">
+                                <th class="text-center">Imagen del producto</th>
+                                <th class="text-center">Nombre del producto</th>
+                                <th class="text-center">Cantidad Vendida</th>
+                                <th class="text-center">Unidad de medida</th>
+                                <th class="text-center">Precio Unidad</th>
+                                <th class="text-center">Valor Total</th>
+                            </tr>
+                            </thead>
+                            <tbody id="bodytable2">
+                            {% for oferta in ofertas_producto %}
+                                <tr  class="product-orden-pago">
+                                    <td>
+                                        <img src="{{ oferta.fk_producto.imagen.url }}"
+                                             style="width:100px;height:100px;">
+                                    </td>
+                                    <td class="text-center">{{ oferta.fk_producto.nombre }}
+                                    <td class="text-center">{{ oferta.cantidad_vendida }}</td>
+                                    <td class="text-center">{{ oferta.fk_producto.unidad_medida }}</td>
+                                    <td class="text-center">${{ oferta.precioProvedor }}</td>
+                                    <td class="text-center">
+                                        ${{ oferta.cantidad_vendida|multiply_cop:oferta.precioProvedor }}
+                                        <input class="price-productor" type="hidden"
+                                                   value="{{ oferta.cantidad_vendida|multiply:oferta.precioProvedor }}"
+                                                   readonly disabled>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="4">
+                                    <h1 class="text-right">Total Pago</h1>
+                                </td>
+                                <td colspan="2">
+                                    <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <br>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/scripts.js' %}"></script>
+
+{% endblock %}

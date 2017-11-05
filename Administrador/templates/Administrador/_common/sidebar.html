@@ -61,6 +61,12 @@
                         <i class="fa fa-tree"></i> <span>Productores</span>
                     </a>
                 </li>
+                {% url 'administrador:pagos-pendientes-productor' as url_pago %}
+                <li {% if request.path == url_pago %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:pagos-pendientes-productor' %}">
+                        <i class="fa fa-money"></i> <span>Pago Productores</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

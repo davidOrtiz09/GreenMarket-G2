@@ -1,0 +1,56 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+            <h1 class="text-center"> Ordenes de Pago Productor: {{ ordenes_compra.0.fk_productor.nombre }}</h1>
+            <br/>
+            <br>
+            <div class="panel panel panel-success">
+                <div class="panel-heading"></div>
+                <div class="container-fluid" style="height: 400px;overflow: auto">
+                    <table class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ordenes de Pago Generadas
+                        </th>
+                        <tr bgcolor="#deb887">
+                             <th class="text-center">Nro. Comprobante</th>
+                            <th class="text-center">Productor</th>
+                            <th class="text-center">Fecha de Pago</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Detalle</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for orden_compra in ordenes_compra %}
+                            <tr>
+                            <td class="text-center">
+                                    {{ orden_compra.id }}
+                                </td>
+                                <td class="text-center">
+                                    {{ orden_compra.fk_productor.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ orden_compra.fecha_pago }}
+                                </td>
+                                <td class="text-center">
+                                    {{ orden_compra.estado }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'administrador:detalle-orden-pago' orden_compra_id=orden_compra.id %}"
+                                       class="btn btn-info">
+                                        Ver Detalle
+                                    </a>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

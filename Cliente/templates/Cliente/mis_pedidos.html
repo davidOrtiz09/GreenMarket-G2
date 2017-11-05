@@ -1,30 +1,6 @@
 {% extends 'MarketPlace/_common/base.html' %}
 {% block main %}
     <section>
-        {% if compra %}
-            <div id="myModal" class="modal fade bootstrap-dialog type-warning in">
-                <div class="modal-dialog type-danger modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Green Market</h4>
-                        </div>
-                        <div id="detalles-pedido" class="collapse show" role="tabpanel"
-                             data-parent="#proceso-checkout">
-                            <div class="card-body">
-                                {% include 'Cliente/_elements/_pago-Exitoso.html' %}
-                            </div>
-                        </div>
-                        <div class="modal-body">
-
-                            <p>
-                            <h3 class="text-center">Tu compra fue Exitosa</h3></p>
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Mis Pedidos </h1>
             <br/>

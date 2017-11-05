@@ -321,7 +321,11 @@ class DoPayment(AbstractClienteLoggedView):
         pedido_model.valor_total = valor_total
         pedido_model.save()
         savepoint_commit(checkpoint)
-        return render(request, 'Cliente/mis_pedidos.html', {'compra': True})
+
+        request.session['cartCompra'] = request.session['cart']
+        request.session['cart']=""
+        return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
+                      {'compra': True})
 
 
 class Canastas(View):
