@@ -52,13 +52,13 @@
                 {% url 'administrador:informes' as url_informes %}
                 <li {% if request.path == url_informes %}class="active"{% endif %}>
                     <a href="{% url 'administrador:informes' %}">
-                        <i class="icon-user"></i> <span>Informes</span>
+                        <i class="fa fa-list"></i> <span>Informes</span>
                     </a>
                 </li>
-                {% url 'administrador:Productores' as url_productores %}
+                {% url 'administrador:productores' as url_productores %}
                 <li {% if request.path == url_productores %}class="active"{% endif %}>
                     <a href="{% url 'administrador:productores' %}">
-                        <i class="icon-user"></i> <span>Productores</span>
+                        <i class="fa fa-tree"></i> <span>Productores</span>
                     </a>
                 </li>
             </ul>

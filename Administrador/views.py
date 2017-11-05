@@ -347,20 +347,20 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
     @atomic
     def post(self, request, id_canasta):
         nombre = request.POST.get('nombre', '')
-        precio_str = request.POST.get('precio', '0.0')
-        precio = Decimal(precio_str) if precio_str != '' else Decimal()
         imagen = request.FILES.get('imagen', None)
 
         canasta = Canasta.objects.filter(id=id_canasta).first()
         if canasta:
             canasta.nombre = nombre
-            canasta.precio = precio
             if imagen:
                 canasta.imagen = imagen
 
             canasta.save()
-            messages.add_message(request, messages.SUCCESS,
-                                 'Los datos principales de la canasta se actualizaron correctamente')
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Los datos principales de la canasta se actualizaron correctamente'
+            )
             return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
         else:
             messages.add_message(request, messages.ERROR, 'No existe la canasta que estás buscando')
@@ -387,13 +387,13 @@ class CrearCanasta(AbstractAdministradorLoggedView):
     @atomic
     def post(self, request):
         nombre = request.POST.get('nombre', '')
-        precio_str = request.POST.get('precio', '0.0')
-        precio = Decimal(precio_str) if precio_str != '' else Decimal()
         imagen = request.FILES.get('imagen', None)
-        nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, precio=precio, imagen=imagen)
+        nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, imagen=imagen)
         nueva.save()
-        messages.add_message(request, messages.SUCCESS,
-                             'La canasta fue creada exitosamente. Ahora puede agregar los productos que desee')
+        messages.add_message(
+            request, messages.SUCCESS,
+            'La canasta fue creada exitosamente. Ahora puede agregar los productos que desee'
+        )
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': nueva.id}))
 
 

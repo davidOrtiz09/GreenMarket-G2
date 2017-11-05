@@ -30,7 +30,7 @@ def redirect_user_to_home(request):
 
 def get_or_create_week():
     today = datetime.date.today()
-    existe = Semana.objects.filter(fecha_inicio__lte=today, fecha_fin__gt=today).first()
+    existe = Semana.objects.filter(fecha_inicio__lte=today, fecha_fin__gte=today).first()
     if existe:
         return existe
     else:

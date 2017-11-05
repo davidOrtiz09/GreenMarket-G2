@@ -260,7 +260,6 @@ class PedidoProducto(models.Model):
 class Canasta(models.Model):
     fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
-    precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Precio', null=False, blank=False)
     imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
     esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False, blank=False)
 
@@ -276,23 +275,15 @@ class Canasta(models.Model):
         return '{0:.2f}'.format(self.precio)
 
     @property
-    def precio_sin_descuento(self):
+    def precio(self):
         precio = Decimal('0')
         for producto in self.productos:
-            precio += Decimal(str(producto.fk_producto_catalogo.precio))
+            precio += Decimal(str(producto.fk_producto_catalogo.precio)) * producto.cantidad
         return precio
 
     @property
-    def get_precio_sin_descuento(self):
-        return '{0:.2f}'.format(self.precio_sin_descuento)
-
-    @property
-    def descuento(self):
-        if self.precio > 0:
-            descuento = Decimal('100') * ((self.precio - self.precio_sin_descuento) / self.precio)
-            return '- {descuento}%'.format(descuento='{0:.2f}'.format(descuento))
-        else:
-            return 'Descuento sin definir'
+    def get_estado(self):
+        return 'Publicada' if self.esta_publicada else 'Sin publicar'
 
     class Meta:
         verbose_name = 'Canasta'

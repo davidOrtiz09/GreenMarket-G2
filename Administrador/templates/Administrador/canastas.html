@@ -51,7 +51,11 @@
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                         </div>
                         <div class="col text-right">
-                            <button type="button" class="btn btn-info">Publicar</button>
+                            <form action="{% url 'administrador:publicar-canastas' %}" method="post">
+                                {% csrf_token %}
+                                <button class="btn btn-info">Publicar</button>
+                            </form>
+
                         </div>
                     </div>
                 </div>

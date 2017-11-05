@@ -3,12 +3,10 @@
     <img class="card-img-top img-fluid mx-auto d-block" src="{{ canasta.imagen.url }}" alt="{{ canasta.nombre }}">
     <div class="card-body">
         <h4 class="card-title text-center">{{ canasta.nombre }}</h4>
+        <p><b>Estado: </b>{{ canasta.get_estado }}</p>
         <div class="row">
             <div class="col">
                 $ {{ canasta.precio|to_cop }}
-            </div>
-            <div class="col">
-                <h3 class="text-primary text-right">{{ canasta.descuento }}</h3>
             </div>
         </div>
 
