@@ -19,9 +19,6 @@ from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
 from django.http import JsonResponse
-from decimal import Decimal
-from django.utils import timezone
-from datetime import timedelta
 
 
 class AbstractAdministradorLoggedView(View):
@@ -329,13 +326,13 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
     def get(self, request, id_canasta):
         canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
         if canasta:
-            ids_productos_canasta = CanastaProducto.objects\
-                .filter(fk_canasta_id=canasta.id)\
+            ids_productos_canasta = CanastaProducto.objects \
+                .filter(fk_canasta_id=canasta.id) \
                 .values_list('fk_producto_catalogo_id', flat=True)
 
-            productos_disponibles = Catalogo_Producto.objects\
-                .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id)\
-                .exclude(id__in=ids_productos_canasta)\
+            productos_disponibles = Catalogo_Producto.objects \
+                .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id) \
+                .exclude(id__in=ids_productos_canasta) \
                 .distinct()
             return render(request, 'Administrador/detalles-canasta.html', {
                 'canasta': canasta, 'productos_disponibles': productos_disponibles
@@ -440,7 +437,8 @@ class AgregarProductoCanasta(AbstractAdministradorLoggedView):
                 nuevo.save()
                 messages.add_message(request, messages.SUCCESS, 'El producto fue agregado a la canasta exitosamente')
             else:
-                messages.add_message(request, messages.ERROR, 'En el catalogo correspondiente de la cansata, no encontramos el producto que deseabas agregar')
+                messages.add_message(request, messages.ERROR,
+                                     'En el catalogo correspondiente de la cansata, no encontramos el producto que deseabas agregar')
             return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
 
         else:
@@ -469,13 +467,13 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
 
 
-class Productores (AbstractAdministradorLoggedView):
+class Productores(AbstractAdministradorLoggedView):
     def get(self, request):
         productores = Productor.objects.all().order_by('id')
         return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
 
 
-class CrearProductor (AbstractAdministradorLoggedView):
+class CrearProductor(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/crear-productor.html', {})
 
@@ -495,8 +493,8 @@ class GetCiudadPorDepto(View):
 
 class GetCooperativaPorCiudad(View):
     def get(self, request):
-        idCooperativa= request.GET['ciudad']
-        cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre','id')
+        idCooperativa = request.GET['ciudad']
+        cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre', 'id')
         return JsonResponse({"ListaCooperativas": list(cooperativas)})
 
 
@@ -517,7 +515,7 @@ class AgregarProductor(AbstractAdministradorLoggedView):
 
         direccion = body["direccion"]
         descripcion = body["descripcion"]
-        coordenadas= body["coordenadas"]
+        coordenadas = body["coordenadas"]
 
         user_model = User.objects.create_user(
             username=correo,
@@ -541,13 +539,14 @@ class AgregarProductor(AbstractAdministradorLoggedView):
 
 class ConsultarPagosPendientes(View):
     def get(self, request):
-        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)\
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True) \
             .distinct('fk_oferta__fk_productor')
         productor = Productor.objects.all()
 
         return render(request, 'Administrador/pagos-pendientes-productor.html',
                       {'ofertas_por_pagar': ofertas_por_pagar,
                        'productores': productor})
+
 
 class DetalleOrdenPagoProductores(View):
     def get(self, request, id_productor):
@@ -559,6 +558,7 @@ class DetalleOrdenPagoProductores(View):
             'ofertas_por_pagar': ofertas_por_pagar,
             'productor': productor
         })
+
 
 class GenerarOrdenPagoProductores(View):
     def post(self, request):
@@ -583,11 +583,11 @@ class GenerarOrdenPagoProductores(View):
             .distinct('fk_oferta__fk_productor')
 
         for productor in productores_pagar:
-            pagar_ofertas=Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
-                                           fk_oferta__fk_productor=productor.fk_oferta.fk_productor)
+            pagar_ofertas = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
+                                                           fk_oferta__fk_productor=productor.fk_oferta.fk_productor)
 
-            valor_total=pagar_ofertas.aggregate(Sum('precioProvedor')).get('precioProvedor__sum')
-            orden_compra = Orden_Compra.objects\
+            valor_total = pagar_ofertas.aggregate(Sum('precioProvedor')).get('precioProvedor__sum')
+            orden_compra = Orden_Compra.objects \
                 .create(fk_productor=productor.fk_oferta.fk_productor, valor_total=valor_total, estado='PA')
 
             for pagar_oferta in pagar_ofertas:
@@ -597,6 +597,7 @@ class GenerarOrdenPagoProductores(View):
         return render(request, 'Administrador/pagos-pendientes-productor.html',
                       {'ofertas_por_pagar': productores_pagar,
                        'productores': Productor.objects.all()})
+
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
@@ -609,7 +610,7 @@ class DetalleOrdenPago(View):
     def get(self, request, orden_compra_id):
         orden_compra = Orden_Compra.objects.filter(id=orden_compra_id)
 
-        ofertas_producto = Oferta_Producto.objects.\
+        ofertas_producto = Oferta_Producto.objects. \
             filter(fk_orden_compra=orden_compra)
         return render(request, 'Administrador/detalle-orden-pago.html', {
             'ofertas_producto': ofertas_producto
