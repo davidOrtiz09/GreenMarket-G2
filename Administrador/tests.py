@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class Test(TestCase):
     def setUp(self):
-        self.browser = webdriver.Chrome("C:\\Users\\JUAN CIFUENTES\\chromedriver.exe")
+        self.browser = webdriver.Chrome("C:\\Users\\alfye\\Documents\\Agiles\\chromedriver_win32\\chromedriver.exe")
         # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
 
@@ -29,6 +29,21 @@ class Test(TestCase):
         text=self.browser.find_element_by_xpath(
             "//select[@id='tipo_informe']/option[text()='Ver inventarios']")
         self.assertIn('Ver inventarios', text.text)
+
+    def test_ir_informe_inventario(self):
+        self.do_login()
+        self.browser.get('http://127.0.0.1:8000/administrador/informes')
+        self.browser.implicitly_wait(3)
+        text=self.browser.find_element_by_xpath(
+            "//select[@id='tipo_informe']/option[text()='Ver inventarios']")
+
+        text.click()
+        self.browser.implicitly_wait(3)
+
+        th_table = self.browser.find_element_by_xpath(
+            "//table/thead/tr/th[text()='Inventario semana']")
+
+        self.assertIn('Inventario semana', th_table.text)
 
     def do_login(self):
         username_str = 'jc.cifuentes'
