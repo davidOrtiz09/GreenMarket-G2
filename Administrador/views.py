@@ -447,12 +447,11 @@ class GenerarOrdenPagoProductores(View):
             ofertas_por_pagar.fk_orden_compra = orden_compra
             ofertas_por_pagar.save()
 
-        return render(request, 'Administrador/pagos-pendientes-productor.html', {
-            # 'ofertas_por_pagar': ofertas_por_pagar,
+        return render(request, 'Administrador/detalle-orden-pago.html', {
+            'ofertas_producto': Oferta_Producto.objects.filter(fk_orden_compra=orden_compra)
         })
 
     def get(self, request):
-
         productores_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True) \
             .distinct('fk_oferta__fk_productor')
 
@@ -468,10 +467,9 @@ class GenerarOrdenPagoProductores(View):
                 pagar_oferta.fk_orden_compra = orden_compra
                 pagar_oferta.save()
 
-        return render(request, 'Administrador/pagos-pendientes-productor.html', {
-            # 'ofertas_por_pagar': ofertas_por_pagar,
-        })
-
+        return render(request, 'Administrador/pagos-pendientes-productor.html',
+                      {'ofertas_por_pagar': productores_pagar,
+                       'productores': Productor.objects.all()})
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
