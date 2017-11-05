@@ -229,12 +229,17 @@ class InformesClientesMasRentables(View):
         mejores_clientes = list()
         for cliente in Cliente.objects.all():
             pedidos = Pedido.objects.filter(fk_cliente=cliente)
-            cantidad_pedidos = pedidos.objects.count()
+            cantidad_pedidos = pedidos.count()
+            print ("-------------------------")
+            print (cantidad_pedidos)
+            print (pedidos)
             if cantidad_pedidos > 0:
                 django_user = User.objects.get(id=cliente.fk_django_user_id)
                 nombre = django_user.first_name + ' ' + django_user.last_name
                 total_compras = pedidos.aggregate(Sum('valor_total'))
                 ultima_fecha = pedidos.order_by('fecha_pedido')[0]
+                print("*********")
+                print(ultima_fecha)
                 mejores_clientes.append(
                     MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
                 )
