@@ -236,15 +236,16 @@ class InformesClientesMasRentables(View):
                 django_user = User.objects.get(id=cliente.fk_django_user_id)
                 nombre = django_user.first_name + ' ' + django_user.last_name
                 total_compras = pedidos.aggregate(Sum('valor_total'))
-                ultima_fecha = pedidos.order_by('fecha_pedido')[0].objects.get()
+                ultima_fecha = pedidos.order_by('fecha_pedido')[0]
                 print("*********")
-                print(ultima_fecha.objects.get())
+                print(ultima_fecha)
                 mejores_clientes.append(
                     MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
                 )
         clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
         print(">>>>>>>>>>>>>>>>>>")
         print (clientes_ordenados[0].cantidad_pedidos)
+        print (clientes_ordenados[0].ultima_fecha)
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {
             'mejores_clientes': clientes_ordenados
         })
