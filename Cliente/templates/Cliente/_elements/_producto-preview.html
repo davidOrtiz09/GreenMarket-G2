@@ -1,19 +1,22 @@
 <div class="box-product">
     <div class="img-wrapper">
-        <a style="cursor: pointer;">
-            <img alt="Product" onclick="verDetalleCarrito({{ product.fk_producto.id }});" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block">
+        <a href="#" style="cursor: pointer;">
+            <img id="product-image-index-{{ product.fk_producto.id }}" alt="Product" onclick="verDetalleCarrito({{ product.fk_producto.id }});" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block">
         </a>
 
         <div class="option" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">
-            <a title="" data-original-title="Descripcion"><i
-                    >{{product.fk_producto.descripcion}}</i></a>
+            <a title="" data-original-title="Descripcion">
+                <a id="product-description-index-{{ product.fk_producto.id }}">
+                    {{product.fk_producto.descripcion}}
+                </a>
+            </a>
         </div>
     </div>
     <h5>
-        <a class="link" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">{{product.fk_producto.nombre}}</a>
+        <a id="product-name-index-{{ product.fk_producto.id }}" class="link" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">{{product.fk_producto.nombre}}</a>
     </h5>
     <div class="price">
-        <h6>${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
+        <h6 id="product-price-index-{{ product.fk_producto.id }}">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
     </div>
 
     <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
@@ -35,7 +38,7 @@
  <div id="sectionPopUpDescripcion{{ product.fk_producto.id }}" class="sectionPopUpDescripcion">
         <div class="popUpDescripcionProducto container">
             <div class="headerPopUpDescripcion row">
-                <h5 style="font-weight: bold;margin-top: 5px;margin-left: 30px;">{{product.fk_producto.nombre}}</h5>
+                <h5 id="product-name-popup-{{ product.fk_producto.id }}" style="font-weight: bold;margin-top: 5px;margin-left: 30px;">{{product.fk_producto.nombre}}</h5>
                 <a name="{{ product.fk_producto.id }}" class="cerrarPopUpDetalleProducto close-btn popup-close">x</a>
             </div>
             <div class="bodyPopUpDescripcion row">
@@ -57,7 +60,7 @@
                                 <h6 class="mb-1" style="font-weight: bold;">Descripción</h6>
                                 <small></small>
                             </div>
-                            <p class="mb-1">{{product.fk_producto.descripcion }}</p>
+                            <p id="description-popup-{{ product.fk_producto.id }}" class="mb-1">{{product.fk_producto.descripcion }}</p>
                             <small></small>
                         </a>
                         <a class="list-group-item list-group-item-action flex-column align-items-start" style="padding: 5px 15px;">
@@ -65,7 +68,7 @@
                                 <h6 class="mb-1" style="font-weight: bold;">Precio</h6>
                                 <small></small>
                             </div>
-                            <p class="mb-1">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</p>
+                            <p id="product-price-popup-{{ product.fk_producto.id }}" class="mb-1">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</p>
                             <small></small>
                         </a>
                     </div>

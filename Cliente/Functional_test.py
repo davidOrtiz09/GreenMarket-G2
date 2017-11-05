@@ -9,7 +9,7 @@ def current_milli_time():
 
 class FunctionalTest(TestCase):
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        self.browser = webdriver.Chrome('C:\\Users\\Diego\\Downloads\\chromedriver_win32\\chromedriver.exe')
         self.browser.implicitly_wait(2)
 
     def tearDown(self):
@@ -19,20 +19,21 @@ class FunctionalTest(TestCase):
         self.browser.get('http://localhost:8000')
         self.browser.implicitly_wait(3)
 
-        nameIndex=self.browser.find_element_by_id('product-name-index')
-        descriptionIndex=self.browser.find_element_by_id('product-description-index')
-        priceIndex=self.browser.find_element_by_id('product-price-index')
+        time.sleep(2)
+        self.browser.get('http://localhost:8000#product-image-index-1')
+        nameIndex=self.browser.find_element_by_id('product-name-index-1')
+        time.sleep(2)
+        priceIndex=self.browser.find_element_by_id('product-price-index-1')
 
-        link = self.browser.find_element_by_id('button-detail')
+        time.sleep(2)
+        link = self.browser.find_element_by_id('product-image-index-1')
+        time.sleep(2)
         link.click()
-        self.browser.implicitly_wait(2)
 
-        name = self.browser.find_element_by_id('product-name-test')
-        description= self.browser.find_element_by_id('description-test')
-        price= self.browser.find_element_by_id('product-price-test')
+        name = self.browser.find_element_by_id('product-name-popup-1')
+        price= self.browser.find_element_by_id('product-price-popup-1')
 
         self.assertEquals(nameIndex.text, name.text)
-        self.assertEquals(descriptionIndex.text, description.text)
         self.assertEquals(priceIndex.text, price.text)
 
 
