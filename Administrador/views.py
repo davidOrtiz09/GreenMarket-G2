@@ -414,18 +414,12 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class ConsultarPagosPendientes(View):
     def get(self, request):
-        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)\
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)\
             .distinct('fk_oferta__fk_productor')
         productor = Productor.objects.all()
-        ofertas_productor = ()
-
-        # for oferta_producto in Oferta_Producto.objects.all():
-        #     print ofteras_por_pagar.filter(fk_oferta__fk_productor=oferta_producto.fk_oferta.fk_productor).exists()
-        #     if(ofteras_por_pagar.filter(fk_oferta__fk_productor=oferta_producto.fk_oferta.fk_productor).exists()):
-        #         ofteras_por_pagar.union(Oferta_Producto.objects.all())
 
         return render(request, 'Administrador/pagos-pendientes-productor.html',
-                      {'ofteras_por_pagar': ofteras_por_pagar,
+                      {'ofertas_por_pagar': ofertas_por_pagar,
                        'productores': productor})
 
 class DetalleOrdenPagoProductores(View):
@@ -441,7 +435,6 @@ class DetalleOrdenPagoProductores(View):
 
 class GenerarOrdenPagoProductores(View):
     def post(self, request):
-
         orden_compra_Json = json.loads(request.POST.get('orden-pago-form'))
         orden_compra = orden_compra_Json.get('orden_compra')
         valor_total_json = orden_compra.get('valor_total')
@@ -458,6 +451,27 @@ class GenerarOrdenPagoProductores(View):
             # 'ofertas_por_pagar': ofertas_por_pagar,
         })
 
+    def get(self, request):
+
+        productores_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True) \
+            .distinct('fk_oferta__fk_productor')
+
+        for productor in productores_pagar:
+            pagar_ofertas=Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
+                                           fk_oferta__fk_productor=productor.fk_oferta.fk_productor)
+
+            valor_total=pagar_ofertas.aggregate(Sum('precioProvedor')).get('precioProvedor__sum')
+            orden_compra = Orden_Compra.objects\
+                .create(fk_productor=productor.fk_oferta.fk_productor, valor_total=valor_total, estado='PA')
+
+            for pagar_oferta in pagar_ofertas:
+                pagar_oferta.fk_orden_compra = orden_compra
+                pagar_oferta.save()
+
+        return render(request, 'Administrador/pagos-pendientes-productor.html', {
+            # 'ofertas_por_pagar': ofertas_por_pagar,
+        })
+
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
@@ -468,7 +482,6 @@ class OrdenesPagoProductores(View):
 
 class DetalleOrdenPago(View):
     def get(self, request, orden_compra_id):
-        print orden_compra_id
         orden_compra = Orden_Compra.objects.filter(id=orden_compra_id)
 
         ofertas_producto = Oferta_Producto.objects.\

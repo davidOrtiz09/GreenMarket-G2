@@ -6,7 +6,6 @@ $(document).ready(function () {
 
 $('button#ordenPago').click(function () {
 
-    console.log("ingrese a La fucnion de pago 2");
     var container = $('div#orden-Pago-detalle');
     var response = [];
     var oferta_productos = [];

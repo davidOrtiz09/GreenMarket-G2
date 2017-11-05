@@ -3,90 +3,70 @@
 {% block main %}
     <section>
         <div class="container-fluid" style="margin-top: 10px">
-            <h1 class="text-center"> Generar Orden de Pago</h1>
+            <h1 class="text-center"> Ordenes de Pago Productores</h1>
             <br/>
             <br>
             <div class="panel panel panel-success">
-                <div class="panel-heading">Generar Orden de Pago</div>
+                <div class="panel-heading"></div>
                 <div class="container-fluid" style="height: 400px;overflow: auto">
                     <table id="pagosPendientesTable" class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
                         <br/>
-                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Pago Pendientes de
-                            Productores
+                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ordenes de Pago Productores
                         </th>
                         <tr bgcolor="#deb887">
                             {#                            <th class="text-center">Imagen</th>#}
                             <th class="text-center">Cooperativa</th>
                             <th class="text-center">Productor</th>
                             <th class="text-center">Descripción</th>
-                            <th class="text-center">Detalle</th>
+                            <th class="text-center">Pagos/Pagar</th>
                         </tr>
                         </thead>
                         <tbody>
                         <form method="post" action="{% url 'administrador:pagos-pendientes-productor' %}">
-                            {% for ofertas in ofteras_por_pagar %}
-
+                            {% for productor in productores %}
                                 {% csrf_token %}
                                 <tr>
                                     {#                                    <td class="text-center">#}
                                     {#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
                                     {#                                    </td>#}
                                     <td class="text-center">
-                                        {{ ofertas.fk_oferta.fk_productor.nombre }}
+                                        {{ productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                        {{ ofertas.fk_oferta.fk_productor.nombre }}
+                                        {{ productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                        {{ ofertas.fk_oferta.fk_productor.descripcion }}
+                                        {{ productor.descripcion }}
                                     </td>
                                     <td class="text-center">
-                                        <a href="{% url 'administrador:ordenes-pago-productor' id_productor=ofertas.fk_oferta.fk_productor.id %}"
+                                        <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
                                            class="btn btn-info">
-                                            detalle
+                                            Ver Pagos
                                         </a>
-                                        <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=ofertas.fk_oferta.fk_productor.id %}"
-                                           class="btn btn-info">
-                                            Pagar
-                                        </a>
+
+                                        {% for oferta_por_pagar in ofertas_por_pagar %}
+                                            {% if oferta_por_pagar.fk_oferta.fk_productor.id == productor.id %}
+                                                <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=productor.id %}"
+                                                   class="btn btn-info">
+                                                    Pagar
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
                                     </td>
                                 </tr>
-
-                            {% endfor %}
-                            {% for productor in productores %}
-                                {% for ofertas in ofteras_por_pagar %}
-                                    {% if ofertas.fk_oferta.fk_productor.id != productor.id %}
-
-                                        {% csrf_token %}
-                                        <tr>
-                                            {#                                    <td class="text-center">#}
-                                            {#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
-                                            {#                                    </td>#}
-                                            <td class="text-center">
-                                                {{ productor.nombre }}
-                                            </td>
-                                            <td class="text-center">
-                                                {{ productor.nombre }}
-                                            </td>
-                                            <td class="text-center">
-                                                {{ productor.descripcion }}
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
-                                                   class="btn btn-info">
-                                                    detalle
-                                                </a>
-
-                                            </td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
                             {% endfor %}
                         </form>
                         </tbody>
                     </table>
+
+                    {% if ofertas_por_pagar.exists %}
+                        <a href="{% url 'administrador:generar-orden-pago-productores' %}"
+                           class="btn btn-info">
+                            Pagar Todas
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
