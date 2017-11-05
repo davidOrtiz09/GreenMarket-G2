@@ -9,6 +9,22 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav mr-auto">
+                {% url 'cliente:index' as url_index %}
+                <li class="nav-item {% if request.path == url_index or request.path == "" %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'cliente:index' %}">
+                        <i class="fa fa-apple"></i>
+                        Productos individuales
+                    </a>
+                </li>
+                {% url 'cliente:canastas' as url_canastas %}
+                <li class="nav-item {% if request.path == url_canastas %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'cliente:canastas' %}">
+                        <i class="fa fa-shopping-basket"></i>
+                        Canastas de productos
+                    </a>
+                </li>
+            </ul>
             <ul class="navbar-nav ml-auto">
                 {% if not user.is_authenticated %}
                     <li class="nav-item active">
@@ -30,13 +46,8 @@
                             {{ user.get_full_name }}
                         </a>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'cliente:index' %}">
-                                <i class="fa fa-user"></i>
-                                Mi perfil
-                            </a>
-                            <div role="separator" class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'cliente:mis-pedidos' %}">
-                                <i class="fa fa-sign-out"></i>
+                                <i class="fa fa-list"></i>
                                 Mis pedidos
                             </a>
                             <div role="separator" class="dropdown-divider"></div>

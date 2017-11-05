@@ -10,5 +10,7 @@ urlpatterns = [
     url(r'^eliminar-producto-carrito$', views.DeleteProductFromShoppingCart.as_view(), name='eliminar-producto-carrito'),
     url(r'^registrar-cliente$', views.RegisterClientView.as_view(), name='registrar-cliente'),
     url(r'^mis-pedidos$', views.MisPedidosView.as_view(), name='mis-pedidos'),
-    url(r'^realizar-pago', views.DoPayment.as_view(), name='realizar-pago')
+    url(r'^realizar-pago', views.DoPayment.as_view(), name='realizar-pago'),
+    url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
+    url(r'^agregar-canasta-carrito$', views.AgregarCanastaCarrito.as_view(), name='agregar-canasta-carrito')
 ]

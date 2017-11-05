@@ -6,16 +6,17 @@ from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
+from Cliente.utils import agregar_producto_carrito
 
 
 class AbstractClienteLoggedView(View):
@@ -132,42 +133,13 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
         # Se retorna a la página desde el que se añadió el producto al carrito
         product_id = int(request.POST.get('product_id', '0'))
         quantity = int(request.POST.get('quantity', '0'))
-        product = Catalogo_Producto.objects.get(id=product_id)
-        if product_id > 0 and quantity != 0:
-            cart = request.session.get('cart', None)
-            if not cart:
-                cart = {
-                    'items': [{
-                        'product_id': product_id,
-                        'quantity': quantity,
-                        'name': product.fk_producto.nombre,
-                        'image': product.fk_producto.imagen.url,
-                        'price': float(product.precio),
-                        'unit': product.fk_producto.unidad_medida
-                    }]
-                }
-            else:
-                items = cart.get('items', [])
-                exists = False
-                i = 0
-                while not exists and i < len(items):
-                    item = items[i]
-                    if item['product_id'] == product_id:
-                        item['quantity'] += quantity
-                        exists = True
-                    i += 1
-                if not exists:
-                    items.append({
-                        'product_id': product_id,
-                        'quantity': quantity,
-                        'name': product.fk_producto.nombre,
-                        'image': product.fk_producto.imagen.url,
-                        'price': float(product.precio),
-                        'unit': product.fk_producto.unidad_medida
-                    })
-                cart['items'] = items
 
-            request.session['cart'] = cart
+        if product_id > 0 and quantity != 0:
+            request.session['cart'] = agregar_producto_carrito(
+                request=request,
+                product_id=product_id,
+                quantity=quantity
+            )
             messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -350,3 +322,43 @@ class DoPayment(AbstractClienteLoggedView):
         pedido_model.save()
         savepoint_commit(checkpoint)
         return render(request, 'Cliente/mis_pedidos.html', {'compra': True})
+
+
+class Canastas(View):
+    def get(self, request):
+        canastas = Canasta.objects.filter(esta_publicada=True, fk_semana=get_or_create_week())
+        if canastas:
+            return render(request, 'Cliente/canastas.html', {'canastas': canastas})
+        else:
+            messages.add_message(request, messages.INFO, 'Actualmente no hay canastas disponibles')
+            return redirect(reverse('cliente:index'))
+
+
+class AgregarCanastaCarrito(AbstractClienteLoggedView):
+    logged_out_message = 'Por favor ingresa a tu cuenta para agregar canastas a tu carrito'
+
+    @atomic
+    def post(self, request):
+        id_canasta = request.POST.get('id_canasta', '0')
+        canasta = Canasta.objects.filter(id=id_canasta, esta_publicada=True, fk_semana=get_or_create_week()).first()
+        if canasta:
+            productos_canasta = CanastaProducto.objects.filter(fk_canasta_id=canasta)
+            for producto_canasta in productos_canasta:
+                request.session['cart'] = agregar_producto_carrito(
+                    request=request,
+                    product_id=producto_canasta.fk_producto_catalogo_id,
+                    quantity=producto_canasta.cantidad
+                )
+
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Los productos de la canasta fueron añadidos al carrito'
+            )
+        else:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                'La canasta que estas buscando ya no se encuentra disponible'
+            )
+        return redirect(reverse('cliente:canastas'))
