@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
+from django.http import JsonResponse
 from decimal import Decimal
 
 
@@ -422,3 +423,21 @@ class Productores (AbstractAdministradorLoggedView):
 class CrearProductor (AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/crear-productor.html', {})
+
+
+class GetDepartamentos(View):
+    def get(self, request):
+        departamentos = Cooperativa.objects.all().values('departamento').distinct('departamento')
+        return JsonResponse({"ListaDepartamentos": list(departamentos)})
+
+class GetCiudadPorDepto(View):
+    def get(self, request):
+        idDepto = request.GET['idDepto']
+        ciudades = Cooperativa.objects.filter(departamento=idDepto).values('ciudad').distinct('ciudad')
+        return JsonResponse({"ListaCiudades": list(ciudades)})
+
+class GetCooperativaPorCiudad(View):
+    def get(self, request):
+        idCooperativa= request.GET['ciudad']
+        cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre','id')
+        return JsonResponse({"ListaCooperativas": list(cooperativas)})

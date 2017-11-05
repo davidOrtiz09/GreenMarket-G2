@@ -40,8 +40,7 @@
 
                 <div id="seccionDescripcionProductor" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Descripción del Productor</strong>
-                    <textarea id="inputDescripcionProductor" class="col-md-6 col-sm-12 form-control" rows="4">
-                    </textarea>
+                    <textarea id="inputDescripcionProductor" class="col-md-6 col-sm-12 form-control" rows="4"></textarea>
                 </div>
 
                 <div id="seccionSeleccionarUbicacion" class="col-md-12 row secciones">
@@ -55,7 +54,7 @@
 
                 <div id="seccionAgregarProductor" class="col-md-12 row secciones" style="margin-top: 40px;">
                     <div class="col-md-3 col-sm-1"></div>
-                    <button type="button" class="col-md-6 col-sm-11 btn btn-primary">Agregar Productor</button>
+                    <button onclick="agregarProductor();" type="button" class="col-md-6 col-sm-11 btn btn-primary">Agregar Productor</button>
                     <div class="col-md-3 col-sm-1"></div>
                 </div>
             </div>
@@ -75,6 +74,9 @@
                     <button type="button" onclick="seleccionarUbicacion();" class="btn btn-primary" style="position: absolute; top: 5px; left: 21px;">Seleccionar Ubicación</button>
                 </div>
             </div>
+        </div>
+        <div id="sectionLoading">
+            <img id="loadingIcon" src="{% static  '/images/loading.gif' %}">
         </div>
     </section>
 {% endblock %}

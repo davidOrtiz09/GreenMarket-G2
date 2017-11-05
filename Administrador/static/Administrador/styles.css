@@ -96,4 +96,28 @@ td.encabezado{
     background: black;
 }
 
+#sectionLoading{
+    display: none;
+    background: rgba(0,0,0,0.6);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+}
+
+#loadingIcon{
+    width: 10%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+
+}
 /* Fin seccion estilos crear-Productor  */
