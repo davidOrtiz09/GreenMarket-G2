@@ -458,3 +458,14 @@ class OrdenesPagoProductores(View):
         return render(request, 'Administrador/ordenes-pago-productor.html',
                       {'ordenes_compra': orden_compra})
 
+
+class DetalleOrdenPago(View):
+    def get(self, request, orden_compra_id):
+        print orden_compra_id
+        orden_compra = Orden_Compra.objects.filter(id=orden_compra_id)
+
+        ofertas_producto = Oferta_Producto.objects.\
+            filter(fk_orden_compra=orden_compra)
+        return render(request, 'Administrador/detalle-orden-pago.html', {
+            'ofertas_producto': ofertas_producto
+        })

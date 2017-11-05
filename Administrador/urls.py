@@ -34,6 +34,6 @@ urlpatterns = [
     url(r'^detalle-producto-orden-pago/(?P<id_productor>\d+)$', views.DetalleOrdenPagoProductores.as_view(), name='detalle-producto-orden-pago'),
     url(r'^generar-orden-pago-productores$', views.GenerarOrdenPagoProductores.as_view(), name='generar-orden-pago-productores'),
     url(r'^ordenes-pago-productor/(?P<id_productor>\d+)$', views.OrdenesPagoProductores.as_view(), name='ordenes-pago-productor'),
-
+    url(r'^detalle-orden-pago/(?P<orden_compra_id>\d+)$', views.DetalleOrdenPago.as_view(), name='detalle-orden-pago'),
 
 ]
