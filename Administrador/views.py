@@ -7,8 +7,10 @@ from operator import itemgetter
 from django.contrib.auth.models import User
 from django.db.models import Sum, Min, Max
 from django.shortcuts import render, redirect, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 from Administrador.models import MejoresClientes
+from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
 from Administrador.utils import catalogo_actual, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
@@ -16,6 +18,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
+from django.http import JsonResponse
 from decimal import Decimal
 
 
@@ -424,3 +427,74 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
             )
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+
+class Productores (AbstractAdministradorLoggedView):
+    def get(self, request):
+        productores = Productor.objects.all().order_by('id')
+        return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
+
+class CrearProductor (AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/crear-productor.html', {})
+
+
+class GetDepartamentos(View):
+    def get(self, request):
+        departamentos = Cooperativa.objects.all().values('departamento').distinct('departamento')
+        return JsonResponse({"ListaDepartamentos": list(departamentos)})
+
+class GetCiudadPorDepto(View):
+    def get(self, request):
+        idDepto = request.GET['idDepto']
+        ciudades = Cooperativa.objects.filter(departamento=idDepto).values('ciudad').distinct('ciudad')
+        return JsonResponse({"ListaCiudades": list(ciudades)})
+
+
+class GetCooperativaPorCiudad(View):
+    def get(self, request):
+        idCooperativa= request.GET['ciudad']
+        cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre','id')
+        return JsonResponse({"ListaCooperativas": list(cooperativas)})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AgregarProductor(AbstractAdministradorLoggedView):
+    def get(self, request):
+        print 'holaGet'
+        return JsonResponse({})
+
+    def post(self, request):
+        print 'holaPost'
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        cooperativa = Cooperativa.objects.filter(id=body["cooperativaId"]).first()
+        print 'hola'
+
+        nombre = body["nombre"]
+        apellido = body["apellido"]
+        contrasena = body["contrasena"]
+        correo = body["correo"]
+
+        direccion = body["direccion"]
+        descripcion = body["descripcion"]
+        coordenadas= body["coordenadas"]
+
+        user_model = User.objects.create_user(
+            username=correo,
+            password=contrasena,
+            first_name=nombre,
+            last_name=apellido,
+            email=correo
+        )
+        user_model.save()
+        productor_model = Productor(
+            fk_django_user=user_model,
+            fk_cooperativa=cooperativa,
+            nombre=nombre,
+            direccion=direccion,
+            descripcion=descripcion,
+            coordenadas_gps=coordenadas
+        )
+        productor_model.save()
+        return JsonResponse({"Mensaje": "Finalizó con exito"})

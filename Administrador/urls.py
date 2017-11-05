@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from . import views
 
+
 urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
     url(r'^ingresar$', views.Ingresar.as_view(), name='ingresar'),
@@ -31,4 +32,13 @@ urlpatterns = [
     url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta'),
     url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
     url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta'),
+
+    url(r'^productores$', views.Productores.as_view(),name='productores'),
+    url(r'^productores/crear-productor$', views.CrearProductor.as_view(), name='crear-productor'),
+    url(r'^getDepartamentos/$', views.GetDepartamentos.as_view(), name='get-Departamentos'),
+    url(r'^getCiudadPorDepto/$', views.GetCiudadPorDepto.as_view(), name='get-ciudad-depto'),
+    url(r'^getCooperativaPorCiudad/$', views.GetCooperativaPorCiudad.as_view(), name='get-cooperativa-ciudad'),
+    url(r'^agregarProductor/$', views.AgregarProductor.as_view(), name='agregar-productor'),
+
+
 ]
