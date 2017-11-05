@@ -15,6 +15,25 @@
                         </tr>
                         </thead>
                         <tbody>
+                        {% for clientes in mejores_clientes %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ clientes.cliente_id }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.cantidad_pedidos }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.total_compras }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.ultima_fecha }}
+                                </td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
         </div>
