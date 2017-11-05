@@ -49,16 +49,16 @@
                         <i class="icon-user"></i> <span>Clientes</span>
                     </a>
                 </li>
-            {% url 'administrador:informes' as url_informes %}
+                {% url 'administrador:informes' as url_informes %}
                 <li {% if request.path == url_informes %}class="active"{% endif %}>
                     <a href="{% url 'administrador:informes' %}">
                         <i class="icon-padnote"></i> <span>Informes</span>
                     </a>
                 </li>
-            {% url 'administrador:generar-orden-compra' as url_pago %}
+                {% url 'administrador:pagos-pendientes-productor' as url_pago %}
                 <li {% if request.path == url_pago %}class="active"{% endif %}>
-                    <a href="{% url 'administrador:generar-orden-compra' %}">
-                        <i class="fa fa-money"></i> <span>Pago a Productores</span>
+                    <a href="{% url 'administrador:pagos-pendientes-productor' %}">
+                        <i class="fa fa-money"></i> <span>Pago Productores</span>
                     </a>
                 </li>
             </ul>
