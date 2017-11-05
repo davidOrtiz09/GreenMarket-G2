@@ -449,24 +449,26 @@ class GetCooperativaPorCiudad(View):
         return JsonResponse({"ListaCooperativas": list(cooperativas)})
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AgregarProductor(AbstractProductorLoggedView):
+class AgregarProductor(AbstractAdministradorLoggedView):
     def get(self, request):
+        print 'holaGet'
         return JsonResponse({})
 
     def post(self, request):
+        print 'holaPost'
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-        cooperativa = Cooperativa.objects.filter(id=request.cooperativa.id).first()
+        cooperativa = Cooperativa.objects.filter(id=body["cooperativaId"]).first()
+        print 'hola'
 
+        nombre = body["nombre"]
+        apellido = body["apellido"]
+        contrasena = body["contrasena"]
+        correo = body["correo"]
 
-        nombre = request.productor.nombre
-        apellido = request.productor.apellido
-        contrasena = request.productor.contrasena
-        correo = request.productor.correo
-
-        direccion = request.productor.direccion
-        descripcion = request.productor.descripcion
-        coordenadas= request.productor.coordenadas
+        direccion = body["direccion"]
+        descripcion = body["descripcion"]
+        coordenadas= body["coordenadas"]
 
         user_model = User.objects.create_user(
             username=correo,
