@@ -1,0 +1,79 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid w-75 p-3" style="margin-top: 10px">
+            <div id="detalles-pedido">
+                <div class="row">
+                    <div class="col mb-3">
+                        <br>
+                        <h1 class="text-center">Compra Exitosa!</h1>
+                    </div>
+                </div>
+                <div class="col mb-3">
+                    <a href="{% url 'cliente:mis-pedidos' %}" class="btn btn-info">Ver mis Pedidos</a>
+                </div>
+                <table class="table table-responsive">
+                    <thead>
+                    <tr class="table-success">
+                        <th class="text-center">Producto</th>
+                        <th class="text-center">Cantidad</th>
+                        <th class="text-center">Precio unitario</th>
+                        <th class="text-center">Total</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cart_item in request.session.cartCompra.items %}
+                        <tr class="product-cart">
+                            <td>
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="text-center">
+                                            <img src="{{ cart_item.image }}" class=" img-fluid mx-auto">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-6">
+                                        <h5>{{ cart_item.name }}</h5>
+                                        <p>x {{ cart_item.unit }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="col-lg-6 col-sm-6">
+                                     <input class="form-control product-quantity cart-details" type="hidden" type="number" min="1" value="{{ cart_item.quantity }}" step="1" pattern="\d*">
+                                    <h5>{{ cart_item.quantity }}</h5>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="col-lg-6 col-sm-6">
+                                    <input class="unit-price" type="hidden" value={{ cart_item.price }} readonly
+                                           disabled>
+                                    ${{ cart_item.price }}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="col-lg-6 col-sm-6">
+                                    $<span
+                                        class="subtotal-producto">{{ cart_item.quantity|multiply_cop:cart_item.price }}</span>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            <h5 class="text-right">Total Compra</h5>
+                        </td>
+                        <td colspan="2">
+                            $<span id="total-a-pagar"></span>
+                        </td>
+                    </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}

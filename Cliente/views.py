@@ -332,5 +332,8 @@ class DoPayment(AbstractClienteLoggedView):
         pedido_model.valor_total = valor_total
         pedido_model.save()
 
-        return render(request, 'Cliente/mis_pedidos.html',
+
+        request.session['cartCompra'] = request.session['cart']
+        request.session['cart']=""
+        return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
                       {'compra': True})
