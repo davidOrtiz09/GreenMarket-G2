@@ -31,4 +31,7 @@ urlpatterns = [
     url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta'),
     url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
     url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta'),
+
+    url(r'^productores$', views.Productores.as_view(),name='productores'),
+    url(r'^productores/crear-productor$', views.CrearProductor.as_view(), name='crear-productor'),
 ]

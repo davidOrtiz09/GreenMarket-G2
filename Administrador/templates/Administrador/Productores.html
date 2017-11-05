@@ -1,0 +1,16 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+    <a href="{% url 'administrador:crear-productor' %}">
+        <button type="button" class="btn btn-primary">Agregar un Productor</button>
+    </a>
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/productores/js/productores.js' %}"></script>
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+
+{% endblock %}

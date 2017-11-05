@@ -414,3 +414,11 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
 
+class Productores (AbstractAdministradorLoggedView):
+    def get(self, request):
+        productores = Productor.objects.all().order_by('-nombre')
+        return render(request, 'Administrador/Productores.html', {'productores': productores})
+
+class CrearProductor (AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/crear-productor.html', {})

@@ -3,3 +3,96 @@ td.encabezado{
     background-color: rgba(190,184,135,13);
     font-weight: bold;
 }
+
+/* Inicio seccion estilos crear-Productor  */
+#sectionAgregarProductor{
+    width: 100%;
+    height: auto;
+    margin-left: 0px !important;
+}
+
+.headerPopUpDescripcion {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    margin-bottom: 10px;
+    padding: 1px;
+}
+
+#headerPopUp > h2 {
+    text-align: center;
+    margin: 10px 0px;
+}
+
+#seccionDepartamento{
+    margin-top: 5%;
+}
+
+.secciones{
+     margin: 0% 0% 2% 0%;
+}
+
+.close-btn {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    -webkit-transition: all ease 0.50s;
+    transition: all ease 0.75s;
+    border-radius: 1000px;
+    background: #1e5615;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    line-height: 24px;
+    text-align: center;
+}
+
+.close-btn:hover {
+  -webkit-transform:rotate(360deg);
+  transform:rotate(360deg);
+}
+
+#cerrarPopUpDetalleProducto{
+    background: #545558 !important;
+    cursor: pointer;
+    color: #fff;
+    max-height: 90%;
+}
+
+#sectionMapa{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+}
+
+.popUpMapa {
+    position: fixed;
+    max-width: 90%;
+    border-radius: 20px;
+    top: 20%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 60%;
+    background: white;
+    width: 60%;
+    min-height: 190px;
+}
+
+.bodyPopUpDescripcion{
+    height: 75%;
+}
+
+#mapa{
+    width: 100%;
+    height:100%;
+    background: black;
+}
+
+/* Fin seccion estilos crear-Productor  */
