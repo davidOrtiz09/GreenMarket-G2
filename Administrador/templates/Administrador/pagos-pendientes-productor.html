@@ -17,7 +17,7 @@
                             Productores
                         </th>
                         <tr bgcolor="#deb887">
-                            <th class="text-center">Imagen</th>
+{#                            <th class="text-center">Imagen</th>#}
                             <th class="text-center">Productor</th>
                             <th class="text-center">Productos Por Pagar</th>
                             <th class="text-center">Precio Total</th>
@@ -29,9 +29,9 @@
                             <form method="post" action="{% url 'administrador:pagos-pendientes-productor' %}">
                                 {% csrf_token %}
                                 <tr>
-                                    <td class="text-center">
-                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">
-                                    </td>
+{#                                    <td class="text-center">#}
+{#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
+{#                                    </td>#}
                                     <td class="text-center">
                                         {{ productor.nombre }}
                                     </td>
@@ -42,6 +42,10 @@
                                         {{ productor.nombre }}
                                     </td>
                                     <td class="text-center">
+                                        <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
+                                           class="btn btn-info">
+                                            detalle
+                                        </a>
                                         <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=productor.id %}"
                                            class="btn btn-info">
                                             Pagar
