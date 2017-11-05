@@ -229,7 +229,7 @@ class InformesClientesMasRentables(View):
         mejores_clientes = list()
         for cliente in Cliente.objects.all():
             pedidos = Pedido.objects.filter(fk_cliente=cliente)
-            cantidad_pedidos = pedidos.count()
+            cantidad_pedidos = pedidos.objects.count()
             if cantidad_pedidos > 0:
                 django_user = User.objects.get(id=cliente.fk_django_user_id)
                 nombre = django_user.first_name + ' ' + django_user.last_name
