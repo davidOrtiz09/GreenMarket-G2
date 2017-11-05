@@ -3,7 +3,7 @@
     <div class="side-navbar-wrapper">
         <div class="sidenav-header d-flex align-items-center justify-content-center">
             <div class="sidenav-header-inner text-center">
-                <img src="{% static 'Administrador/logo.png' %}" alt="person" class="img-fluid">
+                <img src="{% static 'MarketPlace/logo.png' %}" alt="person" class="img-fluid">
             </div>
             <div class="sidenav-header-logo">
                 <a href="{% url 'administrador:index' %}" class="brand-small text-center">
@@ -47,6 +47,18 @@
                 <li {% if request.path == url_clientes %}class="active"{% endif %}>
                     <a href="{% url 'administrador:clientes' %}">
                         <i class="icon-user"></i> <span>Clientes</span>
+                    </a>
+                </li>
+                {% url 'administrador:informes' as url_informes %}
+                <li {% if request.path == url_informes %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:informes' %}">
+                        <i class="icon-user"></i> <span>Informes</span>
+                    </a>
+                </li>
+                {% url 'administrador:Productores' as url_productores %}
+                <li {% if request.path == url_productores %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:productores' %}">
+                        <i class="icon-user"></i> <span>Productores</span>
                     </a>
                 </li>
             </ul>

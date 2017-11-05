@@ -90,4 +90,30 @@
             </form>
         </div>
     </section>
+
+    {% for cart_item in request.session.cart.items %}
+        <div class="modal fade" id="modal-eliminar-carrito-{{ cart_item.product_id }}" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="text-center">¿Desea eliminar este producto?</h6>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <form id="form-eliminar-carrito-{{ forloop.counter }}" action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product-id" value="{{ cart_item.product_id }}">
+                                    <button form="form-eliminar-carrito-{{ forloop.counter }}" type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
+                                </form>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary btn-block clickable" data-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}

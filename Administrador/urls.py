@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from . import views
 
+
 urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
     url(r'^ingresar$', views.Ingresar.as_view(), name='ingresar'),
@@ -13,7 +14,13 @@ urlpatterns = [
     url(r'^ofertas$', views.ListarOfertasView.as_view(), name='ofertas'),
     url(r'^ofertas/(?P<id_oferta>\d+)/(?P<guardado_exitoso>\d+)$', views.DetalleOfertaView.as_view(), name='detalle-ofertas'),
     url(r'^terminar-oferta$', views.RealizarOfertaView.as_view(), name='terminar-oferta'),
+    url(r'^informes$', views.Informes.as_view(), name='informes'),
+    url(r'^informes/clientes-mas-rentables$', views.InformesClientesMasRentables.as_view(),
+        name='informes/clientes-mas-rentables'),
+    url(r'^informes/seleccionSemanas', views.SeleccionSemanas.as_view(), name='informes/seleccionSemanas'),
+    url(r'^informes/obtener_mejores_productos', views.ObtenerMejoresProductos.as_view(), name='informes/obtener_mejores_productos'),
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
+    url(r'^clientes/(\d+)/$', views.PerfilClienteView.as_view(), name='perfil_cliente'),
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/(\d+)/$', views.HistorialClienteView.as_view(), name='historial-cliente'),
     url(r'^historial-cliente/pedido/(\d+)/$', views.PedidoClienteView.as_view(), name='pedido'),
@@ -25,5 +32,14 @@ urlpatterns = [
     url(r'^canastas/(?P<id_canasta>\d+)$', views.DetallesCanasta.as_view(), name='detalles-canasta'),
     url(r'^canastas/(?P<id_canasta>\d+)/agregar-producto$', views.AgregarProductoCanasta.as_view(), name='agregar-producto-canasta'),
     url(r'^eliminar-producto-canasta$', views.EliminarProductoCanasta.as_view(), name='eliminar-producto-canasta'),
-    url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta')
+    url(r'^cambiar-cantidad-producto-canasta$', views.CambiarCantidadProductoCanasta.as_view(),name='cambiar-cantidad-producto-canasta'),
+
+    url(r'^productores$', views.Productores.as_view(),name='productores'),
+    url(r'^productores/crear-productor$', views.CrearProductor.as_view(), name='crear-productor'),
+    url(r'^getDepartamentos/$', views.GetDepartamentos.as_view(), name='get-Departamentos'),
+    url(r'^getCiudadPorDepto/$', views.GetCiudadPorDepto.as_view(), name='get-ciudad-depto'),
+    url(r'^getCooperativaPorCiudad/$', views.GetCooperativaPorCiudad.as_view(), name='get-cooperativa-ciudad'),
+    url(r'^agregarProductor/$', views.AgregarProductor.as_view(), name='agregar-productor'),
+
+
 ]

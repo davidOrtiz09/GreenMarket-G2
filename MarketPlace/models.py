@@ -80,13 +80,13 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
-   
+
+@python_2_unicode_compatible
 class Semana(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
                                        blank=False)
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
     fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
-
 
     class Meta:
         verbose_name = 'Semana'
@@ -124,7 +124,7 @@ class Oferta_Producto(models.Model):
     fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta', null=True, blank=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True,
                                           blank=False)
-    precioProvedor = models.FloatField(verbose_name='Precio del producto', null=False, blank=False)
+    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10, decimal_places=2)
     estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
 
     class Meta:
@@ -139,11 +139,13 @@ class Oferta_Producto(models.Model):
         ofertas_producto = list()
         for oferta in Oferta_Producto.objects.filter(fk_oferta=id_oferta):
             producto = oferta.fk_producto
-            ofertas_producto.append((producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
-                                     oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
+            ofertas_producto.append(
+                (producto.imagen.url, producto.nombre, oferta.cantidad_ofertada, oferta.precioProvedor,
+                 oferta.cantidad_aceptada, oferta.estado, producto.unidad_medida, oferta.id))
         return ofertas_producto
 
 
+@python_2_unicode_compatible
 class Catalogo(models.Model):
     fk_semana = models.ForeignKey(Semana, verbose_name='Semana', null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
@@ -167,10 +169,9 @@ class Catalogo_Producto(models.Model):
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'
-        unique_together = (('fk_catalogo', 'fk_producto'),)
 
     def __str__(self):
-        return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
+        return '{0}'.format(self.id)
 
 
 class Cliente(models.Model):
@@ -209,6 +210,8 @@ class Cliente(models.Model):
         # unique_together = ('numero_identificacion', 'tipo_identificacion',)
 
 
+
+@python_2_unicode_compatible
 class Pedido(models.Model):
     TIPO_DOCUMENTOS = (
         ('CC', 'Cédula de Ciudadanía'),
@@ -228,22 +231,29 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=50, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
 
-    nombre_envio=models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
-    direccion_envio=models.CharField(max_length=150, null=False, blank=False)
-    email_envio=models.CharField(max_length=150, null=False, blank=False)
-    telefono_envio=models.CharField(max_length=150, null=False, blank=False)
-    observaciones_envio=models.CharField(max_length=150, null=False, blank=False)
+    nombre_envio = models.CharField(max_length=150, verbose_name='Nombre', null=False, blank=False)
+    direccion_envio = models.CharField(max_length=150, null=False, blank=False)
+    email_envio = models.CharField(max_length=150, null=False, blank=False)
+    telefono_envio = models.CharField(max_length=150, null=False, blank=False)
+    observaciones_envio = models.CharField(max_length=150, null=False, blank=False)
 
-    nombre_pago=models.CharField(max_length=150, null=False, blank=False)
-    tipo_identificacion=models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
-    numero_identificacion=models.CharField(max_length=20)
+    nombre_pago = models.CharField(max_length=150, null=False, blank=False)
+    tipo_identificacion = models.CharField(max_length=2, choices=TIPO_DOCUMENTOS)
+    numero_identificacion = models.CharField(max_length=20)
+
+    def __str__(self):
+        return '{cliente} (Pedido {fecha})'.format(cliente=self.fk_cliente, fecha=self.fecha_pedido)
 
 
+@python_2_unicode_compatible
 class PedidoProducto(models.Model):
     cantidad = models.IntegerField(default=0, blank=True, null=True)
-    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
+
+    def __str__(self):
+        return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad), producto=self.fk_catalogo_producto.fk_producto.nombre)
 
 
 @python_2_unicode_compatible
@@ -289,6 +299,7 @@ class Canasta(models.Model):
         verbose_name_plural = 'Canastas'
 
 
+@python_2_unicode_compatible
 class CanastaProducto(models.Model):
     fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
     fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
@@ -316,3 +327,7 @@ class CanastaProducto(models.Model):
         verbose_name = 'Producto de canasta'
         verbose_name_plural = 'Productos de canastas'
         unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
+
+    def __str__(self):
+        return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre, producto=self.fk_producto_catalogo.fk_producto)
+

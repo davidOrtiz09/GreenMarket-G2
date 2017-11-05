@@ -1,24 +1,26 @@
 <div class="box-product">
     <div class="img-wrapper">
-        <a href="#">
-            <img alt="Product" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block">
+        <a href="#" style="cursor: pointer;">
+            <img id="product-image-index-{{ product.fk_producto.id }}" alt="Product" onclick="verDetalleCarrito({{ product.fk_producto.id }});" src="{{ product.fk_producto.imagen.url }}" class="img-responsive center-block product-preview">
         </a>
 
-        <div class="option">
-            <a title="" data-original-title="Descripcion"><i
-                    >{{product.fk_producto.descripcion}}</i></a>
+        <div class="option" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">
+            <a title="" data-original-title="Descripcion">
+                <a id="product-description-index-{{ product.fk_producto.id }}">
+                    {{product.fk_producto.descripcion}}
+                </a>
+            </a>
         </div>
     </div>
     <h5>
-        <a href="#">{{product.fk_producto.nombre}}</a>
+        <a id="product-name-index-{{ product.fk_producto.id }}" class="link" style="cursor: pointer;" onclick="verDetalleCarrito({{ product.fk_producto.id }});">{{product.fk_producto.nombre}}</a>
     </h5>
     <div class="price">
-        <h6>${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
+        <h6 id="product-price-index-{{ product.fk_producto.id }}">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
     </div>
 
     <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
         {% csrf_token %}
-        {# TODO el product id se debería extraer directamente del producto #}
         <input type="hidden" name="product_id" value="{{ product.id }}">
         <div class="input-group">
             <span class="input-group-btn clickable">
@@ -33,12 +35,61 @@
             </span>
         </div>
     </form>
-
-
-{#    <div class="detail">#}
-{#        <div>#}
-{#            <h5>{{ product.fk_producto.descripcion }}</h5>#}
-{#        </div>#}
-{#    </div>#}
-
+ <div id="sectionPopUpDescripcion{{ product.fk_producto.id }}" class="sectionPopUpDescripcion">
+        <div class="popUpDescripcionProducto container">
+            <div class="headerPopUpDescripcion row">
+                <h5 id="product-name-popup-{{ product.fk_producto.id }}" style="font-weight: bold;margin-top: 5px;margin-left: 30px;">{{product.fk_producto.nombre}}</h5>
+                <a name="{{ product.fk_producto.id }}" class="cerrarPopUpDetalleProducto close-btn popup-close">x</a>
+            </div>
+            <div class="bodyPopUpDescripcion row">
+                <div class="sectionImage col-md-4 col-sm-6">
+                    <img class="imagenDescripcionProducto" src="{{ product.fk_producto.imagen.url }}">
+                </div>
+                <div class="contentPopUp col-md-8 col-sm-6">
+                    <div class="list-group">
+                        <a class="list-group-item list-group-item-action flex-column align-items-start" style="padding: 5px 15px;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" style="font-weight: bold;">Categoria</h6>
+                                <small></small>
+                            </div>
+                            <p class="mb-1">{{product.fk_producto.fk_categoria.nombre }}</p>
+                            <small></small>
+                        </a>
+                        <a class="list-group-item list-group-item-action flex-column align-items-start" style="padding: 5px 15px;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" style="font-weight: bold;">Descripción</h6>
+                                <small></small>
+                            </div>
+                            <p id="description-popup-{{ product.fk_producto.id }}" class="mb-1">{{product.fk_producto.descripcion }}</p>
+                            <small></small>
+                        </a>
+                        <a class="list-group-item list-group-item-action flex-column align-items-start" style="padding: 5px 15px;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" style="font-weight: bold;">Precio</h6>
+                                <small></small>
+                            </div>
+                            <p id="product-price-popup-{{ product.fk_producto.id }}" class="mb-1">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</p>
+                            <small></small>
+                        </a>
+                    </div>
+                    <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" style="margin: 15px 0px; " class="form-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <div class="input-group">
+                            <span class="input-group-btn clickable">
+                                <button type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
+                            </span>
+                            <input name="quantity" class="form-control product-quantity" type="number" min="0" value="0" step="1" pattern="\d*">
+                            <span class="input-group-btn clickable">
+                                <button type="button" class="btn btn-success product-plus"><i class="fa fa-2x fa-plus-circle"></i></button>
+                            </span>
+                            <span class="input-group-btn clickable">
+                                <button class="btn btn-link add-to-cart" data-toggle="modal" disabled><i class="fa fa-2x fa-cart-plus"></i></button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

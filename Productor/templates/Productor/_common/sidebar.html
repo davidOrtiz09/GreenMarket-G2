@@ -1,0 +1,34 @@
+{% load static %}
+<nav class="side-navbar">
+    <div class="side-navbar-wrapper">
+        <div class="sidenav-header d-flex align-items-center justify-content-center">
+            <div class="sidenav-header-inner text-center">
+                <img src="{% static 'MarketPlace/logo.png' %}" alt="person" class="img-fluid">
+            </div>
+            <div class="sidenav-header-logo">
+                <a href="{% url 'productor:index' %}" class="brand-small text-center">
+                    <strong>G</strong><strong class="text-primary">M</strong>
+                </a>
+            </div>
+        </div>
+        <div class="main-menu">
+            <ul id="side-main-menu" class="side-menu list-unstyled">
+
+                {% url 'productor:crearOferta' as url_crear_oferta %}
+                <li {% if request.path == url_crear_oferta %}class="active"{% endif %}>
+                    <a href="{{ url_crear_oferta }}">
+                        <i class="fa fa-shopping-basket"></i>
+                        <span>Realizar oferta</span>
+                    </a>
+                </li>
+                {% url 'productor:productos-vendidos' as url_productos_vendidos %}
+                <li {% if request.path == url_productos_vendidos %}class="active"{% endif %}>
+                    <a href="{{ url_productos_vendidos }}">
+                        <i class="fa fa-apple"></i>
+                        <span>Productos vendidos</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

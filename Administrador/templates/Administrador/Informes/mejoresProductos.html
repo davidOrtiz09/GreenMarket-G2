@@ -1,0 +1,60 @@
+{% extends 'Administrador/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px" align="center">
+            <h1 class="text-center"> Mejores Productos </h1>
+            <br/>
+            <form method="post" action="{% url 'administrador:informes/obtener_mejores_productos' %}">
+                <div>
+                    <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2"
+                                   width="100%"
+                                   border="1" align="center">
+                                <thead>
+                                <th colspan="8" bgcolor="#228b22" class="text-white text-center">Mejores Productos de las semanas seleccionadas</th>
+                                <tr bgcolor="#deb887">
+                                    <th class="text-center">Categoria</th>
+                                    <th class="text-center">Producto</th>
+                                    <th class="text-center">Imagen del producto</th>
+                                    <th class="text-center">Cantidad Vendida</th>
+                                    <th class="text-center">Valor de compra promedio</th>
+                                    <th class="text-center">Valor de venta</th>
+                                    <th class="text-center">Ganancias producidas (Promedio)</th>
+                                    <th class="text-center">Porcentaje de ganancia (Promedio)</th>
+                                </tr>
+                                </thead>
+                                {% for mejProd in datos %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ mejProd.producto.fk_categoria.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.producto.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    <img src="{{ mejProd.producto.imagen.url }}" class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.cantidad_vendida }} {{ mejProd.producto.unidad_medida }}
+                                </td>
+                                <td class="text-center">
+                                    ${{ mejProd.valor_compra }}
+                                </td>
+                                <td class="text-center">
+                                    ${{ mejProd.valor_venta }}
+                                </td>
+                                <td class="text-center">
+                                    ${{ mejProd.ganancia }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.porcentaje }}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+
+                    </table>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

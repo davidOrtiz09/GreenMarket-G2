@@ -1,0 +1,42 @@
+{% block main %}
+    {% load humanize %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px">
+             <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
+                           align="center">
+                        <thead>
+                        <br/>
+                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Clientes Más Rentables</th>
+                        <tr bgcolor="#deb887">
+                            <th class="text-center">Cliente ID</th>
+                            <th class="text-center">Nombre</th>
+                            <th class="text-center">Cantidad Comprada</th>
+                            <th class="text-center">Total Compras</th>
+                            <th class="text-center">Ultima Fecha De Compra</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for clientes in mejores_clientes %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ clientes.cliente_id }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.cantidad_comprada }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.total_compras.valor_total__sum|intcomma }}
+                                </td>
+                                <td class="text-center">
+                                    {{ clientes.ultima_fecha_de_compra.fecha_pedido }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+        </div>
+    </section>
+{% endblock %}

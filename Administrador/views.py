@@ -3,16 +3,22 @@ from __future__ import unicode_literals
 
 import datetime
 import json
-from django.db.models import Sum, Min, Max, QuerySet
+from operator import itemgetter
+from django.contrib.auth.models import User
+from django.db.models import Sum, Min, Max
 from django.shortcuts import render, redirect, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
+from Administrador.models import MejoresClientes
+from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Categoria
-from Administrador.utils import catalogo_actual, catalogo_validaciones
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto
+from Administrador.utils import catalogo_actual, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
+from django.http import JsonResponse
 from decimal import Decimal
 from django.utils import timezone
 from datetime import timedelta
@@ -179,13 +185,15 @@ class ActualizarEstadoPedidoView(AbstractAdministradorLoggedView):
 class ListarOfertasView(AbstractAdministradorLoggedView):
     def get(self, request):
         ofertas = list()
-        cantidad_ofertas = 0
-        id_oferta = 0
         for productor in Productor.objects.all():
-            for oferta in Oferta.objects.filter(fk_productor=productor.id):
-                cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta.id).count()
+            cantidad_ofertas = 0
+            id_oferta = 0
+            for oferta in Oferta.objects.filter(fk_productor=productor):
+                cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta).count()
                 id_oferta = oferta.id
-            ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
+
+            if cantidad_ofertas > 0:
+                ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
         return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
 
@@ -207,7 +215,7 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         id_oferta_producto = request.POST.get('id_oferta_producto')
         aprobar = request.POST.get('aprobar')
         cantidad_aceptada = request.POST.get('cantidad_aceptada')
-        if aprobar == '0' and cantidad_aceptada > 0:
+        if aprobar == '0' and int(cantidad_aceptada) > 0:
             cantidad_aceptada = 0
         oferta_producto = Oferta_Producto.objects.get(pk=id_oferta_producto)
         oferta_producto.estado = aprobar
@@ -216,9 +224,83 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
 
+class Informes(View):
+    def get(self, request):
+        return render(request, 'Administrador/Informes/index.html', {})
+
+
+class InformesClientesMasRentables(View):
+    def get(self, request):
+        mejores_clientes = list()
+        for cliente in Cliente.objects.all():
+            pedidos = Pedido.objects.filter(fk_cliente=cliente)
+            cantidad_pedidos = pedidos.count()
+            if cantidad_pedidos > 0:
+                django_user = User.objects.get(id=cliente.fk_django_user_id)
+                nombre = django_user.first_name + ' ' + django_user.last_name
+                total_compras = pedidos.aggregate(Sum('valor_total'))
+                ultima_fecha = pedidos.latest('fecha_pedido')
+                mejores_clientes.append(
+                    MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
+                )
+        clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
+        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {
+            'mejores_clientes': clientes_ordenados
+        })
+
+
+class SeleccionSemanas(View):
+    def get(self, request):
+        semanasAll = Semana.objects.all()
+        semanasCount = len(semanasAll)
+        semanas = []
+        if semanasCount >= 4:
+            semanas.append((semanasAll[semanasCount - 1]))
+            semanas.append((semanasAll[semanasCount - 2]))
+            semanas.append((semanasAll[semanasCount - 3]))
+            semanas.append((semanasAll[semanasCount - 4]))
+        else:
+            semanas = semanasAll
+        return render(request, 'Administrador/Informes/seleccionSemanas.html',
+                      {'semanas': semanas})
+
+
+class ObtenerMejoresProductos(View):
+    def post(self, request):
+        semanas = request.POST.getlist('semana', [])
+        respuesta = []
+        catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas)
+        for pro in catalogoProd:
+            valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
+            valor_venta = pro.precio
+            cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto)
+            producto = Producto.objects.filter(id=pro.fk_producto_id).first()
+            porcentaje = int
+            if cantVendida != 0:
+                porcentaje = int((((valor_venta - valor_compra) * cantVendida) * 100) / (valor_compra * cantVendida))
+            else:
+                porcentaje = 0
+            respuesta.append({
+                'producto': producto,
+                'cantidad_vendida': cantVendida,
+                'valor_compra': valor_compra,
+                'valor_venta': valor_venta,
+                'ganancia': (valor_venta - valor_compra) * cantVendida,
+                'porcentaje': porcentaje
+
+            })
+        ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
+        return render(request, 'Administrador/Informes/mejoresProductos.html', {'datos': ordenado})
+
+
 class ClientesView(View):
     def get(self, request):
         return render(request, 'Administrador/clientes.html', {'clientes': Cliente.objects.all()})
+
+
+class PerfilClienteView(View):
+    def get(self, request, id):
+        return render(request, 'Administrador/perfil-cliente.html', {'cliente': Cliente.objects.filter(id=id).first()})
 
 
 class HistorialClienteView(View):
@@ -377,8 +459,79 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
         if producto_canasta:
             producto_canasta.cantidad = cantidad if cantidad > 0 else 1
             producto_canasta.save()
-            messages.add_message(request, messages.SUCCESS,
-                                 'La cantidad del producto {producto} fue actualziado en esta canasta'.format(
-                                     producto=producto_canasta.nombre_producto))
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'La cantidad del producto {producto} fue actualziado en esta canasta'
+                    .format(producto=producto_canasta.nombre_producto)
+            )
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+
+class Productores (AbstractAdministradorLoggedView):
+    def get(self, request):
+        productores = Productor.objects.all().order_by('id')
+        return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
+
+class CrearProductor (AbstractAdministradorLoggedView):
+    def get(self, request):
+        return render(request, 'Administrador/crear-productor.html', {})
+
+
+class GetDepartamentos(View):
+    def get(self, request):
+        departamentos = Cooperativa.objects.all().values('departamento').distinct('departamento')
+        return JsonResponse({"ListaDepartamentos": list(departamentos)})
+
+class GetCiudadPorDepto(View):
+    def get(self, request):
+        idDepto = request.GET['idDepto']
+        ciudades = Cooperativa.objects.filter(departamento=idDepto).values('ciudad').distinct('ciudad')
+        return JsonResponse({"ListaCiudades": list(ciudades)})
+
+
+class GetCooperativaPorCiudad(View):
+    def get(self, request):
+        idCooperativa= request.GET['ciudad']
+        cooperativas = Cooperativa.objects.filter(ciudad=idCooperativa).values('nombre','id')
+        return JsonResponse({"ListaCooperativas": list(cooperativas)})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AgregarProductor(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        cooperativa = Cooperativa.objects.filter(id=body["cooperativaId"]).first()
+
+        nombre = body["nombre"]
+        apellido = body["apellido"]
+        contrasena = body["contrasena"]
+        correo = body["correo"]
+
+        direccion = body["direccion"]
+        descripcion = body["descripcion"]
+        coordenadas= body["coordenadas"]
+
+        user_model = User.objects.create_user(
+            username=correo,
+            password=contrasena,
+            first_name=nombre,
+            last_name=apellido,
+            email=correo
+        )
+        user_model.save()
+        productor_model = Productor(
+            fk_django_user=user_model,
+            fk_cooperativa=cooperativa,
+            nombre=nombre,
+            direccion=direccion,
+            descripcion=descripcion,
+            coordenadas_gps=coordenadas
+        )
+        productor_model.save()
+        return JsonResponse({"Mensaje": "Finalizó con exito"})
