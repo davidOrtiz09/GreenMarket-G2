@@ -1,0 +1,83 @@
+.sectionPopUpDescripcion{
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+}
+.popUpDescripcionProducto {
+    position: fixed;
+    max-width: 90%;
+    border-radius: 20px;
+    top: 20%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    height: 60%;
+    background: white;
+    width: 60%;
+}
+
+.headerPopUpDescripcion{
+    height:10%;
+    position: relative;
+    border-bottom: 1px solid #eae7e7;
+}
+
+.bodyPopUpDescripcion {
+    max-height: 90%;
+    max-width: 100%;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    padding-top: 5px;
+}
+
+.sectionImage > img {
+   max-height: 100%;
+}
+
+.contentPopUp{
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.imagenDescripcionProducto{
+    width: 100%;
+}
+.close-btn {
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    position: absolute;
+    top: 10%;
+    right: 10px;
+    -webkit-transition: all ease 0.50s;
+    transition: all ease 0.75s;
+    border-radius: 1000px;
+    background: #1e5615;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    line-height: 130%;
+    text-align: center;
+}
+
+.close-btn:hover {
+  -webkit-transform:rotate(360deg);
+  transform:rotate(360deg);
+}
+
+.cerrarPopUpDetalleProducto{
+    background: #545558 !important;
+    cursor: pointer;
+    color: #fff;
+    max-height: 90%;
+}
+
+.link:hover {
+    text-decoration: underline !important;
+    color: #202fe2 !important;
+}

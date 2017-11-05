@@ -1,5 +1,10 @@
 {% extends 'MarketPlace/_common/base.html' %}
 {% load static %}
+
+{% block styles %}
+    <link href="{% static '/theme/css/style_cliente.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block main %}
     <section>
         <div class="container">
@@ -63,4 +68,9 @@
             </div>
         </div>
     </section>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static  '/js/cliente.js' %}"></script>
 {% endblock %}
