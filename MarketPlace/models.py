@@ -47,22 +47,23 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombre
 
-@python_2_unicode_compatible
-
 
 class Orden_Compra(models.Model):
     ESTADOS = (
         ('PP', 'Por Pagar'),
-        ('PA', 'Pagado'),
+        ('PA', 'Pago'),
         ('AC', 'Activo'),
         ('CA', 'Cancelado')
 
     )
-    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False)
-    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False)
+    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False,auto_now_add=True)
+    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False,auto_now_add=True)
     fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
     estado = models.CharField(max_length=2, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
-
+    valor_total = models.DecimalField(verbose_name='Precio Total', null=False, blank=False, max_digits=10, decimal_places=2,default=0.0)
+    class Meta:
+        verbose_name = 'Orden de Compra'
+        verbose_name_plural = 'Ordenes de Compra'
 
 
 
