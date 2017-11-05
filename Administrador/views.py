@@ -423,8 +423,8 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class Productores (AbstractAdministradorLoggedView):
     def get(self, request):
-        productores = Productor.objects.all().order_by('-nombre')
-        return render(request, 'Administrador/Productores.html', {'productores': productores})
+        productores = Productor.objects.all().order_by('id')
+        return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
 
 class CrearProductor (AbstractAdministradorLoggedView):
     def get(self, request):

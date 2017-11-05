@@ -2,9 +2,53 @@
 {% load static %}
 {% block main %}
     <section>
-    <a href="{% url 'administrador:crear-productor' %}">
+    <a href="{% url 'administrador:crear-productor' %}"style="margin: 10px;">
         <button type="button" class="btn btn-primary">Agregar un Productor</button>
     </a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 class="text-center">Productores</h1>
+                    <h2>{{ subtitulo }}</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="container-fluid" style="width: 80%">
+            <table class="table table-responsive" border="1">
+                <thead>
+                <tr>
+                   <th class="text-white text-center" bgcolor="#228b22" colspan="6">
+                    Productores
+                   </th>
+                </tr>
+                <tr bgcolor="#dbeb887">
+                    <th class="text-center">Productores ID</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Correo</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in listaProductores %}
+                    <tr>
+                        <td class="text-center">
+                            {{ item.id }}
+                        </td>
+                        <td>
+                            {{ item.fk_django_user.first_name }} {{ item.fk_django_user.last_name }}
+                        </td>
+                        <td>
+                            {{ item.fk_django_user.email }}
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     </section>
 {% endblock %}
 {% block scripts %}
