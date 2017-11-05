@@ -17,43 +17,74 @@
                             Productores
                         </th>
                         <tr bgcolor="#deb887">
-{#                            <th class="text-center">Imagen</th>#}
+                            {#                            <th class="text-center">Imagen</th>#}
+                            <th class="text-center">Cooperativa</th>
                             <th class="text-center">Productor</th>
-                            <th class="text-center">Productos Por Pagar</th>
-                            <th class="text-center">Precio Total</th>
+                            <th class="text-center">Descripción</th>
                             <th class="text-center">Detalle</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for productor in productores %}
-                            <form method="post" action="{% url 'administrador:pagos-pendientes-productor' %}">
+                        <form method="post" action="{% url 'administrador:pagos-pendientes-productor' %}">
+                            {% for ofertas in ofteras_por_pagar %}
+
                                 {% csrf_token %}
                                 <tr>
-{#                                    <td class="text-center">#}
-{#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
-{#                                    </td>#}
+                                    {#                                    <td class="text-center">#}
+                                    {#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
+                                    {#                                    </td>#}
                                     <td class="text-center">
-                                        {{ productor.nombre }}
+                                        {{ ofertas.fk_oferta.fk_productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                        {{ productor.descripcion }}
+                                        {{ ofertas.fk_oferta.fk_productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                        {{ productor.nombre }}
+                                        {{ ofertas.fk_oferta.fk_productor.descripcion }}
                                     </td>
                                     <td class="text-center">
-                                        <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
+                                        <a href="{% url 'administrador:ordenes-pago-productor' id_productor=ofertas.fk_oferta.fk_productor.id %}"
                                            class="btn btn-info">
                                             detalle
                                         </a>
-                                        <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=productor.id %}"
+                                        <a href="{% url 'administrador:detalle-producto-orden-pago' id_productor=ofertas.fk_oferta.fk_productor.id %}"
                                            class="btn btn-info">
                                             Pagar
                                         </a>
                                     </td>
                                 </tr>
-                            </form>
-                        {% endfor %}
+
+                            {% endfor %}
+                            {% for productor in productores %}
+                                {% for ofertas in ofteras_por_pagar %}
+                                    {% if ofertas.fk_oferta.fk_productor.id != productor.id %}
+
+                                        {% csrf_token %}
+                                        <tr>
+                                            {#                                    <td class="text-center">#}
+                                            {#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
+                                            {#                                    </td>#}
+                                            <td class="text-center">
+                                                {{ productor.nombre }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ productor.nombre }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ productor.descripcion }}
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
+                                                   class="btn btn-info">
+                                                    detalle
+                                                </a>
+
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </form>
                         </tbody>
                     </table>
                 </div>

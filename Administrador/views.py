@@ -414,8 +414,15 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class ConsultarPagosPendientes(View):
     def get(self, request):
-        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)
-        productor = Productor.objects.filter(oferta__oferta_producto__fk_orden_compra__isnull=True).distinct('id')
+        ofteras_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True)\
+            .distinct('fk_oferta__fk_productor')
+        productor = Productor.objects.all()
+        ofertas_productor = ()
+
+        # for oferta_producto in Oferta_Producto.objects.all():
+        #     print ofteras_por_pagar.filter(fk_oferta__fk_productor=oferta_producto.fk_oferta.fk_productor).exists()
+        #     if(ofteras_por_pagar.filter(fk_oferta__fk_productor=oferta_producto.fk_oferta.fk_productor).exists()):
+        #         ofteras_por_pagar.union(Oferta_Producto.objects.all())
 
         return render(request, 'Administrador/pagos-pendientes-productor.html',
                       {'ofteras_por_pagar': ofteras_por_pagar,
@@ -454,7 +461,7 @@ class GenerarOrdenPagoProductores(View):
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
-        orden_compra = Orden_Compra.objects.filter(fk_productor=id_productor)
+        orden_compra = Orden_Compra.objects.filter(fk_productor=id_productor).order_by('-id')
         return render(request, 'Administrador/ordenes-pago-productor.html',
                       {'ordenes_compra': orden_compra})
 
