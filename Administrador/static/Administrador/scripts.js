@@ -1,5 +1,6 @@
 $(document).ready(function () {
     actualizarTotalPagar();
+    TotalPagar();
 });
 
 
@@ -38,7 +39,7 @@ $('button#ordenPago').click(function () {
     var form = $('form#form-orden-pago');
     var inputJson = form.find('input#json-form-orden');
     inputJson.val(stringPago);
-    //form.submit();
+    form.submit();
 });
 
 
@@ -64,6 +65,21 @@ function actualizarTotalPagar() {
         }
     }
     inputTotalPagar.val(totalPagar)
+    spanTotalPagarToCop.html(toCop(totalPagar));
+
+}
+
+function TotalPagar() {
+
+    var detallesPedido = $('div#orden-Pago-detalle');
+    var spanTotalPagarToCop = detallesPedido.find('span#total-a-pagar-tocop');
+    var productRows = detallesPedido.find('tr.product-orden-pago');
+    var totalPagar = 0;
+    for (var i = 0; i < productRows.length; i++) {
+        var row = $(productRows[i]);
+            var priceProductor = parseFloat(row.find('input.price-productor').val());
+            totalPagar += priceProductor
+    }
     spanTotalPagarToCop.html(toCop(totalPagar));
 
 }
