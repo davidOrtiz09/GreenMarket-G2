@@ -474,6 +474,7 @@ class Productores (AbstractAdministradorLoggedView):
         productores = Productor.objects.all().order_by('id')
         return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
 
+
 class CrearProductor (AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/crear-productor.html', {})
@@ -483,6 +484,7 @@ class GetDepartamentos(View):
     def get(self, request):
         departamentos = Cooperativa.objects.all().values('departamento').distinct('departamento')
         return JsonResponse({"ListaDepartamentos": list(departamentos)})
+
 
 class GetCiudadPorDepto(View):
     def get(self, request):
