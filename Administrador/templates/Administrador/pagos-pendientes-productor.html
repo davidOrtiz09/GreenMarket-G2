@@ -32,13 +32,13 @@
                                     {#                                        <img src="{{ productor.nombre }}" style="width:100px;height:100px;">#}
                                     {#                                    </td>#}
                                     <td class="text-center">
-                                        {{ productor.nombre }}
+                                        {{ productor.fk_cooperativa.nombre }}
                                     </td>
                                     <td class="text-center">
                                         {{ productor.nombre }}
                                     </td>
                                     <td class="text-center">
-                                        {{ productor.descripcion }}
+                                        {{ productor.direccion }}
                                     </td>
                                     <td class="text-center">
                                         <a href="{% url 'administrador:ordenes-pago-productor' id_productor=productor.id %}"
