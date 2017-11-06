@@ -145,18 +145,14 @@ class AgregarProductoCanasataTest(TestCase):
         self.assertEqual(len(divs_productos_agregados), len(divs_productos_agregados2) - 1)
 
 
-
-
 class Test(TestCase):
     def setUp(self):
         self.browser = webdriver.Chrome("C:\\Users\\JUAN CIFUENTES\\chromedriver.exe")
         # self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(2)
 
-
     def tearDown(self):
         self.browser.quit()
-
 
     def test_lista(self):
         self.do_login()
@@ -210,7 +206,6 @@ class Test(TestCase):
             "//table/thead/tr/th[text()='Cantidad Disponible']")
 
         self.assertIn('Cantidad Disponible', tr_th_table.text)
-
 
     def do_login(self):
         username_str = 'jc.cifuentes'
