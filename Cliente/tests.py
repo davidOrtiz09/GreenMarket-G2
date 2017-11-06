@@ -127,3 +127,31 @@ class ClienteTestCase(TestCase):
 
         self.assertEquals(nameIndex.text, name.text)
         self.assertEquals(priceIndex.text, price.text)
+
+    def test_cart(self):
+        self.do_login()
+        self.browser.get('http://localhost:8000')
+        self.browser.implicitly_wait(5)
+
+        link = self.browser.find_element_by_id('button-detail')
+        link.click()
+        self.browser.implicitly_wait(5)
+
+        link_plus = self.browser.find_element_by_id('add-quantity-plus')
+        link_plus.click()
+        link_plus.click()
+        link_plus.click()
+
+        link_min = self.browser.find_element_by_id('add-quantity-min')
+        link_min.click()
+
+        link_min = self.browser.find_element_by_id('add-quantity-min')
+        link_min.click()
+        self.browser.implicitly_wait(2)
+
+        quantity = self.browser.find_element_by_id('add-quantity-cart')
+        quantity.click()
+
+        alter_m = self.browser.find_element_by_class_name('alert')
+
+        self.assertEquals('Por favor ingresa a tu cuenta para agregar items a tu carrito', alter_m.text)
