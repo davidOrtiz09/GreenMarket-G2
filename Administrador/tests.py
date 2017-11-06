@@ -62,6 +62,7 @@ class Test(TestCase):
         tr_th_table = self.browser.find_element_by_xpath(
             "//table/thead/tr/th[text()='Total Productos']")
 
+
         self.assertIn('Total Productos', tr_th_table.text)
 
         tr_th_table = self.browser.find_element_by_xpath(
