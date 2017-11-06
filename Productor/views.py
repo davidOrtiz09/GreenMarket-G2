@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from MarketPlace.models import Oferta_Producto, Producto, Productor, Oferta, Categoria, Semana
-from MarketPlace.utils import es_productor, redirect_user_to_home, get_or_create_week
+from MarketPlace.utils import es_productor, redirect_user_to_home, get_or_create_week, get_or_create_next_week
 from django.utils.decorators import method_decorator
 
 
@@ -63,19 +63,14 @@ class ProductosVendidosView(AbstractProductorLoggedView):
 
     def get(self, request):
 
-        dia_semana = datetime.date.today().weekday()
+        semana = get_or_create_week()
 
-        # Si el dia esta entre el jueves y el domingo.
-        if dia_semana >= 3:
-            dias_restar = dia_semana -3
-        else:
-            dias_restar = dia_semana + 4
 
         # Se obtienen las ofertas  realizadas por un productor y que fueron aceptadas
-        # Solo se toman las ofertas de realizadas desde el día actual al jueves anterior.
+        # Solo se toman las ofertas de realizadas en la semana actual.
         ofertas_pro = Oferta_Producto \
             .objects.filter(estado=1, fk_oferta__fk_productor__fk_django_user= request.user,
-                            fk_oferta__fecha__gte=datetime.date.today() + datetime.timedelta(days=-dias_restar)) \
+                            fk_oferta__fk_semana=semana) \
             .values('fk_producto__nombre', 'fk_producto__unidad_medida', 'cantidad_aceptada',
                     'cantidad_vendida', 'precioProvedor', cantidad_disponible= F('cantidad_aceptada') - F('cantidad_vendida'))
 
@@ -83,9 +78,9 @@ class ProductosVendidosView(AbstractProductorLoggedView):
         hay_ofertas = ofertas_pro.count() > 0
 
         if hay_ofertas:
-            subtitulo = datetime.date.today().strftime("%d/%m/%y")
+            subtitulo = semana.__str__
         else:
-            subtitulo = "No hay ofertas aceptadas para la semana"
+            subtitulo = "No hay ofertas aceptadas para la semana " + semana.__str__
 
         return render(request, 'Productor/productos_vendidos.html'
                       ,{'ofertas_pro':ofertas_pro, 'hay_ofertas':hay_ofertas, 'subtitulo':subtitulo})
@@ -94,7 +89,8 @@ class ProductosVendidosView(AbstractProductorLoggedView):
 class CrearOferta(AbstractProductorLoggedView):
     def get(self, request):
         context = {
-            'form': 'form'
+            'form': 'form',
+            'semana': get_or_create_week()
         }
         return render(request, 'Productor/crear_oferta.html', context)
 
@@ -121,7 +117,7 @@ class AgregarOferta(AbstractProductorLoggedView):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         productor = Productor.objects.filter(fk_django_user_id=request.user.id).first()
-        semana = get_or_create_week()
+        semana = get_or_create_next_week()
         oferta = Oferta(fk_productor=productor, fk_semana=semana)
         oferta.save()
         for producto in body:

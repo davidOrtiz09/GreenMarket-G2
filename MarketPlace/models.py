@@ -115,7 +115,7 @@ class Semana(models.Model):
         verbose_name_plural = 'Semanas'
 
     def __str__(self):
-        return '{0}'.format(self.id)
+        return 'de ' + self.fecha_inicio.__str__() + ' al ' + self.fecha_fin.__str__()
 
 
 @python_2_unicode_compatible

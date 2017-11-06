@@ -95,7 +95,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
                 oferta_nueva = ofertas_pro.count() > 0
 
                 if oferta_nueva:
-                    subtitulo = semana.fecha_inicio.strftime("%d/%m/%y") + '-' + semana.fecha_fin.strftime("%d/%m/%y")
+                    subtitulo = semana.__str__
                 else:
                     subtitulo = "No hay ofertas disponibles para crear el catálogo"
 

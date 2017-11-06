@@ -13,7 +13,7 @@ def catalogo_actual():
                                                             'fk_producto__imagen',
                                                             'fk_producto__unidad_medida',
                                                             'precio')
-        subtitulo = catalogo.fk_semana.fecha_inicio.strftime("%d/%m/%y") + ' - ' + catalogo.fk_semana.fecha_fin.strftime("%d/%m/%y")
+        subtitulo = catalogo.fk_semana.__str__
     else:
         subtitulo = 'No hay catálago disponible'
 

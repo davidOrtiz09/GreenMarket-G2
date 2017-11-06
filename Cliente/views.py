@@ -78,7 +78,7 @@ class Index(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo = Catalogo.objects.last()
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
         producto_catalogo = Catalogo_Producto.objects \
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
