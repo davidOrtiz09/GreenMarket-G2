@@ -1,0 +1,39 @@
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px" align="center">
+             <table id="tb_inventario" class="table table-responsive" cellspacing="2"
+                    border="1"
+                    align="center">
+                <thead>
+                        <tr>
+                            <th colspan="5" bgcolor="#228b22" class="text-white text-center">Inventario semana</th>
+                        </tr>
+                       <tr bgcolor="#deb887">
+                           <th class="text-center">Producto</th>
+                           <th class="text-center">Total Productos</th>
+                           <th class="text-center">Cantidad Vendida</th>
+                           <th class="text-center">Cantidad Disponible</th>
+                       </tr>
+                </thead>
+                 {% for inventario in ofertas_pro %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ inventario.fk_producto__nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ inventario.canAceptada }} {{ inventario.fk_producto__unidad_medida }}
+                                </td>
+                                <td class="text-center">
+                                    {{ inventario.canVendida }} {{ inventario.fk_producto__unidad_medida }}
+                                </td>
+                                <td class="text-center">
+                                    {{ inventario.canDisponible }} {{ inventario.fk_producto__unidad_medida }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

@@ -19,6 +19,8 @@ from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
 from django.http import JsonResponse
+from decimal import Decimal
+from django.db.models.expressions import F
 
 
 class AbstractAdministradorLoggedView(View):
@@ -465,6 +467,25 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
             )
 
         return redirect(reverse('administrador:detalles-canasta', kwargs={'id_canasta': canasta.id}))
+
+
+class InventarioView(View):
+    def get(self, request):
+        today = datetime.date.today()
+        prev_monday = today - datetime.timedelta(days=today.weekday())
+        next_sunday = prev_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
+        semana = Semana.objects.filter(fecha_inicio=prev_monday, fecha_fin=next_sunday).first()
+
+        ofertas_pro = Oferta_Producto \
+            .objects.filter(estado=1, fk_oferta__fk_semana_id=semana) \
+            .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
+            .annotate(canAceptada=Sum('cantidad_aceptada'), canVendida=Sum('cantidad_vendida'),
+                      canDisponible=Sum(F('cantidad_aceptada') - F('cantidad_vendida'))) \
+            .distinct()
+
+        return render(request, 'Administrador/Informes/inventario.html', {
+            'ofertas_pro': ofertas_pro
+        })
 
 
 class Productores(AbstractAdministradorLoggedView):

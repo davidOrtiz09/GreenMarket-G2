@@ -1,12 +1,13 @@
 {% extends 'Administrador/_common/base.html' %}
 {% block main %}
-    <section>
+    <section >
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Informes Green Market </h1>
              <select class="form-control" id="tipo_informe" onchange="cargar_informe()">
                  <option value="0">Seleccione un tipo de informe</option>
                  <option value="1">Clientes Más Rentables</option>
                  <option value="2">Mejores Productos</option>
+                 <option value="3">Ver inventarios</option>
              </select>
             <main id="informe">
             </main>
@@ -21,6 +22,11 @@
                             }
                             else if(x === "2") {
                              $.get('{% url 'administrador:informes/seleccionSemanas' %}', function(data, status){
+                               $('#informe').html(data)
+                                });
+                            }
+                            else if(x === "3") {
+                             $.get('{% url 'administrador:informes/inventario' %}', function(data, status){
                                $('#informe').html(data)
                                 });
                             }
