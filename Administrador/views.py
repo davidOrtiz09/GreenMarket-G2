@@ -560,7 +560,9 @@ class AgregarProductor(AbstractAdministradorLoggedView):
 
 class ConsultarPagosPendientes(View):
     def get(self, request):
-        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True) \
+        semana = Semana.objects.last()
+        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True, cantidad_vendida__gt=0) \
+            .exclude(fk_oferta__fk_semana=semana)\
             .distinct('fk_oferta__fk_productor')
         productor = Productor.objects.all()
 
@@ -571,8 +573,11 @@ class ConsultarPagosPendientes(View):
 
 class DetalleOrdenPagoProductores(View):
     def get(self, request, id_productor):
-        ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True,
-                                                           fk_oferta__fk_productor_id=id_productor)
+        semana = Semana.objects.last()
+        ofertas_por_pagar = Oferta_Producto.objects.\
+            filter(fk_orden_compra__isnull=True, fk_oferta__fk_productor_id=id_productor,cantidad_vendida__gt=0)\
+            .exclude(fk_oferta__fk_semana=semana)
+
 
         productor = Productor.objects.filter(id=id_productor)[0]
         return render(request, 'Administrador/detalle-productos-orden-pago.html', {

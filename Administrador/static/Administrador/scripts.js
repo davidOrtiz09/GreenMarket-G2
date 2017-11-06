@@ -50,7 +50,6 @@ $('input.change-check').change(function () {
 
 
 function actualizarTotalPagar() {
-
     var detallesPedido = $('div#orden-Pago-detalle');
     var spanTotalPagarToCop = detallesPedido.find('span#total-a-pagar-tocop');
     var inputTotalPagar = detallesPedido.find('input.total-a-pagar');
@@ -69,7 +68,6 @@ function actualizarTotalPagar() {
 }
 
 function TotalPagar() {
-
     var detallesPedido = $('div#orden-Pago-detalle');
     var spanTotalPagarToCop = detallesPedido.find('span#total-a-pagar-tocop');
     var productRows = detallesPedido.find('tr.product-orden-pago');
@@ -81,4 +79,10 @@ function TotalPagar() {
     }
     spanTotalPagarToCop.html(toCop(totalPagar));
 
+}
+/*
+    Se formatea un número a moneda para que sea más legible
+ */
+function toCop(number){
+    return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
 }
