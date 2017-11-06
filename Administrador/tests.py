@@ -13,7 +13,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 
-class AgregarProductoCanasataTest(TestCase):
+class AdministradorTests(TestCase):
     def setUp(self):
         cooperativa = Cooperativa.objects.create(
             nombre='Cooperativa',
@@ -144,21 +144,11 @@ class AgregarProductoCanasataTest(TestCase):
         self.assertEqual(len(divs_productos_disponibles), len(divs_productos_disponibles2) + 1)
         self.assertEqual(len(divs_productos_agregados), len(divs_productos_agregados2) - 1)
 
-
-class Test(TestCase):
-    def setUp(self):
-        self.browser = webdriver.Chrome("C:\\Users\\JUAN CIFUENTES\\chromedriver.exe")
-        # self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(2)
-
-    def tearDown(self):
-        self.browser.quit()
-
     def test_lista(self):
         self.do_login()
         self.browser.get('http://127.0.0.1:8000/administrador/informes')
         self.browser.implicitly_wait(3)
-        text=self.browser.find_element_by_xpath(
+        text = self.browser.find_element_by_xpath(
             "//select[@id='tipo_informe']/option[text()='Ver inventarios']")
         self.assertIn('Ver inventarios', text.text)
 
@@ -166,7 +156,7 @@ class Test(TestCase):
         self.do_login()
         self.browser.get('http://127.0.0.1:8000/administrador/informes')
         self.browser.implicitly_wait(3)
-        text=self.browser.find_element_by_xpath(
+        text = self.browser.find_element_by_xpath(
             "//select[@id='tipo_informe']/option[text()='Ver inventarios']")
 
         text.click()
@@ -194,7 +184,6 @@ class Test(TestCase):
         tr_th_table = self.browser.find_element_by_xpath(
             "//table/thead/tr/th[text()='Total Productos']")
 
-
         self.assertIn('Total Productos', tr_th_table.text)
 
         tr_th_table = self.browser.find_element_by_xpath(
@@ -206,18 +195,3 @@ class Test(TestCase):
             "//table/thead/tr/th[text()='Cantidad Disponible']")
 
         self.assertIn('Cantidad Disponible', tr_th_table.text)
-
-    def do_login(self):
-        username_str = 'jc.cifuentes'
-        password_str = 'Maria0517*'
-        self.browser.get('http://127.0.0.1:8000/administrador/ingresar')
-
-        username = self.browser.find_element_by_id('login-username')
-        username.send_keys(username_str)
-
-        password = self.browser.find_element_by_id('login-password')
-        password.send_keys(password_str)
-
-        boton_login = self.browser.find_element_by_id('login')
-        boton_login.click()
-        self.browser.implicitly_wait(3)
