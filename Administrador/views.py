@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
 from django.db.transaction import atomic
 from decimal import Decimal
+from django.db.models.expressions import F
 
 
 class AbstractAdministradorLoggedView(View):
@@ -215,43 +216,46 @@ class RealizarOfertaView(AbstractAdministradorLoggedView):
         oferta_producto.save()
         return redirect('administrador:detalle-ofertas', id_oferta=id_oferta, guardado_exitoso=1)
 
+
 class Informes(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/index.html', {})
 
+
 class seleccionSemanas(View):
     def get(self, request):
-        semanasAll= Semana.objects.all()
-        semanasCount=len(semanasAll)
-        semanas =[]
+        semanasAll = Semana.objects.all()
+        semanasCount = len(semanasAll)
+        semanas = []
         if semanasCount >= 4:
-            semanas.append((semanasAll[semanasCount-1]))
-            semanas.append((semanasAll[semanasCount-2]))
-            semanas.append((semanasAll[semanasCount-3]))
-            semanas.append((semanasAll[semanasCount-4]))
+            semanas.append((semanasAll[semanasCount - 1]))
+            semanas.append((semanasAll[semanasCount - 2]))
+            semanas.append((semanasAll[semanasCount - 3]))
+            semanas.append((semanasAll[semanasCount - 4]))
         else:
-            semanas=semanasAll
+            semanas = semanasAll
         return render(request, 'Administrador/Informes/seleccionSemanas.html',
-                      {'semanas':semanas})
-      
+                      {'semanas': semanas})
+
+
 class obtener_mejores_productos(View):
     def post(self, request):
         semanas = request.POST.getlist('semana', [])
         respuesta = []
-        catalogoProd= Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in= semanas)
+        catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas)
         for pro in catalogoProd:
-            valor_compra = obtener_valor_compra(semanas,pro.fk_producto)
+            valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
-            cantVendida = obtener_cantidad_vendida(semanas,pro.fk_producto)
-            producto=Producto.objects.filter(id=pro.fk_producto.id).first()
-            porcentaje=int
-            if cantVendida !=0:
+            cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto)
+            producto = Producto.objects.filter(id=pro.fk_producto.id).first()
+            porcentaje = int
+            if cantVendida != 0:
                 porcentaje = int((((valor_venta - valor_compra) * cantVendida) * 100) / (valor_compra * cantVendida))
             else:
                 porcentaje = 0
             respuesta.append({
                 'producto': producto,
-                'cantidad_vendida':cantVendida,
+                'cantidad_vendida': cantVendida,
                 'valor_compra': valor_compra,
                 'valor_venta': valor_venta,
                 'ganancia': (valor_venta - valor_compra) * cantVendida,
@@ -259,9 +263,9 @@ class obtener_mejores_productos(View):
 
             })
         ordenado = sorted(respuesta, key=itemgetter('ganancia'), reverse=True)
-        return  render(request, 'Administrador/Informes/mejoresProductos.html', {'datos':ordenado})
+        return render(request, 'Administrador/Informes/mejoresProductos.html', {'datos': ordenado})
 
-      
+
 def obtener_cantidad_vendida(semana, id_producto):
     productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
     cantidad = 0
@@ -269,17 +273,20 @@ def obtener_cantidad_vendida(semana, id_producto):
         cantidad = cantidad + pro.cantidad_vendida
     return cantidad
 
+
 def obtener_valor_compra(semana, id_producto):
     ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
-    sumPrecios=0
+    sumPrecios = 0
     for ofertaProd in ofertaProducto:
         sumPrecios = sumPrecios + ofertaProd.precioProvedor
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
-  
+
+
 class InformesClientesMasRentables(View):
     def get(self, request):
         return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {})
+
 
 class ClientesView(View):
     def get(self, request):
@@ -412,4 +419,20 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class InventarioView(View):
     def get(self, request):
-        return  render(request, 'Administrador/Informes/inventario.html', {})
+        today = datetime.date.today()
+        prev_monday = today - datetime.timedelta(days=today.weekday())
+        next_sunday = prev_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
+        semana = Semana.objects.filter(fecha_inicio=prev_monday, fecha_fin=next_sunday).first()
+
+        ofertas_pro = Oferta_Producto \
+            .objects.filter(estado=1, fk_oferta__fk_semana_id=semana) \
+            .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
+            .annotate(canAceptada=Sum('cantidad_aceptada'), canVendida=Sum('cantidad_vendida'),
+                      canDisponible=Sum(F('cantidad_aceptada') - F('cantidad_vendida'))) \
+            .distinct()
+
+        return render(request, 'Administrador/Informes/inventario.html', {
+            'ofertas_pro': ofertas_pro
+        })
+
+
