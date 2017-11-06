@@ -77,14 +77,14 @@
                         <input type="hidden" name="product_id" value="{{ product.id }}">
                         <div class="input-group">
                             <span class="input-group-btn clickable">
-                                <button type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
+                                <button id="minusAgregarProductoPopUp-{{ product.id }}" type="button" class="btn btn-danger product-minus" disabled><i class="fa fa-2x fa-minus-circle"></i></button>
                             </span>
                             <input name="quantity" class="form-control product-quantity" type="number" min="0" value="0" step="1" pattern="\d*">
                             <span class="input-group-btn clickable">
-                                <button type="button" class="btn btn-success product-plus"><i class="fa fa-2x fa-plus-circle"></i></button>
+                                <button id="plusAgregarProductoPopUp-{{ product.id }}" type="button" class="btn btn-success product-plus"><i class="fa fa-2x fa-plus-circle"></i></button>
                             </span>
                             <span class="input-group-btn clickable">
-                                <button class="btn btn-link add-to-cart" data-toggle="modal" disabled><i class="fa fa-2x fa-cart-plus"></i></button>
+                                <button id="agregarProductoPopUp-{{ product.id }}" class="btn btn-link add-to-cart" data-toggle="modal" disabled><i class="fa fa-2x fa-cart-plus"></i></button>
                             </span>
                         </div>
                     </form>
