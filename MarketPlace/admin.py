@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from MarketPlace.models import Categoria, Producto, Oferta, Oferta_Producto, Cooperativa, Productor, Pedido, Cliente, \
-    Catalogo, Catalogo_Producto, PedidoProducto, Semana, Canasta, CanastaProducto
+    Catalogo, Catalogo_Producto, PedidoProducto, Semana, Canasta, CanastaProducto, Orden_Compra
 
 
 class CanastaProductoInline(admin.TabularInline):
@@ -69,3 +69,4 @@ admin.site.register(Catalogo_Producto)
 admin.site.register(PedidoProducto)
 admin.site.register(Semana, SemanaAdmin)
 admin.site.register(Canasta, CanastaAdmin)
+admin.site.register(Orden_Compra)
