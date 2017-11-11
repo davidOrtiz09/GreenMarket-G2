@@ -9,7 +9,7 @@
                     {% for semana in semanas %}
                     <div class="funkyradio">
                         <div class="funkyradio-success">
-                            <input id="{{ semana }}" name="semana" type="checkbox" value="{{ semana.id }}"/>
+                            <input id="{{ semana.id }}" name="semana" type="checkbox" value="{{ semana.id }}"/>
                             <label for="{{ semana.id }}" class="label-primary">Semana {{ semana.id }}, del {{ semana.fecha_inicio }} al {{ semana.fecha_fin }} </label>
                         </div>
                     </div>
