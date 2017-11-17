@@ -78,9 +78,9 @@ class ProductosVendidosView(AbstractProductorLoggedView):
         hay_ofertas = ofertas_pro.count() > 0
 
         if hay_ofertas:
-            subtitulo = semana.__str__
+            subtitulo = str(semana)
         else:
-            subtitulo = "No hay ofertas aceptadas para la semana " + semana.__str__
+            subtitulo = "No hay ofertas aceptadas para la semana " + str(semana)
 
         return render(request, 'Productor/productos_vendidos.html'
                       ,{'ofertas_pro':ofertas_pro, 'hay_ofertas':hay_ofertas, 'subtitulo':subtitulo})
