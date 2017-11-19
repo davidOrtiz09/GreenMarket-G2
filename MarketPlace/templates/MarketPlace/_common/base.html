@@ -41,12 +41,16 @@
     {% include 'MarketPlace/_common/footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
+    <script src="https://unpkg.com/vue"></script>
     <script src="{% static 'MarketPlace/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'MarketPlace/popper/popper.min.js' %}"></script>
     <script src="{% static 'MarketPlace/bootstrap/js/bootstrap.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
     {% block scripts %}
+    {% endblock %}
+    {% block vue_scripts %}
+
     {% endblock %}
 </body>
 

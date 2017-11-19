@@ -84,9 +84,10 @@ class Index(View):
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
+            'productos_json': json.dumps([x.to_dict for x in producto_catalogo]),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
         })
 
     def post(self, request):

@@ -189,6 +189,22 @@ class Catalogo_Producto(models.Model):
                                     blank=False)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
+    @property
+    def to_dict(self):
+        return {
+            'id': self.fk_producto_id,
+            'descripcion': self.fk_producto.descripcion,
+            'imagen': self.fk_producto.imagen.url if self.fk_producto.imagen else '',
+            'precio': float(self.precio),
+            'nombre': self.fk_producto.nombre,
+            'unidad_medida': self.fk_producto.unidad_medida,
+            'categoria': {
+                'id': self.fk_producto.fk_categoria_id,
+                'nombre': self.fk_producto.fk_categoria.nombre
+            },
+            'cantidad_carrito': 0
+        }
+
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'

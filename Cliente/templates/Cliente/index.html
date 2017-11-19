@@ -59,18 +59,21 @@
 
             </div>
 
-            <div class="row">
-                {% for producto in productos_catalogo %}
-                    <div class="col-12 col-md-6 col-lg-3 mb-4">
-                        {% include 'Cliente/_elements/_producto-preview.html' with product=producto %}
-                    </div>
-                {% endfor %}
+            <div class="row" id="lista-productos">
+                {% include 'Cliente/_elements/_producto-preview.html' with product=producto %}
             </div>
         </div>
     </section>
 
 {% endblock %}
 
+{% block vue_scripts %}
+    <script type="text/javascript">
+        var productos = {{ productos_json|safe }};
+    </script>
+    <script type="text/javascript" src="{% static 'Cliente/vue_scripts/products_list.js' %}"></script>
+{% endblock %}
+
 {% block scripts %}
-    <script src="{% static  '/js/cliente.js' %}"></script>
+    <script src="{% static  'Cliente/js/cliente.js' %}"></script>
 {% endblock %}
