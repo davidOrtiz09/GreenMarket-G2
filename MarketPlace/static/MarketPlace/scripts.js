@@ -7,24 +7,6 @@ $(document).ready(function(){
     Añadimos los listeners para las funcionalidades Javascript de los detalles del carrito de compras
  */
 function addCartDetailsListeners(){
-    actualizarTotalPagar();
-    /*
-        Cuando la cantidad de un item del carrito compra cambia, se actualia el subtotal y el total de la compra
-     */
-    $('input.product-quantity.cart-details').change(function(){
-        var quantity = $(this).val();
-        if(quantity < 1){
-            $(this).val(1);
-        }
-        else{
-            var row = $(this).parent().parent().parent();
-            var unitPrice = row.find('input.unit-price').val();
-            var subtotal = row.find('span.subtotal-producto');
-            subtotal.html(toCop(quantity*unitPrice.split(',')[0]));
-            actualizarTotalPagar();
-        }
-    });
-    
     /*
         Cuando le da click en pagar, se obtienen los datos de los 3 formularios, para posteriormente hacerles post
      */
@@ -45,11 +27,6 @@ function addCartDetailsListeners(){
         inputJson.val(stringPago);
         form.submit();
     });
-
-    $(document).ready(function(){
-        $("#myModal").modal('show');
-    });
-
 }
 
 /*
@@ -116,21 +93,4 @@ function getJsonInfoPago(){
  */
 function toCop(number){
     return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
-}
-
-/*
-    Se actualiza el total a pagar según los items y cantidades del carrito de compras
- */
-function actualizarTotalPagar(){
-    var detallesPedido = $('div#detalles-pedido');
-    var spanTotalPagar = detallesPedido.find('span#total-a-pagar');
-    var productRows = detallesPedido.find('tr.product-cart');
-    var totalPagar = 0;
-    for(var i=0;i < productRows.length;i++){
-        var row = $(productRows[i]);
-        var unitPrice = parseFloat(row.find('input.unit-price').val());
-        var quantity = row.find('input.product-quantity.cart-details').val();
-        totalPagar += (unitPrice*quantity)
-    }
-    spanTotalPagar.html(toCop(totalPagar));
 }

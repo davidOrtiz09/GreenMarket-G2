@@ -1,5 +1,5 @@
 var listaProductosApp = new Vue({
-    el: '#lista-productos',
+    el: '#lista-productos-app',
     delimiters: ['[[', ']]'],
     data: {
         productos: productos,

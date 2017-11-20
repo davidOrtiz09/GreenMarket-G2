@@ -53,9 +53,9 @@
 
     <script type="text/javascript">
         {% if request.session.cart.items %}
-            var cartPreview = {{ request.session.cart|dumps_filter|safe }};
+            var cart = {{ request.session.cart|dumps_filter|safe }};
         {% else %}
-            var cartPreview = {
+            var cart = {
                 items: []
             };
         {% endif %}

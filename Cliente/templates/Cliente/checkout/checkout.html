@@ -1,6 +1,7 @@
-{% extends 'MarketPlace/_common/base.html' %}+
+{% extends 'MarketPlace/_common/base.html' %}
+{% load static %}
 {% block main %}
-    <section class="mt-3 mb-3">
+    <section class="mt-3 mb-3" id="cart-details-app">
         <div class="container">
             <div class="row">
                 <div class="col mb-3">
@@ -89,10 +90,8 @@
                 </div>
             </form>
         </div>
-    </section>
 
-    {% for cart_item in request.session.cart.items %}
-        <div class="modal fade" id="modal-eliminar-carrito-{{ cart_item.product_id }}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div v-for="cartItem in cart.items" class="modal fade" v-bind:id="'modal-eliminar-carrito-'+cartItem.product_id" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-sm" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -101,10 +100,10 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-6">
-                                <form id="form-eliminar-carrito-{{ forloop.counter }}" action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
+                                <form action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="product-id" value="{{ cart_item.product_id }}">
-                                    <button form="form-eliminar-carrito-{{ forloop.counter }}" type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
+                                    <input type="hidden" name="product-id" v-model="cartItem.product_id">
+                                    <button type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
                                 </form>
                             </div>
                             <div class="col-6">
@@ -115,5 +114,10 @@
                 </div>
             </div>
         </div>
-    {% endfor %}
+
+    </section>
+{% endblock %}
+
+{% block vue_scripts %}
+    <script src="{% static 'Cliente/vue_scripts/cartDetails.js' %}" type="text/javascript"></script>
 {% endblock %}
