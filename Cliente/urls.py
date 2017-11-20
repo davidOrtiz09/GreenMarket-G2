@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^mis-pedidos$', views.MisPedidosView.as_view(), name='mis-pedidos'),
     url(r'^realizar-pago', views.DoPayment.as_view(), name='realizar-pago'),
     url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
-    url(r'^agregar-canasta-carrito$', views.AgregarCanastaCarrito.as_view(), name='agregar-canasta-carrito')
+    url(r'^agregar-canasta-carrito$', views.AgregarCanastaCarrito.as_view(), name='agregar-canasta-carrito'),
+    url(r'^detalle-mis-pedidos/(?P<id_pedido>\d+)$', views.DetalleMisPedidoView.as_view(), name='detalle-mis-pedidos')
 ]
