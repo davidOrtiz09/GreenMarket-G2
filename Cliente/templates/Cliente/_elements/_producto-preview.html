@@ -19,7 +19,7 @@
         </h5>
         <div class="price">
             <h6 v-bind:id="'product-price-index-'+producto.id">
-                $[[ producto.precio ]] [[ producto.unidad_medida ]]
+                $[[ producto.precio_cop ]] [[ producto.unidad_medida ]]
             </h6>
         </div>
 
@@ -86,7 +86,7 @@
                                     <small></small>
                                 </div>
                                 <p v-bind:id="'product-price-popup-'+[[ producto.id ]]" class="mb-1">
-                                    $[[ producto.precio ]] [[ producto.unidad_medida ]]</p>
+                                    $[[ producto.precio_cop ]] [[ producto.unidad_medida ]]</p>
                                 <small></small>
                             </a>
                         </div>

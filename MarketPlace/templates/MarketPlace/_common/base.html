@@ -1,4 +1,5 @@
 {% load static %}
+{% load marketplace_filters %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -49,6 +50,18 @@
     <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
     {% block scripts %}
     {% endblock %}
+
+    <script type="text/javascript">
+        {% if request.session.cart.items %}
+            var cartPreview = {{ request.session.cart|dumps_filter|safe }};
+        {% else %}
+            var cartPreview = {
+                items: []
+            };
+        {% endif %}
+    </script>
+
+    <script src="{% static 'Cliente/vue_scripts/cartPreview.js' %}"></script>
     {% block vue_scripts %}
 
     {% endblock %}
