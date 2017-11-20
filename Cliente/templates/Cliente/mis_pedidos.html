@@ -17,6 +17,7 @@
                             <th class="text-center">Codigo Pedido</th>
                             <th class="text-center">Valor</th>
                             <th class="text-center">Fecha Entrega</th>
+                            <th class="text-center">Ver Detalle</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -30,6 +31,11 @@
                                 </td>
                                 <td class="text-center">
                                     {{ pedido.fecha_entrega }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'cliente:detalle-mis-pedidos' id_pedido=pedido.id %}" class="btn btn-info">
+                                        Ver detalle
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -48,6 +54,7 @@
                             <th class="text-center">Valor</th>
                             <th class="text-center">Fecha Pedido</th>
                             <th class="text-center">Estado Pedido</th>
+                            <th class="text-center">Ver Detalle</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -64,6 +71,11 @@
                                 </td>
                                 <td class="text-center">
                                     {{ pedido.estado }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'cliente:detalle-mis-pedidos' id_pedido=pedido.id %}" class="btn btn-info">
+                                        Ver detalle
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
