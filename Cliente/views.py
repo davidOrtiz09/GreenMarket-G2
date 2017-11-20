@@ -366,3 +366,12 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+class DetalleMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, id_pedido):
+        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
+        pedido = Pedido.objects.get(id=id_pedido)
+        return render(request, 'Cliente/detalle-mis-pedidos.html', {
+            'detalle_pedido': detalle_mi_pedido
+        })
