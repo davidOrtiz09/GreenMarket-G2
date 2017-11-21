@@ -70,6 +70,12 @@
 {% block vue_scripts %}
     <script type="text/javascript">
         var productos = {{ productos_json|safe }};
+        var urlAgregarAlCarrito = '{% url 'cliente:actualizar-carrito-compras' %}';
+        {% if user.is_authenticated %}
+            var autenticado = true;
+        {% else %}
+            var autenticado = false;
+        {% endif %}
     </script>
     <script type="text/javascript" src="{% static 'Cliente/vue_scripts/products_list.js' %}"></script>
 {% endblock %}

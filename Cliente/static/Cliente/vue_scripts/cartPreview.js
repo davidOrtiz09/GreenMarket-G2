@@ -12,6 +12,9 @@ var cartPreviewApp = new Vue({
                 response += parseInt(items[i].quantity);
             }
             return response;
+        },
+        updateCart: function(newCart){
+            this.cartPreview = newCart;
         }
     }
 });
