@@ -370,8 +370,19 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
 
 class DetalleMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, id_pedido):
-        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
         pedido = Pedido.objects.get(id=id_pedido)
+        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
+        lista_productos=[]
+        for detPed in detalle_mi_pedido:
+            productoPedido=detPed
+            valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
+            categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            lista_productos.append({
+                'categoria': categoria,
+                'producto': productoPedido,
+                'valor': valor
+            })
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
-            'detalle_pedido': detalle_mi_pedido
+            'detalle_pedido': lista_productos,
+            'pedido': pedido
         })
