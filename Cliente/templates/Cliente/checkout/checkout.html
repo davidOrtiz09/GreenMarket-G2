@@ -91,33 +91,13 @@
             </form>
         </div>
 
-        <div v-for="cartItem in cart.items" class="modal fade" v-bind:id="'modal-eliminar-carrito-'+cartItem.product_id" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="text-center">¿Desea eliminar este producto?</h6>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <form action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product-id" v-model="cartItem.product_id">
-                                    <button type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
-                                </form>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-secondary btn-block clickable" data-dismiss="modal">Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </section>
 {% endblock %}
 
 {% block vue_scripts %}
+    <script type="text/javascript">
+        var urlAgregarAlCarrito = '{% url 'cliente:actualizar-carrito-compras' %}';
+        var urlEliminarDelCarrito = '{% url 'cliente:eliminar-producto-carrito' %}';
+    </script>
     <script src="{% static 'Cliente/vue_scripts/cartDetails.js' %}" type="text/javascript"></script>
 {% endblock %}

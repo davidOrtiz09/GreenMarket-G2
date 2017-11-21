@@ -53,6 +53,11 @@
     {% endblock %}
 
     <script type="text/javascript">
+        {% if user.is_authenticated %}
+            var autenticado = true;
+        {% else %}
+            var autenticado = false;
+        {% endif %}
         {% if request.session.cart.items %}
             var cart = {{ request.session.cart|dumps_filter|safe }};
         {% else %}

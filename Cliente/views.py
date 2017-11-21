@@ -155,7 +155,8 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
-        product_id = int(request.POST.get('product-id', '-1'))
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', -1)
         if cart:
             items = cart.get('items', [])
             index = -1
@@ -170,7 +171,7 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
                 items.remove(items[index])
                 cart['items'] = items
                 request.session['cart'] = cart
-        return redirect(reverse('cliente:checkout'))
+        return JsonResponse(request.session['cart'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')
