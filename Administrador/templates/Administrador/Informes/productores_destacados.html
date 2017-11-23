@@ -16,10 +16,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for productor in mejores_productore %}
+                        {% for productor in productores_destacados %}
                             <tr>
                                 <td class="text-center">
-                                    {{ productor.cliente_id }}
+                                    {{ productor.productor_id }}
                                 </td>
                                 <td class="text-center">
                                     {{ productor.nombre }}
@@ -31,7 +31,7 @@
                                     {{ productor.total_ventas|intcomma }}
                                 </td>
                                 <td class="text-center">
-                                    {{ productor.ultima_fecha_de_venta.fecha_pedido }}
+                                    {{ productor.ultima_fecha_de_venta.fecha_creacion }}
                                 </td>
                             </tr>
                         {% endfor %}

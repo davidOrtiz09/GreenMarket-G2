@@ -9,7 +9,7 @@ from django.db.models import Sum, Min, Max
 from django.shortcuts import render, redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from Administrador.models import MejoresClientes
+from Administrador.models import MejoresClientes, ProductorDestacado
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
@@ -562,7 +562,7 @@ class ConsultarPagosPendientes(View):
     def get(self, request):
         semana = Semana.objects.last()
         ofertas_por_pagar = Oferta_Producto.objects.filter(fk_orden_compra__isnull=True, cantidad_vendida__gt=0) \
-            .exclude(fk_oferta__fk_semana=semana)\
+            .exclude(fk_oferta__fk_semana=semana) \
             .distinct('fk_oferta__fk_productor')
         productor = Productor.objects.all()
 
@@ -574,10 +574,9 @@ class ConsultarPagosPendientes(View):
 class DetalleOrdenPagoProductores(View):
     def get(self, request, id_productor):
         semana = Semana.objects.last()
-        ofertas_por_pagar = Oferta_Producto.objects.\
-            filter(fk_orden_compra__isnull=True, fk_oferta__fk_productor_id=id_productor,cantidad_vendida__gt=0)\
+        ofertas_por_pagar = Oferta_Producto.objects. \
+            filter(fk_orden_compra__isnull=True, fk_oferta__fk_productor_id=id_productor, cantidad_vendida__gt=0) \
             .exclude(fk_oferta__fk_semana=semana)
-
 
         productor = Productor.objects.filter(id=id_productor)[0]
         return render(request, 'Administrador/detalle-productos-orden-pago.html', {
@@ -642,21 +641,22 @@ class DetalleOrdenPago(View):
             'ofertas_producto': ofertas_producto
         })
 
+
 class InformesMejoresProductores(View):
     def get(self, request):
-        mejores_clientes = list()
-        for cliente in Cliente.objects.all():
-            pedidos = Pedido.objects.filter(fk_cliente=cliente)
-            cantidad_pedidos = pedidos.count()
-            if cantidad_pedidos > 0:
-                django_user = User.objects.get(id=cliente.fk_django_user_id)
-                nombre = django_user.first_name + ' ' + django_user.last_name
-                total_compras = pedidos.aggregate(Sum('valor_total'))['valor_total__sum']
-                ultima_fecha = pedidos.latest('fecha_pedido')
-                mejores_clientes.append(
-                    MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
+        productores_destacados = list()
+        for productor in Productor.objects.all():
+            ordenes = Orden_Compra.objects.filter(fk_productor=productor, estado='PA')
+            cantidad_ordenes = ordenes.count()
+            if cantidad_ordenes > 0:
+                nombre = productor.nombre
+                cooperativa = Cooperativa.objects.get(id=productor.fk_cooperativa).nombre
+                total_ventas = ordenes.aggregate(Sum('valor_total'))['valor_total__sum']
+                ultima_fecha = ordenes.latest('fecha_creacion')
+                productores_destacados.append(
+                    ProductorDestacado(productor.id, nombre, cooperativa, total_ventas, ultima_fecha)
                 )
-        clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
-        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {
-            'mejores_clientes': clientes_ordenados
+        productores_ordenados = sorted(productores_destacados, key=lambda x: x.total_compras, reverse=True)
+        return render(request, 'Administrador/Informes/productores_destacados.html', {
+            'productores_destacados': productores_ordenados
         })
