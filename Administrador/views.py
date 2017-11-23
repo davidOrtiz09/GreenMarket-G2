@@ -650,13 +650,13 @@ class InformesMejoresProductores(View):
             cantidad_ordenes = ordenes.count()
             if cantidad_ordenes > 0:
                 nombre = productor.nombre
-                cooperativa = Cooperativa.objects.get(id=productor.fk_cooperativa).nombre
+                cooperativa = productor.fk_cooperativa.nombre
                 total_ventas = ordenes.aggregate(Sum('valor_total'))['valor_total__sum']
                 ultima_fecha = ordenes.latest('fecha_creacion')
                 productores_destacados.append(
                     ProductorDestacado(productor.id, nombre, cooperativa, total_ventas, ultima_fecha)
                 )
-        productores_ordenados = sorted(productores_destacados, key=lambda x: x.total_compras, reverse=True)
+        productores_ordenados = sorted(productores_destacados, key=lambda x: x.total_ventas, reverse=True)
         return render(request, 'Administrador/Informes/productores_destacados.html', {
             'productores_destacados': productores_ordenados
         })
