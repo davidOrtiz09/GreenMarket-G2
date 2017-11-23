@@ -641,3 +641,22 @@ class DetalleOrdenPago(View):
         return render(request, 'Administrador/detalle-orden-pago.html', {
             'ofertas_producto': ofertas_producto
         })
+
+class InformesMejoresProductores(View):
+    def get(self, request):
+        mejores_clientes = list()
+        for cliente in Cliente.objects.all():
+            pedidos = Pedido.objects.filter(fk_cliente=cliente)
+            cantidad_pedidos = pedidos.count()
+            if cantidad_pedidos > 0:
+                django_user = User.objects.get(id=cliente.fk_django_user_id)
+                nombre = django_user.first_name + ' ' + django_user.last_name
+                total_compras = pedidos.aggregate(Sum('valor_total'))['valor_total__sum']
+                ultima_fecha = pedidos.latest('fecha_pedido')
+                mejores_clientes.append(
+                    MejoresClientes(cliente.id, nombre, cantidad_pedidos, total_compras, ultima_fecha)
+                )
+        clientes_ordenados = sorted(mejores_clientes, key=lambda x: x.total_compras, reverse=True)
+        return render(request, 'Administrador/Informes/clientes_mas_rentables.html', {
+            'mejores_clientes': clientes_ordenados
+        })
