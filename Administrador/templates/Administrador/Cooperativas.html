@@ -1,0 +1,60 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+    <a href="{% url 'administrador:crear-cooperativas' %}"style="margin: 10px;">
+        <button type="button" class="btn btn-primary">Agregar una Cooperativa</button>
+    </a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 class="text-center">Cooperativas</h1>
+                    <h2>{{ subtitulo }}</h2>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="container-fluid" style="width: 80%">
+            <table class="table table-responsive" border="1">
+                <thead>
+                <tr>
+                   <th class="text-white text-center" bgcolor="#228b22" colspan="6">
+                    Cooperativas
+                   </th>
+                </tr>
+                <tr bgcolor="#dbeb887">
+                    <th class="text-center">Cooperativa ID</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Departamento</th>
+                    <th class="text-center">Ciudad</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in listaCooperativas %}
+                    <tr>
+                        <td class="text-center">
+                            {{ item.id }}
+                        </td>
+                        <td class="text-center">
+                            {{ item.nombre }}
+                        </td>
+                        <td class="text-center">
+                            {{ item.departamento }}
+                        </td>
+                         <td class="text-center">
+                            {{ item.ciudad }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </section>
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+{% endblock %}
