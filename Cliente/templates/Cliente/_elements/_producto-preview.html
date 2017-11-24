@@ -19,6 +19,7 @@
         <h6 id="product-price-index-{{ product.fk_producto.id }}">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
     </div>
 
+    <button type="button" class="btn bg-transparent"><i class="fa fa-2x fa-star-o"></i></button>
     <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
         {% csrf_token %}
         <input type="hidden" name="product_id" value="{{ product.id }}">
