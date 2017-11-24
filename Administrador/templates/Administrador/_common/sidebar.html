@@ -67,6 +67,12 @@
                         <i class="fa fa-money"></i> <span>Pago Productores</span>
                     </a>
                 </li>
+            {% url 'administrador:cooperativas' as url_cooperativa %}
+                <li {% if request.path == url_cooperativa %}class="active"{% endif %}>
+                    <a href="{% url 'administrador:cooperativas' %}">
+                        <i class="icon-padnote"></i> <span>Cooperativas</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
