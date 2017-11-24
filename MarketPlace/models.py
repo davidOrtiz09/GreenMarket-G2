@@ -345,3 +345,23 @@ class CanastaProducto(models.Model):
     def __str__(self):
         return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre, producto=self.fk_producto_catalogo.fk_producto)
 
+
+class Favorito(models.Model):
+    fk_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente", null=False, blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE,verbose_name="Producto", null=False, blank=False)
+
+    @property
+    def nombre_producto(self):
+        return self.fk_producto.nombre
+
+    @property
+    def nombre_cliente(self):
+        return self.fk_cliente.fk_django_user.get_full_name()
+
+    class Meta:
+        verbose_name = 'Favorito'
+        verbose_name_plural = 'Favoritos'
+        unique_together = (('fk_cliente', 'fk_producto'),)
+
+    def __str__(self):
+        return 'Cliente {cliente} - {producto}'.format(cliente=self.nombre_cliente, producto=self.nombre_producto)
