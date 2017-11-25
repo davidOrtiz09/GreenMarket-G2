@@ -1,3 +1,4 @@
+{% load app_filters %}
 <div class="box-product">
     <div class="img-wrapper">
         <a href="#" style="cursor: pointer;">
@@ -18,8 +19,11 @@
     <div class="price">
         <h6 id="product-price-index-{{ product.fk_producto.id }}">${{ product.precio}}  {{product.fk_producto.unidades_medida }}</h6>
     </div>
-
-    <button type="button" class="btn bg-transparent" onclick="clicFavorito({{ product.fk_producto.id }})"><i id="favpro_{{  product.fk_producto.id }}"  class="fa fa-2x fa-star-o"></i></button>
+    {% if product|is_favorito:cliente %}
+        <button type="button" class="btn bg-transparent" onclick="clicFavorito({{ product.fk_producto.id }})"><i id="favpro_{{  product.fk_producto.id }}"  class="fa fa-2x fa-star"></i></button>
+    {% else %}
+        <button type="button" class="btn bg-transparent" onclick="clicFavorito({{ product.fk_producto.id }})"><i id="favpro_{{  product.fk_producto.id }}"  class="fa fa-2x fa-star-o"></i></button>
+    {% endif %}
     <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}" class="form-inline">
         {% csrf_token %}
         <input type="hidden" name="product_id" value="{{ product.id }}">
