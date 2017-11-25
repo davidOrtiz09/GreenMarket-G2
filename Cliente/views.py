@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+import sys
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -17,6 +19,7 @@ from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, g
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
+from django.http import JsonResponse
 
 
 class AbstractClienteLoggedView(View):
@@ -366,3 +369,31 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FavoritoView(AbstractClienteLoggedView):
+    def get(self, request):
+        return JsonResponse({"Mensaje": "Aquí llegó"})
+
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            favorito = Favorito(fk_producto_id=int(body['idProducto']),
+                                fk_cliente= Cliente.objects.filter(fk_django_user=self.request.user).first())
+            favorito.save()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"})
+
+    def delete(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            favorito = Favorito.objects.filter(fk_producto_id=int(body['idProducto']),
+                                fk_cliente= Cliente.objects.filter(fk_django_user=self.request.user).first()).first()
+            favorito.delete()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"})
