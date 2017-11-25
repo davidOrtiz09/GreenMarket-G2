@@ -6,9 +6,11 @@ import json
 from operator import itemgetter
 from django.contrib.auth.models import User
 from django.db.models import Sum, Min, Max
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, render_to_response
 from django.utils.decorators import method_decorator
 from django.views import View
+
+from Administrador.forms import CooperativaForm
 from Administrador.models import MejoresClientes
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
@@ -648,7 +650,22 @@ class Cooperativas(AbstractAdministradorLoggedView):
         return render(request, 'Administrador/Cooperativas.html', {'listaCooperativas': cooperativas})
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CrearCooperativas(AbstractAdministradorLoggedView):
+
+    def get(self, request):
+        return render(request, 'Administrador/crear-cooperativa.html', {})
+
     def post(self, request):
-        productores = Productor.objects.all().order_by('id')
-        return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
+        form = CooperativaForm(request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            nombre = cleaned_data.get('nombre')
+            ciudad = cleaned_data.get('ciudad')
+            departamento = cleaned_data.get('departamento')
+            Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento)
+            cooperativas = Cooperativa.objects.all().order_by('id')
+            return render(request, 'Administrador/Cooperativas.html', {'listaCooperativas': cooperativas})
+        else:
+            print(form.errors)
+            return render(request, 'Administrador/crear-cooperativa.html', {'form': form})
