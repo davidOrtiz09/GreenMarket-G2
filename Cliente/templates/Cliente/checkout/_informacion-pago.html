@@ -5,7 +5,7 @@
                 <i class="fa fa-user mr-2" aria-hidden="true"></i>
                 Nombre completo
             </span>
-            <input name="nombre-completo" type="text" class="form-control" placeholder="Nombre completo*" required>
+            <input v-model="pago.nombre_completo" name="nombre-completo" type="text" class="form-control" placeholder="Nombre completo*" required>
         </div>
     </div>
     <div class="form-group">
@@ -14,7 +14,7 @@
                 <i class="fa fa-credit-card-alt mr-2" aria-hidden="true"></i>
                 Tipo de documento
             </span>
-            <select name="tipo-documento" class="form-control" required>
+            <select v-model="pago.tipo_documento" name="tipo-documento" class="form-control" required>
                 <option value="CC">Cédula de Ciudadanía</option>
                 <option value="PA">Pasaporte</option>
                 <option value="CE">Cédula de Extranjería</option>
@@ -28,7 +28,7 @@
                 <i class="fa fa-credit-card mr-2" aria-hidden="true"></i>
                 Número de documento
             </span>
-            <input name="numero-documento" type="text" class="form-control" placeholder="Número de documento *"
+            <input v-model="pago.numero_documento" name="numero-documento" type="text" class="form-control" placeholder="Número de documento *"
                    required>
         </div>
     </div>

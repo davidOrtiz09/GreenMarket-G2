@@ -3,6 +3,32 @@ var cartDetailsApp = new Vue({
     delimiters: ['[[', ']]'],
     data: {
         cart: cart,
+        envio: {
+            nombre: '',
+            email: '',
+            direccion: '',
+            celular: '',
+            telefono: '',
+            observaciones: ''
+        },
+        pago: {
+            nombre_completo: '',
+            tipo_documento: 'CC',
+            numero_documento: ''
+        }
+    },
+    computed: {
+        checkout_form: function(){
+            var detallesPedido = this.getJsonDetallesPedido();
+
+            var formJson = {
+                detalles_pedido: detallesPedido,
+                informacion_envio: this.envio,
+                informacion_pago: this.pago
+            };
+
+            return JSON.stringify(formJson);
+        }
     },
     methods: {
         toCop: function (number) {
@@ -80,6 +106,23 @@ var cartDetailsApp = new Vue({
                     }
                 }
             });
+        },
+        pagarPedido: function(){
+            var form = $('form#form-ckeckout');
+            if(form.valid()){
+                form.submit();
+            }
+        },
+        getJsonDetallesPedido: function(){
+            var response = [];
+            for(var i=0;i<this.cart.items.length;i++){
+                var item = this.cart.items[i];
+                response.push({
+                    quantity: item.quantity,
+                    product_id: item.product_id
+                })
+            }
+            return response;
         }
     }
 });
