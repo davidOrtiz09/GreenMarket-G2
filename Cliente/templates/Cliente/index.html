@@ -35,22 +35,33 @@
                     </div>
                     <form method="post" action="{% url 'cliente:index' %}">
                         {% csrf_token %}
-                        <div align="center">
-                            <label for="cooperativa">Cooperativa</label>
-                            <select name="cooperativa_id" id="cooperativa">
-                                {% for cooperativa in cooperativas %}
-                                    <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
-                                {% endfor %}
+                        <div class="form-row justify-content-center">
+                            <div class="col-auto">
+                                <label for="cooperativa">Cooperativa</label>
+                                <select name="cooperativa_id" id="cooperativa" class="custom-select">
+                                    {% for cooperativa in cooperativas %}
+                                        <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
+                                    {% endfor %}
 
-                            </select>
-                            <label for="ordenar">Ordenar Por</label>
-                            <select name="ordenar" id="ordenar">
-                                <option value="fk_producto__nombre">Producto: A-Z</option>
-                                <option value="-fk_producto__nombre">Producto: Z-A</option>
-                                <option value="precio">Precio: Menor a Mayor</option>
-                                <option value="-precio">Precio: Mayor a Menor</option>
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="ordenar">Ordenar Por</label>
+                                <select name="ordenar" id="ordenar" class="custom-select">
+                                    <option value="fk_producto__nombre">Producto: A-Z</option>
+                                    <option value="-fk_producto__nombre">Producto: Z-A</option>
+                                    <option value="precio">Precio: Menor a Mayor</option>
+                                    <option value="-precio">Precio: Mayor a Menor</option>
 
-                            </select>
+                                </select>
+                            </div>
+                            {% if not cliente is None %}
+                                <div class="col-auto">
+                                    <label for="favoritos">Favoritos</label>
+                                    <input name="favoritos" type="checkbox" id="favoritos" class="custom-checkbox" {% if solo_favoritos %}
+                                        checked="checked"{% endif %}>
+                                </div>
+                            {% endif %}
                             <input type="submit" value="Buscar" class="btn btn-primary">
 
                         </div>
