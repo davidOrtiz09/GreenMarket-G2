@@ -127,7 +127,7 @@ class Index(View):
             'categorias': categorias,
             'cooperativas': cooperativas,
             'cliente': cliente,
-            'solo_favoritos': favoritos != 'off'
+            'solo_favoritos': favoritos != ''
         })
 
 

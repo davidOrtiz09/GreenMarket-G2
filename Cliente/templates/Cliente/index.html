@@ -58,7 +58,8 @@
                             {% if not cliente is None %}
                                 <div class="col-auto">
                                     <label for="favoritos">Favoritos</label>
-                                    <input name="favoritos" type="checkbox" id="favoritos" class="custom-checkbox">
+                                    <input name="favoritos" type="checkbox" id="favoritos" class="custom-checkbox" {% if solo_favoritos %}
+                                        checked="checked"{% endif %}>
                                 </div>
                             {% endif %}
                             <input type="submit" value="Buscar" class="btn btn-primary">
