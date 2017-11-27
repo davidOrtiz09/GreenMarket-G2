@@ -15,7 +15,6 @@ function verDetalleCarrito(id){
 }
 
 function clicFavorito(idProducto) {
-console.log('favorito' + idProducto);
 
     if($("#favpro_" + idProducto).is('.fa-star'))
         eliminarFavorito(idProducto);
@@ -33,7 +32,6 @@ function agregarFavorito(idProducto){
         contentType: "application/json; charset=utf-8;",
         dataType: "json",
         success: function (data) {
-            console.log(data);
             if(data.Mensaje === "OK")
                 $("#favpro_" + idProducto).toggleClass('fa-star-o fa-star');
         },
@@ -53,7 +51,6 @@ function eliminarFavorito(idProducto){
         contentType: "application/json; charset=utf-8;",
         dataType: "json",
         success: function (data) {
-            console.log(data);
             if(data.Mensaje === "OK")
                 $("#favpro_" + idProducto).toggleClass('fa-star fa-star-o');
         },
