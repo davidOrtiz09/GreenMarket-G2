@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^informes/seleccionSemanas', views.SeleccionSemanas.as_view(), name='informes/seleccionSemanas'),
     url(r'^informes/obtener_mejores_productos', views.ObtenerMejoresProductos.as_view(), name='informes/obtener_mejores_productos'),
     url(r'^informes/inventario', views.InventarioView.as_view(), name='informes/inventario'),
+    url(r'^informes/mejores-productores', views.InformesMejoresProductores.as_view(), name='informes/mejores-productores'),
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
     url(r'^clientes/(\d+)/$', views.PerfilClienteView.as_view(), name='perfil_cliente'),
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
