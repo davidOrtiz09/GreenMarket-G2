@@ -18,7 +18,7 @@ var cartDetailsApp = new Vue({
         }
     },
     computed: {
-        checkout_form: function(){
+        checkout_form: function () {
             var detallesPedido = this.getJsonDetallesPedido();
 
             var formJson = {
@@ -60,11 +60,11 @@ var cartDetailsApp = new Vue({
             if (newValue < 1 || newValue === '') {
                 item.quantity = 1;
             }
-            else{
+            else {
                 item.quantity = newValue;
             }
             var diff = item.quantity - previousQuantity;
-            if(diff !== 0){
+            if (diff !== 0) {
                 this.modificarCantidadCarrito(item, diff);
             }
         },
@@ -107,15 +107,88 @@ var cartDetailsApp = new Vue({
                 }
             });
         },
-        pagarPedido: function(){
+        pagarPedido: function () {
             var form = $('form#form-ckeckout');
-            if(form.valid()){
+            this.validateForm();
+            if (form.valid()) {
                 form.submit();
             }
         },
-        getJsonDetallesPedido: function(){
+        validateForm: function () {
+            var form = $('form#form-ckeckout');
+            form.validate({
+                errorPlacement: function (error, element) {
+                    var placement = $(element).data('error');
+                    if (placement) {
+                        $(placement).append(error)
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorElement: 'div',
+                errorClass: 'text-danger',
+                rules: {
+                    nombre: {
+                        required: true
+                    },
+                    email: {
+                        email: true
+                    },
+                    direccion: {
+                        required: true
+                    },
+                    celular: {
+                        required: true,
+                        number: true
+                    },
+                    telefono: {
+                        number: true
+                    },
+                    'nombre-completo': {
+                        required: true
+                    },
+                    'tipo_documento': {
+                        required: true
+                    },
+                    'numero-documento': {
+                        required: true,
+                        number: true
+                    }
+                },
+                messages: {
+                    nombre: {
+                        required: "* Por favor ingrese su nombre"
+                    },
+                    email: {
+                        email: "* Por favor ingrese un correo electrónico válido",
+                        required: "* Por favor ingrese su correo electrónico"
+                    },
+                    direccion: {
+                        required: '* Por favor ingrese la dirección de entrega'
+                    },
+                    celular: {
+                        required: '* Por favor ingrese su número de celular',
+                        number: '* Por favor ingrese un número de celular válido'
+                    },
+                    telefono: {
+                        number: '* Por favor ingrese un número de teléfono válido'
+                    },
+                    'nombre-completo': {
+                        required: '* Por favor ingrese su nombre completo'
+                    },
+                    'tipo-documento':{
+                        required: '* Por favor seleccione un tipo de documento'
+                    },
+                    'numero-documento':{
+                        required: '* Por favor ingrese su número de documento',
+                        number: '* Por favor ingrese un número de identificación válido'
+                    }
+                }
+            });
+        },
+        getJsonDetallesPedido: function () {
             var response = [];
-            for(var i=0;i<this.cart.items.length;i++){
+            for (var i = 0; i < this.cart.items.length; i++) {
                 var item = this.cart.items[i];
                 response.push({
                     quantity: item.quantity,
