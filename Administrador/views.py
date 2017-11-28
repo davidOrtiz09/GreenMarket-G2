@@ -667,3 +667,19 @@ class SeleccionCooperativaView(View):
     def get(self, request):
         return render(request, 'Administrador/_elements/_modal_cooperativas.html',
                       {'cooperativas_mod': Cooperativa.objects.all()})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SeleccionCooperativaFijarView(AbstractAdministradorLoggedView):
+
+    def get(self, request):
+        return JsonResponse({"Mensaje": "Aquí llegó"})
+
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            request.session['cooperativa'] = Cooperativa.objects.filter(id=int(body['idCooperativa'])).first().to_json()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"})

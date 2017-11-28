@@ -6,18 +6,20 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
+
         <div class="modal-body">
             <table  class="table table-responsive" cellspacing="2" style="width: 80%"
                        border="1"
                        align="center">
                     <thead>
                         <tr>
-                            <th colspan="3" bgcolor="#228b22" class="text-white text-center">Cooperativas</th>
+                            <th colspan="4" bgcolor="#228b22" class="text-white text-center">Cooperativas</th>
                         </tr>
                         <tr bgcolor="#deb887">
                             <th class="text-center">Id</th>
                             <th class="text-center">Nomnbre</th>
                             <th class="text-center">Ciudad</th>
+                            <th class="text-center"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,10 +34,13 @@
                             <td class="text-center">
                                 {{ item.ciudad }}
                             </td>
+                            <td>
+                                <button type="button" class="btn btn-info" name="{{pedido.id}}"  onclick="clicCooperativa({{ item.id }})">Seleccionar</button>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                </table>
+            </table>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-primary cerrarModalCoop " data-dismiss="modal">Volver</button>
