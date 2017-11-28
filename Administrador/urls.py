@@ -49,4 +49,5 @@ urlpatterns = [
     url(r'^ordenes-pago-productor/(?P<id_productor>\d+)$', views.OrdenesPagoProductores.as_view(), name='ordenes-pago-productor'),
     url(r'^detalle-orden-pago/(?P<orden_compra_id>\d+)$', views.DetalleOrdenPago.as_view(), name='detalle-orden-pago'),
 
+    url(r'^seleccion-cooperativa', views.SeleccionCooperativaView.as_view(), name='seleccion-cooperativa'),
 ]

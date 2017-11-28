@@ -50,6 +50,7 @@ class Ingresar(View):
             user = authenticate(username=username, password=password)
             if user is not None and es_administrador(user):
                 login(request, user)
+                request.session['cooperativa'] = Cooperativa.objects.first().to_json()
                 return redirect(reverse('administrador:index'))
             else:
                 messages.add_message(request, messages.ERROR, 'Por favor verifica tu usuario y contraseña')
@@ -660,3 +661,9 @@ class InformesMejoresProductores(View):
         return render(request, 'Administrador/Informes/productores_destacados.html', {
             'productores_destacados': productores_ordenados
         })
+
+class SeleccionCooperativaView(View):
+    # Retorna el template con las cooperativas del sistema.
+    def get(self, request):
+        return render(request, 'Administrador/_elements/_modal_cooperativas.html',
+                      {'cooperativas_mod': Cooperativa.objects.all()})
