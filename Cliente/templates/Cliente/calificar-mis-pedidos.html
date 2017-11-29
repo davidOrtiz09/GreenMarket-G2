@@ -1,0 +1,47 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Calificar Producto</h1>
+                    <br/>
+                    <form method="post" action="{% url 'cliente:guardar-calificacion-mis-pedidos' pedido_producto=fk_pedido_producto productor=fk_productor id_pedido=pedido %}">
+                        {% csrf_token %}
+                        <div class="container-fluid">
+                            <h3 class="text-center">{{ producto.nombre }}</h3>
+                            <div class="text-center"><img src="{{ producto.imagen.url }}"
+                                                          class="img-responsive center-block"
+                                                          style="max-height: 200px; max-width: 200px">
+                            </div>
+                            <br>
+                            <br>
+                            <h4 class="text-center">Por favor califique el producto seleccionado un valor de la lista
+                                <br>
+                                seleccione un valor de 1 a 5, siendo 1 la calificacion mas baja y 5 la calificacion mas
+                                alta</h4>
+                            <br>
+                            <br>
+                            <div class="text-center">
+                                <select id="calificacion" name="calificacion" class="custom-select">
+                                    <option value="1">1 Uno</option>
+                                    <option value="2">2 Dos</option>
+                                    <option value="3">3 Tres</option>
+                                    <option value="4">4 Cuatro</option>
+                                    <option value="5">5 Cinco</option>
+                                </select>
+                                <input type="submit" class="btn btn-primary" value="Guardar Calificacion"/>
+                                <br>
+                                <br>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
