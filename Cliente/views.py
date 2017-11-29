@@ -13,7 +13,7 @@ from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, cantidad_disponible_producto_catalogo
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
@@ -84,8 +84,17 @@ class Index(View):
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
+
+        productos = []
+        for producto in producto_catalogo:
+            cantidad_disponible = cantidad_disponible_producto_catalogo(producto)
+            if cantidad_disponible > 0:
+                product_dict = producto.to_dict
+                product_dict['cantidad_disponible'] = cantidad_disponible
+                productos.append(product_dict)
+
         return render(request, 'Cliente/index.html', {
-            'productos_json': json.dumps([x.to_dict for x in producto_catalogo]),
+            'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
@@ -329,7 +338,7 @@ class DoPayment(AbstractClienteLoggedView):
         savepoint_commit(checkpoint)
 
         request.session['cartCompra'] = request.session['cart']
-        request.session['cart']=""
+        request.session['cart'] = ""
         return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
                       {'compra': True})
 

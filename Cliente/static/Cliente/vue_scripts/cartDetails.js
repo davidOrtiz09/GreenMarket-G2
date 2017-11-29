@@ -44,8 +44,11 @@ var cartDetailsApp = new Vue({
             return this.toCop(total);
         },
         incrementarCantidad: function (item) {
-            item.quantity += 1;
-            this.modificarCantidadCarrito(item, 1);
+            var newQuantity = item.quantity + 1;
+            if(newQuantity <= item.cantidad_disponible){
+                item.quantity += 1;
+                this.modificarCantidadCarrito(item, 1);
+            }
         },
         disminuirCantidad: function (item) {
             var cantidadPrevia = parseInt(item.quantity);
@@ -61,7 +64,12 @@ var cartDetailsApp = new Vue({
                 item.quantity = 1;
             }
             else {
-                item.quantity = newValue;
+                if(newValue > item.cantidad_disponible){
+                    item.quantity = item.cantidad_disponible;
+                }
+                else{
+                    item.quantity = newValue;
+                }
             }
             var diff = item.quantity - previousQuantity;
             if (diff !== 0) {

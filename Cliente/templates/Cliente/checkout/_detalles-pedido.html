@@ -27,20 +27,20 @@
             </td>
             <td>
                 <div class="input-group">
-                        <span class="input-group-btn clickable">
-                            <button @click="disminuirCantidad(cartItem)" type="button" class="btn btn-danger"
-                                    :disabled="cartItem.quantity <= 1">
-                                <i class="fa fa-2x fa-minus-circle"></i>
-                            </button>
-                        </span>
+                    <span class="input-group-btn clickable">
+                        <button @click="disminuirCantidad(cartItem)" type="button" class="btn btn-danger"
+                                :disabled="cartItem.quantity <= 1">
+                            <i class="fa fa-2x fa-minus-circle"></i>
+                        </button>
+                    </span>
                     <input class="form-control product-quantity cart-details" type="number" min="1"
                            :value="cartItem.quantity" @change="cambioCantidad($event, cartItem)" step="1" pattern="\d*">
-                    <input class="product-id" type="hidden" v-model="cartItem.product_id" readonly disabled>
+                    <input class="product-id" type="hidden" v-model="cartItem.product_id" :max="cartItem.cantidad_disponible" readonly disabled>
                     <span class="input-group-btn clickable">
-                            <button @click="incrementarCantidad(cartItem)" type="button" class="btn btn-success">
-                                <i class="fa fa-2x fa-plus-circle"></i>
-                            </button>
-                        </span>
+                        <button @click="incrementarCantidad(cartItem)" type="button" class="btn btn-success" :disabled="cartItem.quantity >= cartItem.cantidad_disponible">
+                            <i class="fa fa-2x fa-plus-circle"></i>
+                        </button>
+                    </span>
                 </div>
             </td>
             <td class="text-center">
