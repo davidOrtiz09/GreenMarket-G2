@@ -210,6 +210,7 @@ class Catalogo_Producto(models.Model):
                 'id': self.fk_producto.fk_categoria_id,
                 'nombre': self.fk_producto.fk_categoria.nombre
             },
+            'cantidad_disponible': 1,
             'cantidad_carrito': 0
         }
 

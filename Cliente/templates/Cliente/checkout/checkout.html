@@ -60,7 +60,7 @@
                                             </div>
 
                                             <div class="col text-right">
-                                                <button v-on:click="pagarPedido()" id="pagar" class="btn btn-success"><i
+                                                <button @click="pagarPedido()" id="pagar" class="btn btn-success"><i
                                                         class="fa fa-money mr-2"></i> Pagar
                                                 </button>
                                                 <input v-model="checkout_form" type="hidden" name="checkout_form" id="json-form">
