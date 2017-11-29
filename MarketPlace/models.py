@@ -274,6 +274,7 @@ class PedidoProducto(models.Model):
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
+    fk_oferta_producto = models.ForeignKey (Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
 
     def __str__(self):
         return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad), producto=self.fk_catalogo_producto.fk_producto.nombre)
@@ -345,3 +346,8 @@ class CanastaProducto(models.Model):
     def __str__(self):
         return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre, producto=self.fk_producto_catalogo.fk_producto)
 
+
+class EvaluacionProducto(models.Model):
+    fk_productor = models.ForeignKey (Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
+    fk_pedido_producto = models.ForeignKey (PedidoProducto, on_delete=models.CASCADE, verbose_name='PedidoProducto', null=False, blank=False)
+    calificacion = models.PositiveIntegerField (verbose_name='Calificacion', null=False, blank=False)
