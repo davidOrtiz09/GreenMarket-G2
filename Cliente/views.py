@@ -6,7 +6,7 @@ from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Productor, EvaluacionProducto, Producto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -371,18 +371,57 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
 class DetalleMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, id_pedido):
         pedido = Pedido.objects.get(id=id_pedido)
-        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido=id_pedido)
+        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido_id=id_pedido)
         lista_productos=[]
         for detPed in detalle_mi_pedido:
             productoPedido=detPed
             valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
             categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto=productoPedido.id)
+
+            if len(evalProducto) == 0:
+                disable_button_producto = ''
+            else:
+                disable_button_producto = 'disabled'
+
             lista_productos.append({
                 'categoria': categoria,
                 'producto': productoPedido,
-                'valor': valor
+                'valor': valor,
+                'disable_button_producto': disable_button_producto
             })
+        if pedido.estado != 'EN':
+            disable_button = 'disabled'
+        else:
+            disable_button = ''
+
+
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
             'detalle_pedido': lista_productos,
+            'pedido' : pedido,
+            'disable' : disable_button
+        })
+
+
+class CalificarMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, fk_pedido_producto, fk_productor, producto, pedido):
+        productoSelected= Producto.objects.filter(id=producto).first
+        return render(request, 'Cliente/calificar-mis-pedidos.html', {
+            'producto': productoSelected,
+            'fk_pedido_producto': fk_pedido_producto,
+            'fk_productor': fk_productor,
             'pedido': pedido
         })
+
+class InsertCalificacionProductoVew(AbstractClienteLoggedView):
+    def post(self, request, pedido_producto, productor,id_pedido):
+        productor = Productor.objects.filter(id=productor).first()
+        pedidoProducto = PedidoProducto.objects.filter(id=pedido_producto).first()
+        ValorCalificacion = request.POST.get('calificacion', '')
+        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto, calificacion=ValorCalificacion)
+        evaluacion.save()
+        messages.add_message(
+            request, messages.SUCCESS,
+                'La calificacion fue guardada exitosamente'
+            )
+        return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
