@@ -434,12 +434,13 @@ class MejoresProductores(View):
     def get(self, request):
         productores_list = Productor.objects.all()
         respuesta = []
+        promedio = 0.0
         if len(productores_list) != 0:
             for prod_list in productores_list:
                 promedio= calcular_promedio(prod_list)
                 respuesta.append({
                     'productor': prod_list,
-                    'calificacion': promedio
+                    'calificacion': "{0:.4f}".format(promedio)
                 })
             productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
         else:
