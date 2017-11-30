@@ -78,11 +78,14 @@ class Index(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa=cooperativas.first())
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
-            .order_by('fk_producto__nombre')
+            .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+
         categorias = Categoria.objects.all()
+
         return render(request, 'Cliente/index.html', {
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
@@ -93,10 +96,14 @@ class Index(View):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
-            .order_by(ordenar_por)
+            .filter(fk_catalogo=catalogo).order_by(ordenar_por)
+
         categorias = Categoria.objects.all()
+
         cooperativas = Cooperativa.objects.all()
 
         return render(request, 'Cliente/index.html', {

@@ -37,7 +37,6 @@ def get_or_create_week():
         prev_monday = today - datetime.timedelta(days=today.weekday())
         next_sunday = prev_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
         nueva = Semana(
-            fk_cooperativa_id=Cooperativa.objects.first().id,
             fecha_inicio=prev_monday,
             fecha_fin=next_sunday
         )
@@ -54,7 +53,6 @@ def get_or_create_next_week():
         prev_monday = next_week - datetime.timedelta(days=next_week.weekday())
         next_sunday = prev_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
         nueva = Semana(
-            fk_cooperativa_id=Cooperativa.objects.first().id,
             fecha_inicio=prev_monday,
             fecha_fin=next_sunday
         )

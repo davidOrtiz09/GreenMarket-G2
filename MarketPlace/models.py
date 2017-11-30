@@ -109,8 +109,7 @@ class Producto(models.Model):
 
 @python_2_unicode_compatible
 class Semana(models.Model):
-    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False,
-                                       blank=False)
+
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio", null=False, blank=False)
     fecha_fin = models.DateField(verbose_name="Fecha Fin", null=False, blank=False)
 
@@ -175,6 +174,7 @@ class Oferta_Producto(models.Model):
 
 @python_2_unicode_compatible
 class Catalogo(models.Model):
+    fk_cooperativa = models.ForeignKey(Cooperativa, verbose_name='Cooperativa', null=False, blank=False)
     fk_semana = models.ForeignKey(Semana, verbose_name='Semana', null=False, blank=False)
     fecha_creacion = models.DateField(verbose_name="Fecha de Creación", null=False, blank=False, auto_now_add=True)
     fecha_cierre = models.DateTimeField(verbose_name="Fecha de Cierre", null=False, blank=False)
