@@ -53,7 +53,7 @@ def obtener_valor_compra(semana, id_producto):
     return valorPromedio
 
 def calcular_promedio(prod_list):
-    calificacion_list = EvaluacionProducto.objects.find(fk_productor=prod_list)
+    calificacion_list = EvaluacionProducto.objects.filter(fk_productor=prod_list)
     if len(calificacion_list) != 0:
         calificacion_sum = 0
         conteo=0
