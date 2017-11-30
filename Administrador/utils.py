@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto
+from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto, EvaluacionProducto
 
 
 # Se obtiene el catalogo más reciente creado
@@ -51,3 +51,15 @@ def obtener_valor_compra(semana, id_producto):
         sumPrecios = sumPrecios + ofertaProd.precioProvedor
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
+
+def calcular_promedio(prod_list):
+    calificacion_list = EvaluacionProducto.objects.find(fk_productor=prod_list)
+    if len(calificacion_list) != 0:
+        calificacion_sum = 0
+        conteo=0
+        for calif_list in calificacion_list:
+            calificacion_sum = calificacion_sum + calif_list.calificacion
+            conteo += 1
+    promedio = calificacion_sum / conteo
+    return promedio
+
