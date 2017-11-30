@@ -43,6 +43,7 @@ def get_or_create_week():
         nueva.save()
         return nueva
 
+
 def get_or_create_next_week():
     today = datetime.date.today()
     next_week = today + datetime.timedelta(weeks=1)

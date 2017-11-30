@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
+from MarketPlace.templatetags.marketplace_filters import to_cop
 
 
 @python_2_unicode_compatible
@@ -194,6 +195,28 @@ class Catalogo_Producto(models.Model):
                                     blank=False)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def to_dict(self, user):
+        es_favorito = False
+        if user and user.is_authenticated:
+            es_favorito = Favorito.objects\
+                .filter(fk_cliente__fk_django_user_id=user.id, fk_producto_id=self.fk_producto_id).exists()
+        return {
+            'id': self.id,
+            'id_producto': self.fk_producto_id,
+            'descripcion': self.fk_producto.descripcion,
+            'imagen': self.fk_producto.imagen.url if self.fk_producto.imagen else '',
+            'precio': float(self.precio),
+            'precio_cop': to_cop(float(self.precio)),
+            'nombre': self.fk_producto.nombre,
+            'unidad_medida': self.fk_producto.unidad_medida,
+            'categoria': {
+                'id': self.fk_producto.fk_categoria_id,
+                'nombre': self.fk_producto.fk_categoria.nombre
+            },
+            'cantidad_carrito': 0,
+            'es_favorito': es_favorito
+        }
+
     class Meta:
         verbose_name = 'Producto del Catalogo'
         verbose_name_plural = 'Productos del Catalogo'
@@ -352,3 +375,24 @@ class CanastaProducto(models.Model):
     def __str__(self):
         return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre,
                                                        producto=self.fk_producto_catalogo.fk_producto)
+
+
+class Favorito(models.Model):
+    fk_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente", null=False, blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto", null=False, blank=False)
+
+    @property
+    def nombre_producto(self):
+        return self.fk_producto.nombre
+
+    @property
+    def nombre_cliente(self):
+        return self.fk_cliente.fk_django_user.get_full_name()
+
+    class Meta:
+        verbose_name = 'Favorito'
+        verbose_name_plural = 'Favoritos'
+        unique_together = (('fk_cliente', 'fk_producto'),)
+
+    def __str__(self):
+        return 'Cliente {cliente} - {producto}'.format(cliente=self.nombre_cliente, producto=self.nombre_producto)
