@@ -1,5 +1,5 @@
 from django import template
-
+from json import dumps
 register = template.Library()
 
 
@@ -11,6 +11,13 @@ def to_cop(number):
     except Exception as e:
         return number
 
+
+@register.filter(name='dumps_filter')
+def dumps_filter(d):
+    try:
+        return dumps(d)
+    except Exception as e:
+        return d
 
 # Funcionalidad para multiplicar en templates y retornar el resultado en formato moneda
 @register.filter(name='multiply_cop')
@@ -27,18 +34,4 @@ def multiply(value, arg):
     try:
         return float(value * arg)
     except (ValueError, ZeroDivisionError):
-        return 0  # Cuenta los items del carrito
-
-# Cuenta los items del carrito
-@register.filter(name='count_cart_products')
-def count_cart_products(request):
-    try:
-        cart = request.session.get('cart', None)
-        response = 0
-        if cart:
-            items = cart.get('items', [])
-            for item in items:
-                response += item['quantity']
-        return response
-    except:
         return 0

@@ -1,27 +1,5 @@
 var URLDomain = document.location.origin+"/";
 
-function verDetalles(){
-    console.log('Seguna variable:',información);
-}
-
-
-$('.cerrarPopUpDetalleProducto').click(function(){
-    var id = $(this).attr('name');
-    $("#sectionPopUpDescripcion"+id).toggle();
-});
-
-function verDetalleCarrito(id){
-    $("#sectionPopUpDescripcion"+id).toggle();
-}
-
-function clicFavorito(idProducto) {
-
-    if($("#favpro_" + idProducto).is('.fa-star'))
-        eliminarFavorito(idProducto);
-    else
-        agregarFavorito(idProducto);
-
-}
 function agregarFavorito(idProducto){
 
     jsonFavorito = {"idProducto":idProducto};

@@ -91,6 +91,7 @@ class Index(View):
             else Cliente.objects.filter(fk_django_user=self.request.user).first()
 
         return render(request, 'Cliente/index.html', {
+            'productos_json': json.dumps([x.to_dict for x in producto_catalogo]),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
@@ -156,8 +157,10 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
-        product_id = int(request.POST.get('product_id', '0'))
-        quantity = int(request.POST.get('quantity', '0'))
+
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', 0)
+        quantity = json_body.get('quantity', 0)
 
         if product_id > 0 and quantity != 0:
             request.session['cart'] = agregar_producto_carrito(
@@ -165,8 +168,9 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
                 product_id=product_id,
                 quantity=quantity
             )
-            messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
@@ -175,7 +179,8 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
-        product_id = int(request.POST.get('product-id', '-1'))
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', -1)
         if cart:
             items = cart.get('items', [])
             index = -1
@@ -190,7 +195,7 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
                 items.remove(items[index])
                 cart['items'] = items
                 request.session['cart'] = cart
-        return redirect(reverse('cliente:checkout'))
+        return JsonResponse(request.session['cart'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')

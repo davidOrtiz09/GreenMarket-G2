@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
+from MarketPlace.templatetags.marketplace_filters import to_cop
 
 
 @python_2_unicode_compatible
@@ -193,6 +194,24 @@ class Catalogo_Producto(models.Model):
     fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False,
                                     blank=False)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    @property
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'id_producto': self.fk_producto_id,
+            'descripcion': self.fk_producto.descripcion,
+            'imagen': self.fk_producto.imagen.url if self.fk_producto.imagen else '',
+            'precio': float(self.precio),
+            'precio_cop': to_cop(float(self.precio)),
+            'nombre': self.fk_producto.nombre,
+            'unidad_medida': self.fk_producto.unidad_medida,
+            'categoria': {
+                'id': self.fk_producto.fk_categoria_id,
+                'nombre': self.fk_producto.fk_categoria.nombre
+            },
+            'cantidad_carrito': 0
+        }
 
     class Meta:
         verbose_name = 'Producto del Catalogo'
