@@ -434,11 +434,17 @@ class MejoresProductores(View):
     def get(self, request):
         productores_list = Productor.objects.all()
         respuesta = []
-        for prod_list in productores_list:
-            promedio= calcular_promedio(prod_list)
-            respuesta.append({
-                'productor': prod_list,
-                'calificacion': promedio
-            })
-        productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        if len(productores_list) != 0:
+            for prod_list in productores_list:
+                promedio= calcular_promedio(prod_list)
+                respuesta.append({
+                    'productor': prod_list,
+                    'calificacion': promedio
+                })
+            productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        else:
+            messages.add_message(
+                request, messages.SUCCESS,
+                'No se encontraron productores'
+            )
         return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
