@@ -17,7 +17,7 @@ from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_
     get_id_cooperativa_global
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
-from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
+from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week, get_or_create_next_week
 from django.db.transaction import atomic
 from django.http import JsonResponse
 from decimal import Decimal
@@ -189,29 +189,35 @@ class ActualizarEstadoPedidoView(AbstractAdministradorLoggedView):
 
 class ListarOfertasView(AbstractAdministradorLoggedView):
     def get(self, request):
+        semana = get_or_create_next_week()
         ofertas = list()
-        for productor in Productor.objects.all():
+        for productor in Productor.objects.filter(fk_cooperativa_id=get_id_cooperativa_global(request)):
             cantidad_ofertas = 0
             id_oferta = 0
-            for oferta in Oferta.objects.filter(fk_productor=productor):
+            for oferta in Oferta.objects.filter(fk_productor=productor, fk_semana=semana):
                 cantidad_ofertas = Oferta_Producto.objects.filter(fk_oferta=oferta).count()
                 id_oferta = oferta.id
 
             if cantidad_ofertas > 0:
                 ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
-        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas})
+        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas, 'semana':semana})
 
 
 class DetalleOfertaView(AbstractAdministradorLoggedView):
     def get(self, request, id_oferta, guardado_exitoso):
-        ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
 
-        return render(request, 'Administrador/detalle-oferta.html', {
-            'ofertas_producto': ofertas_producto,
-            'id_oferta': id_oferta,
-            'guardado_exitoso': guardado_exitoso
-        })
+        if(Oferta.objects.filter(id=id_oferta,
+                                 fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)).exists()):
+            ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
+
+            return render(request, 'Administrador/detalle-oferta.html', {
+                'ofertas_producto': ofertas_producto,
+                'id_oferta': id_oferta,
+                'guardado_exitoso': guardado_exitoso
+            })
+        else:
+            return redirect(reverse('administrador:ofertas'))
 
 
 class RealizarOfertaView(AbstractAdministradorLoggedView):
