@@ -60,6 +60,8 @@ def calcular_promedio(prod_list):
         for calif_list in calificacion_list:
             calificacion_sum = calificacion_sum + calif_list.calificacion
             conteo += 1
-    promedio = calificacion_sum / conteo
+        promedio = calificacion_sum / conteo
+    else:
+        promedio=0
     return promedio
 
