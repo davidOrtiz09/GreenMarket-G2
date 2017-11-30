@@ -195,8 +195,11 @@ class Catalogo_Producto(models.Model):
                                     blank=False)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
-    @property
-    def to_dict(self):
+    def to_dict(self, user):
+        es_favorito = False
+        if user and user.is_authenticated:
+            es_favorito = Favorito.objects\
+                .filter(fk_cliente__fk_django_user_id=user.id, fk_producto_id=self.fk_producto_id).exists()
         return {
             'id': self.id,
             'id_producto': self.fk_producto_id,
@@ -210,7 +213,8 @@ class Catalogo_Producto(models.Model):
                 'id': self.fk_producto.fk_categoria_id,
                 'nombre': self.fk_producto.fk_categoria.nombre
             },
-            'cantidad_carrito': 0
+            'cantidad_carrito': 0,
+            'es_favorito': es_favorito
         }
 
     class Meta:
@@ -375,7 +379,7 @@ class CanastaProducto(models.Model):
 
 class Favorito(models.Model):
     fk_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente", null=False, blank=False)
-    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE,verbose_name="Producto", null=False, blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto", null=False, blank=False)
 
     @property
     def nombre_producto(self):

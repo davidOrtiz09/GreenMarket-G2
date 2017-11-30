@@ -82,6 +82,8 @@
     <script type="text/javascript">
         var productos = {{ productos_json|safe }};
         var urlAgregarAlCarrito = '{% url 'cliente:actualizar-carrito-compras' %}';
+        var urlEliminarFavorito = '{% url 'cliente:eliminar-favorito' %}';
+        var urlAgregarFavorito = '{% url 'cliente:agregar-favorito' %}';
     </script>
     <script type="text/javascript" src="{% static 'Cliente/vue_scripts/products_list.js' %}"></script>
 {% endblock %}

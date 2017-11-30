@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-import sys
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
@@ -86,49 +84,27 @@ class Index(View):
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
-
-        cliente =  None if self.request.user.is_anonymous \
-            else Cliente.objects.filter(fk_django_user=self.request.user).first()
-
         return render(request, 'Cliente/index.html', {
-            'productos_json': json.dumps([x.to_dict for x in producto_catalogo]),
+            'productos_json': json.dumps([x.to_dict(request.user) for x in producto_catalogo]),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas,
-            'cliente': cliente,
-            'solo_favoritos': False
+            'cooperativas': cooperativas
         })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
-        favoritos = request.POST.get('favoritos', '')
-
-        cliente = None if self.request.user.is_anonymous \
-            else Cliente.objects.filter(fk_django_user=self.request.user).first()
-
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
-
-        if(favoritos == ''):
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id, fk_catalogo=catalogo) \
-                .order_by(ordenar_por)
-        else:
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id, fk_catalogo=catalogo,
-                        fk_producto__favorito__fk_cliente=cliente)  \
-                .order_by(ordenar_por)
-
+        producto_catalogo = Catalogo_Producto.objects \
+            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
+            .order_by(ordenar_por)
         categorias = Categoria.objects.all()
         cooperativas = Cooperativa.objects.all()
 
         return render(request, 'Cliente/index.html', {
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas,
-            'cliente': cliente,
-            'solo_favoritos': favoritos != ''
+            'cooperativas': cooperativas
         })
 
 
@@ -398,29 +374,31 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
         return redirect(reverse('cliente:canastas'))
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class FavoritoView(AbstractClienteLoggedView):
-    def get(self, request):
-        return JsonResponse({"Mensaje": "Aquí llegó"})
-
+class AgregarProductoFavoritoView(AbstractClienteLoggedView):
     def post(self, request):
         try:
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
-            favorito = Favorito(fk_producto_id=int(body['idProducto']),
-                                fk_cliente= Cliente.objects.filter(fk_django_user=self.request.user).first())
-            favorito.save()
+            id_producto = body.get('id_producto', '0')
+            cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
+            exist = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id).exists()
+            if not exist:
+                favorito = Favorito(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id)
+                favorito.save()
             return JsonResponse({"Mensaje": "OK"})
         except:
-            return JsonResponse({"Mensaje": "Fallo"})
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
 
-    def delete(self, request):
+
+class EliminarFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
         try:
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
-            favorito = Favorito.objects.filter(fk_producto_id=int(body['idProducto']),
-                                fk_cliente= Cliente.objects.filter(fk_django_user=self.request.user).first()).first()
+            id_producto = body.get('id_producto', '0')
+            user_id = request.user.id
+            favorito = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente__fk_django_user_id=user_id)
             favorito.delete()
             return JsonResponse({"Mensaje": "OK"})
         except:
-            return JsonResponse({"Mensaje": "Fallo"})
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)

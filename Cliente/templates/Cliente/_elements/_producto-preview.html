@@ -1,6 +1,13 @@
-{% load app_filters %}
 <div class="col-12 col-md-6 col-lg-3 mb-4" v-for="producto in productosFiltrados">
     <div class="box-product">
+        <div class="text-right" v-if="esta_autenticado">
+            <button v-if="!producto.es_favorito" type="button" class="btn bg-transparent" @click="agregarFavorito(producto)">
+                <i class="fa fa-2x fa-star-o"></i>
+            </button>
+            <button v-if="producto.es_favorito" type="button" class="btn bg-transparent" @click="eliminarFavorito(producto)">
+                <i class="fa fa-2x fa-star"></i>
+            </button>
+        </div>
         <div class="img-wrapper">
             <a href="#" style="cursor: pointer;">
                 <img v-bind:id="'product-image-index-' + producto.id" v-bind:alt="producto.nombre"
@@ -24,15 +31,8 @@
             </h6>
         </div>
 
-        {% if not cliente is None %}
-        <span class="input-group-btn clickable">
-            {% if product|is_favorito:cliente %}
-                <button type="button" class="btn bg-transparent" onclick="clicFavorito({{ product.fk_producto.id }})"><i id="favpro_{{  product.fk_producto.id }}"  class="fa fa-2x fa-star"></i></button>
-            {% else %}
-                <button type="button" class="btn bg-transparent" onclick="clicFavorito({{ product.fk_producto.id }})"><i id="favpro_{{  product.fk_producto.id }}"  class="fa fa-2x fa-star-o"></i></button>
-            {% endif %}
-        </span>
-        {% endif %}
+
+
 
         <div class="input-group">
             <span class="input-group-btn clickable">
