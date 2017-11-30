@@ -6,7 +6,7 @@ from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -17,6 +17,7 @@ from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, g
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
+from django.http import JsonResponse
 
 
 class AbstractClienteLoggedView(View):
@@ -84,25 +85,42 @@ class Index(View):
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
         return render(request, 'Cliente/index.html', {
+            'productos_json': json.dumps([x.to_dict(request.user) for x in producto_catalogo]),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'solo_favoritos': False
         })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
-        producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
-            .order_by(ordenar_por)
+        favoritos = request.POST.get('favoritos', '')
+
+        cliente = None if self.request.user.is_anonymous \
+            else Cliente.objects.filter(fk_django_user=self.request.user).first()
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+
+        if (favoritos == ''):
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id, fk_catalogo=catalogo) \
+                .order_by(ordenar_por)
+        else:
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id, fk_catalogo=catalogo,
+                        fk_producto__favorito__fk_cliente=cliente) \
+                .order_by(ordenar_por)
+
         categorias = Categoria.objects.all()
         cooperativas = Cooperativa.objects.all()
 
         return render(request, 'Cliente/index.html', {
-            'productos_catalogo': producto_catalogo,
+            'productos_json': json.dumps([x.to_dict(request.user) for x in producto_catalogo]),
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'solo_favoritos': favoritos != ''
         })
 
 
@@ -131,8 +149,10 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
-        product_id = int(request.POST.get('product_id', '0'))
-        quantity = int(request.POST.get('quantity', '0'))
+
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', 0)
+        quantity = json_body.get('quantity', 0)
 
         if product_id > 0 and quantity != 0:
             request.session['cart'] = agregar_producto_carrito(
@@ -140,8 +160,9 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
                 product_id=product_id,
                 quantity=quantity
             )
-            messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
@@ -150,7 +171,8 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
-        product_id = int(request.POST.get('product-id', '-1'))
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', -1)
         if cart:
             items = cart.get('items', [])
             index = -1
@@ -165,7 +187,7 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
                 items.remove(items[index])
                 cart['items'] = items
                 request.session['cart'] = cart
-        return redirect(reverse('cliente:checkout'))
+        return JsonResponse(request.session['cart'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -366,3 +388,33 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+class AgregarProductoFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
+            exist = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id).exists()
+            if not exist:
+                favorito = Favorito(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id)
+                favorito.save()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class EliminarFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            user_id = request.user.id
+            favorito = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente__fk_django_user_id=user_id)
+            favorito.delete()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
