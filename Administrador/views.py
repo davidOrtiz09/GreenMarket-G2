@@ -13,7 +13,7 @@ from Administrador.models import MejoresClientes, ProductorDestacado
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
-from Administrador.utils import catalogo_actual, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
+from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
@@ -78,18 +78,19 @@ class CatalogoView(AbstractAdministradorLoggedView):
     def get(self, request, semana_id):
         info_catalogo = {}
         oferta_nueva = False
-        resp = catalogo_validaciones(semana_id)
+        resp = catalogo_validaciones(semana_id, request)
 
         if (resp['mensaje'] == ''):
             semana = resp['semana']
-
+            cooperativa = resp['cooperativa']
             # Se valida que no se haya creado ya un catalogo para la semana.
-            catalogo = Catalogo.objects.filter(fk_semana_id=semana_id).first()
+            catalogo = Catalogo.objects.filter(fk_semana_id=semana_id, fk_cooperativa_id=cooperativa['id']).first()
             if catalogo is None:
                 # Se obtienen las ofertas agrupadas por producto (cantidad, precio minimo y maximo)
-                # Solo se toman las ofertas aceptadas y correspondientes a la semana.
+                # Solo se toman las ofertas aceptadas y correspondientes a la semana y a la cooperativa del filtro global.
                 ofertas_pro = Oferta_Producto \
-                    .objects.filter(estado=1, fk_oferta__fk_semana_id=semana_id) \
+                    .objects.filter(estado=1, fk_oferta__fk_semana_id=semana_id
+                                    , fk_oferta__fk_productor__fk_cooperativa_id=cooperativa['id']) \
                     .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
                     .annotate(preMin=Min('precioProvedor'), preMax=Max('precioProvedor'),
                               canAceptada=Sum('cantidad_aceptada')) \
@@ -105,7 +106,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
                 info_catalogo.update({'ofertas_pro': ofertas_pro, 'subtitulo': subtitulo})
             else:
                 # Se muestra el catalogo ya creado.
-                info_catalogo = catalogo_actual()
+                info_catalogo = catalogo_semana(cooperativa['id'], semana_id)
         else:
             info_catalogo.update({'ofertas_pro': [], 'subtitulo': resp['mensaje']})
 
@@ -119,9 +120,12 @@ class CatalogoView(AbstractAdministradorLoggedView):
         # Se carga la información desde el JSON recibido donde viene el id del producto con su respectivo precio.
         precios_recibidos = json.loads(request.POST.get('precios_enviar'))
 
+        cooperativa_id = request.session.get('cooperativa')['id']
+
         # Se crea el catalogo
         fecha_cierre = datetime.date.today() + datetime.timedelta(days=3)
-        catalogo = Catalogo.objects.create(fk_semana_id=semana_id, fecha_cierre=fecha_cierre)
+        catalogo = Catalogo.objects.create(fk_semana_id=semana_id, fecha_cierre=fecha_cierre,
+                                           fk_cooperativa_id=cooperativa_id)
         catalogo.save()
 
         # Se agregan los  productos al catalogo
@@ -131,7 +135,7 @@ class CatalogoView(AbstractAdministradorLoggedView):
                                              precio=item['precio'])
 
         # Se carga la informacion del catalogo creado
-        info_catalogo = catalogo_actual()
+        info_catalogo = catalogo_semana(cooperativa_id, semana_id)
         subtitulo = "Catálogo creado correctamente!\r\n" + info_catalogo['subtitulo']
 
         return render(request, 'Administrador/catalogo.html', {
