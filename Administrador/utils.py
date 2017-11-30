@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from MarketPlace.models import Catalogo, Semana, Oferta_Producto
+from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto
 
 
 # Se obtiene el catalogo más reciente creado
@@ -51,3 +51,12 @@ def obtener_valor_compra(semana, id_producto):
         sumPrecios = sumPrecios + ofertaProd.precioProvedor
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
+
+def get_cooperativa_global(request):
+    cooperativa = request.session.get('cooperativa')
+    if (cooperativa is None):
+        cooperativa = Cooperativa.objects.first().to_json()
+    return cooperativa
+
+def get_id_cooperativa_global(request):
+    return(get_cooperativa_global(request)['id'])

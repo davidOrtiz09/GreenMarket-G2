@@ -310,6 +310,7 @@ class PedidoProducto(models.Model):
 
 @python_2_unicode_compatible
 class Canasta(models.Model):
+    fk_cooperativa = models.ForeignKey(Cooperativa, on_delete=models.CASCADE, verbose_name='Cooperativa', null=False, blank=False)
     fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)

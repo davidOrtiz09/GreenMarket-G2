@@ -13,7 +13,8 @@ from Administrador.models import MejoresClientes, ProductorDestacado
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
-from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
+from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida, \
+    get_id_cooperativa_global
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week
@@ -325,20 +326,23 @@ class PedidoClienteView(View):
 
 class Canastas(AbstractAdministradorLoggedView):
     def get(self, request):
-        canastas = Canasta.objects.filter(fk_semana=get_or_create_week())
+        canastas = Canasta.objects.filter(fk_semana=get_or_create_week(),
+                                          fk_cooperativa_id=get_id_cooperativa_global(request))
         return render(request, 'Administrador/canastas.html', {'canastas': canastas})
 
 
 class DetallesCanasta(AbstractAdministradorLoggedView):
     def get(self, request, id_canasta):
-        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
+        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week(),
+                                         fk_cooperativa_id=get_id_cooperativa_global(request)).first()
         if canasta:
             ids_productos_canasta = CanastaProducto.objects \
                 .filter(fk_canasta_id=canasta.id) \
                 .values_list('fk_producto_catalogo_id', flat=True)
 
             productos_disponibles = Catalogo_Producto.objects \
-                .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id) \
+                .filter(fk_catalogo__fk_semana_id=canasta.fk_semana_id,
+                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request)) \
                 .exclude(id__in=ids_productos_canasta) \
                 .distinct()
             return render(request, 'Administrador/detalles-canasta.html', {
@@ -375,7 +379,8 @@ class EliminarCanasta(AbstractAdministradorLoggedView):
     @atomic
     def post(self, request):
         id_canasta = request.POST.get('id_canasta', '0')
-        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week()).first()
+        canasta = Canasta.objects.filter(id=id_canasta, fk_semana=get_or_create_week(),
+                                         fk_cooperativa_id=get_id_cooperativa_global(request)).first()
         if canasta:
             canasta.delete()
             messages.add_message(request, messages.SUCCESS, 'La canasta fue eliminada')
@@ -392,7 +397,8 @@ class CrearCanasta(AbstractAdministradorLoggedView):
     def post(self, request):
         nombre = request.POST.get('nombre', '')
         imagen = request.FILES.get('imagen', None)
-        nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, imagen=imagen)
+        nueva = Canasta(fk_semana=get_or_create_week(), nombre=nombre, imagen=imagen,
+                        fk_cooperativa_id=get_id_cooperativa_global(request))
         nueva.save()
         messages.add_message(
             request, messages.SUCCESS,
@@ -404,7 +410,8 @@ class CrearCanasta(AbstractAdministradorLoggedView):
 class PublicarCanastas(AbstractAdministradorLoggedView):
     @atomic
     def post(self, request):
-        canastas = Canasta.objects.filter(fk_semana=get_or_create_week())
+        canastas = Canasta.objects.filter(fk_semana=get_or_create_week(),
+                                          fk_cooperativa_id=get_id_cooperativa_global(request))
         canastas.update(esta_publicada=True)
         messages.add_message(request, messages.SUCCESS, 'Las canastas fueron publicadas exitosamente')
         return redirect(reverse('administrador:canastas'))
