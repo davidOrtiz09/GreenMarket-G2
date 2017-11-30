@@ -55,7 +55,7 @@
 
                                 </select>
                             </div>
-                            {% if not cliente is None %}
+                            {% if request.user.is_authenticated %}
                                 <div class="col-auto">
                                     <label for="favoritos">Favoritos</label>
                                     <input name="favoritos" type="checkbox" id="favoritos" class="custom-checkbox" {% if solo_favoritos %}
