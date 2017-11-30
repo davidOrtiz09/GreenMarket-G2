@@ -440,5 +440,5 @@ class MejoresProductores(View):
                 'productor': prod_list,
                 'calificacion': promedio
             })
-        ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
-        return render(request, 'cliente/mejoresProductores.html', {'datos': ordenado})
+        productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
