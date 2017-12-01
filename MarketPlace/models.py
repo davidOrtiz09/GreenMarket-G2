@@ -313,7 +313,8 @@ class PedidoProducto(models.Model):
 class Canasta(models.Model):
     fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
-    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Precio con descuento', null=False, blank=False, default=Decimal('0.0'))
+    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagen', null=False, blank=False)
     esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False,
                                          blank=False)
 
@@ -329,11 +330,18 @@ class Canasta(models.Model):
         return '{0:.2f}'.format(self.precio)
 
     @property
-    def precio(self):
+    def precio_sin_descuento(self):
         precio = Decimal('0')
         for producto in self.productos:
             precio += Decimal(str(producto.fk_producto_catalogo.precio)) * producto.cantidad
         return precio
+
+    @property
+    def get_descuento(self):
+        if self.precio_sin_descuento <= 0:
+            return 0
+        descuento = (self.precio / self.precio_sin_descuento) * 100
+        return '{0:.0f}'.format(descuento)
 
     @property
     def get_estado(self):

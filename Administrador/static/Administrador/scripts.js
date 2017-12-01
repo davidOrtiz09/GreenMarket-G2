@@ -86,3 +86,26 @@ function TotalPagar() {
 function toCop(number){
     return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
 }
+
+function modificarCanastaProducto(selector_input, cantidad){
+    var input = $(selector_input);
+    var valorActual = parseInt(input.val());
+    var max = input.attr('max');
+    var nuevoValor = valorActual + cantidad;
+    if(nuevoValor >= 1 && nuevoValor <= max){
+        input.val(nuevoValor);
+    }
+
+}
+
+function modificarCanastaInput(selector_input, nuevoValor){
+    var input = $(selector_input);
+    var max = input.attr('max');
+    var intNuevoValor = parseInt(nuevoValor);
+    if(intNuevoValor < 1){
+        input.val(1);
+    }
+    if(intNuevoValor > max){
+        input.val(max);
+    }
+}

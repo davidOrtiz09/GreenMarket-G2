@@ -1,4 +1,5 @@
 {% load marketplace_filters %}
+{% load administrador_filters %}
 <div class="card producto-agregado">
     <div class="card-header">
         <div class="col text-right">
@@ -12,9 +13,19 @@
          alt="{{ canasta_producto.nombre_producto }}">
     <div class="card-body">
         <h4 class="card-title text-center">{{ canasta_producto.nombre_producto }}</h4>
+        <div class="row">
+            <div class="col">
+                <p class="card-text">
+                    $ {{ canasta_producto.precio_producto|to_cop }} / {{ canasta_producto.unidad_producto }}
+                </p>
+            </div>
+            <div class="col">
+                <p class="card-text">
+                    Disponibles: <b>{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo }}</b>
+                </p>
+            </div>
+        </div>
 
-        <p class="card-text">$ {{ canasta_producto.precio_producto|to_cop }}
-            / {{ canasta_producto.unidad_producto }}</p>
         <form method="post" action="{% url 'administrador:cambiar-cantidad-producto-canasta' %}">
             {% csrf_token %}
             <input name="id_producto_canasta" value="{{ canasta_producto.id }}" type="hidden" required>
@@ -23,16 +34,21 @@
                 <label class="col-5 col-form-label">Cantidad</label>
                 <div class="col-7">
                     <div class="input-group input-group-sm">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-danger product-minus">
-                        <i class="fa fa-minus-circle"></i>
-                    </button>
-                </span>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-danger product-minus"
+                                    onclick="modificarCanastaProducto('#canasta-producto-{{ canasta_producto.id }}', -1)">
+                                <i class="fa fa-minus-circle"></i>
+                            </button>
+                        </span>
                         <input name="cantidad" class="form-control product-quantity" type="number" min="1" step="1"
+                               onchange="modificarCanastaInput('#canasta-producto-{{ canasta_producto.id }}', this.value)"
+                               id="canasta-producto-{{ canasta_producto.id }}"
+                               max="{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo }}"
                                pattern="\d*"
                                value="{{ canasta_producto.cantidad }}">
                         <span class="input-group-btn">
-                        <button type="button" class="btn btn-success product-plus">
+                        <button type="button" class="btn btn-success product-plus"
+                                onclick="modificarCanastaProducto('#canasta-producto-{{ canasta_producto.id }}', 1)">
                             <i class="fa fa-plus-circle"></i>
                         </button>
                     </span>

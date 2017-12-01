@@ -90,3 +90,10 @@ def cantidad_disponible_producto_catalogo(producto_catalogo):
     for oferta_producto in ofertas_producto:
         response += oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
     return response
+
+
+def number_to_cop(number):
+    try:
+        return format(number, ',.0f')
+    except Exception as e:
+        return number

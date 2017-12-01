@@ -1,10 +1,19 @@
 {% load marketplace_filters %}
+{% load administrador_filters %}
 <div class="card producto-disponible">
     <img class="card-img-top img-fluid mx-auto d-block" src="{{ producto.fk_producto.imagen.url }}"
          alt="{{ producto.fk_producto.nombre }}">
     <div class="card-body">
         <h4 class="card-title text-center">{{ producto.fk_producto.nombre }}</h4>
-        <p class="card-text">$ {{ producto.precio|to_cop }} / {{ producto.fk_producto.unidad_medida }}</p>
+        <div class="row">
+            <div class="col">
+                <p class="card-text">$ {{ producto.precio|to_cop }} / {{ producto.fk_producto.unidad_medida }}</p>
+            </div>
+            <div class="col">
+                Disponibles: <b>{{ producto|get_cantidad_disponible_producto_catalogo }}</b>
+            </div>
+        </div>
+
         <div class="text-right">
             <form method="post" action="{% url 'administrador:agregar-producto-canasta' id_canasta=id_canasta %}">
                 {% csrf_token %}

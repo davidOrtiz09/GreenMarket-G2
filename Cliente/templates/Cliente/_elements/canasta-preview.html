@@ -9,20 +9,25 @@
             <h6>${{ canasta.precio|to_cop }}</h6>
         </div>
         <div class="col">
+            <h5 class="text-success text-right">-{{ canasta.get_descuento }}%</h5>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
             <button class="btn btn-outline-success" data-toggle="modal" data-target="#productos-canasta-{{ canasta.id }}">
                 Ver productos
             </button>
         </div>
-    </div>
-    <div class="text-center mt-2">
-        <form action="{% url 'cliente:agregar-canasta-carrito' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="id_canasta" value="{{ canasta.id }}">
-            <button class="btn btn-info">
-                <i class="fa fa-cart-plus"></i>
-                Añade estos productos
-            </button>
-        </form>
+        <div class="col">
+            <form action="{% url 'cliente:agregar-canasta-carrito' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="id_canasta" value="{{ canasta.id }}">
+                <button class="btn btn-info">
+                    <i class="fa fa-cart-plus"></i>
+                    Añadir
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -42,12 +47,16 @@
                 <ul>
                 {% for canasta_producto in canasta.productos %}
                     <li>
-                        {{ canasta_producto.cantidad }}
+                        <b>{{ canasta_producto.cantidad }}</b>
                         {{ canasta_producto.nombre_producto }}
                         ( ${{ canasta_producto.precio_producto|to_cop }} c/u )
                     </li>
                 {% endfor %}
                 </ul>
+                <p>
+                    Descuento:
+                    <b class="text-success">{{ canasta.get_descuento }}%</b>
+                </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
