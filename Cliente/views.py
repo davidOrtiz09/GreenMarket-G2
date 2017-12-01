@@ -89,7 +89,7 @@ class Index(View):
         for producto in producto_catalogo:
             cantidad_disponible = cantidad_disponible_producto_catalogo(producto)
             if cantidad_disponible > 0:
-                product_dict = producto.to_dict
+                product_dict = producto.to_dict(request.user)
                 product_dict['cantidad_disponible'] = cantidad_disponible
                 productos.append(product_dict)
 
