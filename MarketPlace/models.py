@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from decimal import Decimal
+from MarketPlace.templatetags.marketplace_filters import to_cop
 
 
 @python_2_unicode_compatible
@@ -57,11 +58,14 @@ class Orden_Compra(models.Model):
         ('CA', 'Cancelado')
 
     )
-    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False,auto_now_add=True)
-    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False,auto_now_add=True)
-    fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
+    fecha_pago = models.DateField(verbose_name='Fecha pago', null=False, blank=False, auto_now_add=True)
+    fecha_creacion = models.DateField(verbose_name='Fecha Creacion', null=False, blank=False, auto_now_add=True)
+    fk_productor = models.ForeignKey(Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False,
+                                     blank=False)
     estado = models.CharField(max_length=2, verbose_name='Estado', null=False, blank=False, choices=ESTADOS)
-    valor_total = models.DecimalField(verbose_name='Precio Total', null=False, blank=False, max_digits=10, decimal_places=2,default=0.0)
+    valor_total = models.DecimalField(verbose_name='Precio Total', null=False, blank=False, max_digits=10,
+                                      decimal_places=2, default=0.0)
+
     class Meta:
         verbose_name = 'Orden de Compra'
         verbose_name_plural = 'Ordenes de Compra'
@@ -79,6 +83,7 @@ class Categoria(models.Model):
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
+
 
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
@@ -147,7 +152,8 @@ class Oferta_Producto(models.Model):
     fecha_aceptacion = models.DateTimeField(verbose_name='Fecha de aceptación de la oferta', null=True, blank=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creacion de la oferta', null=True,
                                           blank=False)
-    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10, decimal_places=2)
+    precioProvedor = models.DecimalField(verbose_name='Precio del producto', null=False, blank=False, max_digits=10,
+                                         decimal_places=2)
     estado = models.SmallIntegerField(verbose_name='Estado de la oferta', null=False, blank=False, default=0)
 
     class Meta:
@@ -188,6 +194,28 @@ class Catalogo_Producto(models.Model):
     fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False,
                                     blank=False)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def to_dict(self, user):
+        es_favorito = False
+        if user and user.is_authenticated:
+            es_favorito = Favorito.objects\
+                .filter(fk_cliente__fk_django_user_id=user.id, fk_producto_id=self.fk_producto_id).exists()
+        return {
+            'id': self.id,
+            'id_producto': self.fk_producto_id,
+            'descripcion': self.fk_producto.descripcion,
+            'imagen': self.fk_producto.imagen.url if self.fk_producto.imagen else '',
+            'precio': float(self.precio),
+            'precio_cop': to_cop(float(self.precio)),
+            'nombre': self.fk_producto.nombre,
+            'unidad_medida': self.fk_producto.unidad_medida,
+            'categoria': {
+                'id': self.fk_producto.fk_categoria_id,
+                'nombre': self.fk_producto.fk_categoria.nombre
+            },
+            'cantidad_carrito': 0,
+            'es_favorito': es_favorito
+        }
 
     class Meta:
         verbose_name = 'Producto del Catalogo'
@@ -277,7 +305,8 @@ class PedidoProducto(models.Model):
     fk_oferta_producto = models.ForeignKey (Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
 
     def __str__(self):
-        return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad), producto=self.fk_catalogo_producto.fk_producto.nombre)
+        return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad),
+                                                 producto=self.fk_catalogo_producto.fk_producto.nombre)
 
 
 @python_2_unicode_compatible
@@ -285,7 +314,8 @@ class Canasta(models.Model):
     fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
     imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
-    esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False, blank=False)
+    esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False,
+                                         blank=False)
 
     def __str__(self):
         return self.nombre
@@ -317,7 +347,8 @@ class Canasta(models.Model):
 @python_2_unicode_compatible
 class CanastaProducto(models.Model):
     fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
-    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    fk_producto_catalogo = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE, verbose_name='Producto',
+                                             null=False, blank=False)
     cantidad = models.PositiveIntegerField(verbose_name='Cantidad', null=False, blank=False)
 
     @property
@@ -332,7 +363,6 @@ class CanastaProducto(models.Model):
     def unidad_producto(self):
         return self.fk_producto_catalogo.fk_producto.unidad_medida
 
-
     @property
     def imagen_producto(self):
         imagen = self.fk_producto_catalogo.fk_producto.imagen
@@ -344,7 +374,29 @@ class CanastaProducto(models.Model):
         unique_together = (('fk_canasta', 'fk_producto_catalogo'),)
 
     def __str__(self):
-        return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre, producto=self.fk_producto_catalogo.fk_producto)
+        return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre,
+                                                       producto=self.fk_producto_catalogo.fk_producto)
+
+
+class Favorito(models.Model):
+    fk_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente", null=False, blank=False)
+    fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto", null=False, blank=False)
+
+    @property
+    def nombre_producto(self):
+        return self.fk_producto.nombre
+
+    @property
+    def nombre_cliente(self):
+        return self.fk_cliente.fk_django_user.get_full_name()
+
+    class Meta:
+        verbose_name = 'Favorito'
+        verbose_name_plural = 'Favoritos'
+        unique_together = (('fk_cliente', 'fk_producto'),)
+
+    def __str__(self):
+        return 'Cliente {cliente} - {producto}'.format(cliente=self.nombre_cliente, producto=self.nombre_producto)
 
 
 class EvaluacionProducto(models.Model):

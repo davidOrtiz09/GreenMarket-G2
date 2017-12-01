@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^informes/seleccionSemanas', views.SeleccionSemanas.as_view(), name='informes/seleccionSemanas'),
     url(r'^informes/obtener_mejores_productos', views.ObtenerMejoresProductos.as_view(), name='informes/obtener_mejores_productos'),
     url(r'^informes/inventario', views.InventarioView.as_view(), name='informes/inventario'),
+    url(r'^informes/mejores-productores', views.InformesMejoresProductores.as_view(), name='informes/mejores-productores'),
     url(r'^clientes$', views.ClientesView.as_view(), name='clientes'),
     url(r'^clientes/(\d+)/$', views.PerfilClienteView.as_view(), name='perfil_cliente'),
     url(r'^historial-cliente$', views.HistorialClienteView.as_view(), name='historial-cliente'),
@@ -47,5 +48,8 @@ urlpatterns = [
     url(r'^generar-orden-pago-productores$', views.GenerarOrdenPagoProductores.as_view(), name='generar-orden-pago-productores'),
     url(r'^ordenes-pago-productor/(?P<id_productor>\d+)$', views.OrdenesPagoProductores.as_view(), name='ordenes-pago-productor'),
     url(r'^detalle-orden-pago/(?P<orden_compra_id>\d+)$', views.DetalleOrdenPago.as_view(), name='detalle-orden-pago'),
+
+    url(r'^cooperativas$', views.Cooperativas.as_view(), name='cooperativas'),
+    url(r'^cooperativas/crear$', views.CrearCooperativas.as_view(), name='crear-cooperativas'),
 
 ]

@@ -64,8 +64,10 @@
                     </li>
                     <li>
                         <a href="{% url 'cliente:checkout' %}" class="btn btn-info">
-                            <i class="fa fa-2x fa-shopping-cart"></i> <span
-                                class="badge badge-success">{{ request|count_cart_products }}</span>
+                            <i class="fa fa-2x fa-shopping-cart"></i>
+                            <span id="cart-preview-app" class="badge badge-success">
+                                [[ countItems() ]]
+                            </span>
                         </a>
                     </li>
                 {% endif %}

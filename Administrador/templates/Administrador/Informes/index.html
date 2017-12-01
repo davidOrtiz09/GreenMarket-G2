@@ -8,6 +8,7 @@
                  <option value="1">Clientes Más Rentables</option>
                  <option value="2">Mejores Productos</option>
                  <option value="3">Ver inventarios</option>
+                 <option value="4">Mejores Productores</option>
              </select>
             <main id="informe">
             </main>
@@ -27,6 +28,11 @@
                             }
                             else if(x === "3") {
                              $.get('{% url 'administrador:informes/inventario' %}', function(data, status){
+                               $('#informe').html(data)
+                                });
+                            }
+                            else if(x === "4") {
+                             $.get('{% url 'administrador:informes/mejores-productores' %}', function(data, status){
                                $('#informe').html(data)
                                 });
                             }

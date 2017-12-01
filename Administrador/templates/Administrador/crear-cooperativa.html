@@ -1,0 +1,50 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% block main %}
+    <section>
+        <form method="post" class="my-3" action="{% url 'administrador:crear-cooperativas' %}">
+            {% csrf_token %}
+        <div id="sectionAgregarProductor" class="container row">
+            <div class="col-md-2 col-sm-1"></div>
+            <div id="AgregarProductor" class="col-md-8 col-sm-11 row">
+                <div id="headerPopUp" class="col-md-12">
+                    <h2>Agregar una nueva Cooperativa</h2>
+                </div>
+
+                <div id="seccionDepartamento" class="col-md-12 row secciones">
+                    <strong class="col-md-6 col-sm-12">Departamento</strong>
+                    <select class="col-md-6 col-sm-12 form-control" id="selectDepartamento" name="departamento">
+                    </select>
+                </div>
+
+                <div id="seccionCiudad" class="col-md-12 row secciones">
+                    <strong class="col-md-6 col-sm-12">Ciudad</strong>
+                    <select class="col-md-6 col-sm-12 form-control" id="selectCiudad" name="ciudad">
+                    </select>
+                </div>
+
+                <div id="seccionNombre" class="col-md-12 row secciones">
+                    <strong class="col-md-6 col-sm-12">Nombre</strong>
+                    <input type="text" id="inputNombre" class="col-md-6 col-sm-12 form-control" name="nombre">
+                </div>
+
+                <div id="seccionAgregarProductor" class="col-md-12 row secciones" style="margin-top: 40px;">
+                    <div class="col-md-3 col-sm-1"></div>
+                    <button  type="submit" class="col-md-6 col-sm-11 btn btn-primary">Agregar Productor</button>
+                    <div class="col-md-3 col-sm-1"></div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-1"></div>
+        </div>
+        <div id="sectionLoading">
+            <img id="loadingIcon" src="{% static  '/images/loading.gif' %}">
+        </div>
+        </form>
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/productores/js/productores.js' %}"></script>
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+{% endblock %}
