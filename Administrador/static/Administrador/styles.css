@@ -120,4 +120,11 @@ td.encabezado{
     margin-right: auto;
 
 }
+
+.btn span.fa {
+	opacity: 0;
+}
+.btn.active span.fa {
+	opacity: 1;
+}
 /* Fin seccion estilos crear-Productor  */
