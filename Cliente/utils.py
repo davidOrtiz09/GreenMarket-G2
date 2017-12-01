@@ -1,10 +1,11 @@
 from MarketPlace.models import Catalogo_Producto
-from MarketPlace.utils import cantidad_disponible_producto_catalogo
+from MarketPlace.utils import cantidad_disponible_producto_catalogo, get_or_create_week
 
 
 def agregar_producto_carrito(request, product_id, quantity):
-    product = Catalogo_Producto.objects.get(id=product_id)
-    cantidad_disponible = cantidad_disponible_producto_catalogo(product)
+    product = Catalogo_Producto.objects.get(fk_producto_id=product_id,fk_catalogo__fk_cooperativa_id = 1,
+                                            fk_catalogo__fk_semana=get_or_create_week())
+    cantidad_disponible = cantidad_disponible_producto_catalogo(product, 1)
     cart = request.session.get('cart', None)
     if not cart:
         cart = {
