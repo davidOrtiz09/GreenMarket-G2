@@ -79,12 +79,24 @@ def get_or_create_prev_week():
         return nueva
 
 
-def cantidad_disponible_producto_catalogo(producto_catalogo):
+def cantidad_disponible_producto_catalogo(producto_catalogo, cooperativa_id):
     response = 0
     ofertas_producto = Oferta_Producto.objects.filter(
         fk_producto_id=producto_catalogo.fk_producto_id,
-        fk_oferta__fk_semana_id=get_or_create_prev_week().id
+        fk_oferta__fk_semana_id=get_or_create_week().id,
+        fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id
     )
     for oferta_producto in ofertas_producto:
         response += oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
     return response
+
+def formatear_lista_productos(productos_catalogo, request ,cooperativa_id):
+    productos = []
+    for producto in productos_catalogo:
+        cantidad_disponible = cantidad_disponible_producto_catalogo(producto, cooperativa_id)
+        if cantidad_disponible > 0:
+            product_dict = producto.to_dict(request.user)
+            product_dict['cantidad_disponible'] = cantidad_disponible
+            productos.append(product_dict)
+
+    return productos
