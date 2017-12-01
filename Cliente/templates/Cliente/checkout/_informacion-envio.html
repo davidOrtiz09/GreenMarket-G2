@@ -1,55 +1,61 @@
 <div id="formulario-informacion-envio">
     <div class="form-group">
+        <div id="nombre-error"></div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="fa fa-user mr-2" aria-hidden="true"></i>
                 Nombre
             </span>
-            <input name="nombre" type="text" class="form-control" placeholder="Nombre *" required>
+            <input v-model="envio.nombre" name="nombre" type="text" class="form-control" placeholder="Nombre *" data-error="#nombre-error" required>
         </div>
     </div>
 
     <div class="form-group">
+        <div id="email-error"></div>
         <div class="input-group">
-                 <span class="input-group-addon">
-                     <i class="fa fa-envelope-o mr-2" aria-hidden="true"></i>
-                     Correo
-                 </span>
-            <input name="email" type="email" class="form-control" placeholder="Correo electrónico *" required>
+             <span class="input-group-addon">
+                 <i class="fa fa-envelope-o mr-2" aria-hidden="true"></i>
+                 Correo
+             </span>
+            <input v-model="envio.email" name="email" type="email" class="form-control" placeholder="Correo electrónico *" data-error="#email-error" required>
         </div>
     </div>
 
     <div class="form-group">
+        <div id="direccion-error"></div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="fa fa-home mr-2" aria-hidden="true"></i>
                 Dirección
             </span>
-            <input name="direccion" type="text" class="form-control" placeholder="Dirección de entrega *" required>
+            <input v-model="envio.direccion" name="direccion" type="text" class="form-control" placeholder="Dirección de entrega *" data-error="#direccion-error" required>
         </div>
     </div>
 
     <div class="form-group">
+        <div id="celular-error"></div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="fa fa-mobile fa-lg mr-2" aria-hidden="true"></i>
                 Celular
             </span>
-            <input name="celular" type="tel" class="form-control" placeholder="Celular *" required>
+            <input v-model="envio.celular" name="celular" type="tel" class="form-control" placeholder="Celular *" data-error="#celular-error" required>
         </div>
     </div>
 
     <div class="form-group">
+        <div id="telefono-error"></div>
         <div class="input-group">
             <span class="input-group-addon">
                 <i class="fa fa-phone mr-2" aria-hidden="true"></i>
                 Tel. Fijo
             </span>
-            <input name="telefono" type="tel" class="form-control" placeholder="Teléfono fijo">
+            <input v-model="envio.telefono" name="telefono" type="tel" class="form-control" placeholder="Teléfono fijo" data-error="#telefono-error">
         </div>
     </div>
 
     <div class="form-group">
-        <textarea name="observaciones" class="form-control" rows="6" placeholder="Observaciones adicionales"></textarea>
+        <div id="observaciones-error"></div>
+        <textarea v-model="envio.observaciones" name="observaciones" class="form-control" rows="6" placeholder="Observaciones adicionales" data-error="#observaciones-error"></textarea>
     </div>
 </div>

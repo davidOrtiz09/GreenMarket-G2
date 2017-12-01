@@ -8,17 +8,18 @@ from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Productor, EvaluacionProducto, Producto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, cantidad_disponible_producto_catalogo
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
+from django.http import JsonResponse
 
 
 class AbstractClienteLoggedView(View):
@@ -85,10 +86,20 @@ class Index(View):
             .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
             .order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
+
+        productos = []
+        for producto in producto_catalogo:
+            cantidad_disponible = cantidad_disponible_producto_catalogo(producto)
+            if cantidad_disponible > 0:
+                product_dict = producto.to_dict(request.user)
+                product_dict['cantidad_disponible'] = cantidad_disponible
+                productos.append(product_dict)
+
         return render(request, 'Cliente/index.html', {
+            'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
         })
 
     def post(self, request):
@@ -133,8 +144,10 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
-        product_id = int(request.POST.get('product_id', '0'))
-        quantity = int(request.POST.get('quantity', '0'))
+
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', 0)
+        quantity = json_body.get('quantity', 0)
 
         if product_id > 0 and quantity != 0:
             request.session['cart'] = agregar_producto_carrito(
@@ -142,8 +155,9 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
                 product_id=product_id,
                 quantity=quantity
             )
-            messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
@@ -152,7 +166,8 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
-        product_id = int(request.POST.get('product-id', '-1'))
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', -1)
         if cart:
             items = cart.get('items', [])
             index = -1
@@ -167,7 +182,7 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
                 items.remove(items[index])
                 cart['items'] = items
                 request.session['cart'] = cart
-        return redirect(reverse('cliente:checkout'))
+        return JsonResponse(request.session['cart'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -325,7 +340,7 @@ class DoPayment(AbstractClienteLoggedView):
         savepoint_commit(checkpoint)
 
         request.session['cartCompra'] = request.session['cart']
-        request.session['cart']=""
+        request.session['cart'] = ""
         return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
                       {'compra': True})
 
@@ -368,6 +383,36 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+class AgregarProductoFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
+            exist = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id).exists()
+            if not exist:
+                favorito = Favorito(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id)
+                favorito.save()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class EliminarFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            user_id = request.user.id
+            favorito = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente__fk_django_user_id=user_id)
+            favorito.delete()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
 
 
 class DetalleMisPedidoView(AbstractClienteLoggedView):
@@ -415,6 +460,7 @@ class CalificarMisPedidoView(AbstractClienteLoggedView):
             'pedido': pedido
         })
 
+
 class InsertCalificacionProductoVew(AbstractClienteLoggedView):
     def post(self, request, pedido_producto, productor,id_pedido):
         productor = Productor.objects.filter(id=productor).first()
@@ -427,7 +473,6 @@ class InsertCalificacionProductoVew(AbstractClienteLoggedView):
                 'La calificacion fue guardada exitosamente'
             )
         return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
-
 
 
 class MejoresProductores(View):
