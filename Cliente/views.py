@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
+from operator import itemgetter
+from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
@@ -425,3 +427,25 @@ class InsertCalificacionProductoVew(AbstractClienteLoggedView):
                 'La calificacion fue guardada exitosamente'
             )
         return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
+
+
+
+class MejoresProductores(View):
+    def get(self, request):
+        productores_list = Productor.objects.all()
+        respuesta = []
+        promedio = 0.0
+        if len(productores_list) != 0:
+            for prod_list in productores_list:
+                promedio= calcular_promedio(prod_list)
+                respuesta.append({
+                    'productor': prod_list,
+                    'calificacion': "{0:.4f}".format(promedio)
+                })
+            productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        else:
+            messages.add_message(
+                request, messages.SUCCESS,
+                'No se encontraron productores'
+            )
+        return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
