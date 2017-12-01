@@ -280,7 +280,8 @@ class ObtenerMejoresProductos(View):
     def post(self, request):
         semanas = request.POST.getlist('semana', [])
         respuesta = []
-        catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas)
+        catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas,
+                                                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request))
         for pro in catalogoProd:
             valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
