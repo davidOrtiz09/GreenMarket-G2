@@ -686,3 +686,15 @@ class InformesMejoresProductores(View):
         return render(request, 'Administrador/Informes/productores_destacados.html', {
             'productores_destacados': productores_ordenados
         })
+
+class ConsultarProductosSugerir(View):
+    def get(self, request):
+        semana = Semana.objects.last()
+        oferta_producto = Oferta_Producto.objects \
+            .distinct('fk_producto')
+
+        # oferta_producto = Oferta_Producto.objects.filter(fk_oferta__fk_semana=semana) \
+        #     .distinct('fk_producto')
+
+        return render(request, 'Administrador/sugerir-productos.html',
+                      {'oferta_producto': oferta_producto})
