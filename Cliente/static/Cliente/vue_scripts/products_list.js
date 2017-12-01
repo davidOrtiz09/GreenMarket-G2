@@ -18,7 +18,14 @@ var listaProductosApp = new Vue({
             $("#sectionPopUpDescripcion" + producto.id).toggle();
         },
         incrementarCantidadCarrito: function (producto) {
-            producto.cantidad_carrito += 1;
+            var cantidadPrevia = producto.cantidad_carrito;
+            if(cantidadPrevia < producto.cantidad_disponible){
+                producto.cantidad_carrito += 1;
+            }
+            else{
+                producto.cantidad_carrito = producto.cantidad_disponible;
+            }
+
         },
         disminuirCantidadCarrito: function (producto) {
             var cantidadPrevia = producto.cantidad_carrito;
@@ -26,10 +33,13 @@ var listaProductosApp = new Vue({
                 producto.cantidad_carrito -= 1;
             }
         },
-        cambioCantidadCarrito: function (event) {
+        cambioCantidadCarrito: function (event, producto) {
             var value = event.target.value;
             if (value < 0 || value === '') {
                 event.target.value = 0;
+            }
+            else if(value > producto.cantidad_disponible){
+                event.target.value = producto.cantidad_disponible;
             }
         },
         agregarFavorito: function(producto){

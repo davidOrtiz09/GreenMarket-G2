@@ -1,0 +1,65 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Detalle de mi Pedido</h1>
+                    <br/>
+                    <form method="post" action="{% url 'administrador:actualizar-estado-pedido' %}">
+                        {% csrf_token %}
+                        <div class="container-fluid">
+                            <table id="detallePedidoTable" class="table dataTable" cellspacing="2"
+                                   width="100%"
+                                   border="1" align="center">
+                                <thead>
+                                <th colspan="8" bgcolor="#228b22" class="text-white text-center">Detelle Pedido</th>
+                                <tr bgcolor="#deb887">
+                                    <th class="text-center">Categoría</th>
+                                    <th class="text-center">Imagen del producto</th>
+                                    <th class="text-center">Descripción del producto</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">Unidad de medida</th>
+                                    <th class="text-center">Valor unitario</th>
+                                    <th class="text-center">Valor</th>
+                                    <th class="text-center">Calificar<br>Producto</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for detalle in detalle_pedido %}
+                                    <tr>
+                                        <td class="text-center">{{ detalle.categoria }}</td>
+                                        <td class="text-center">
+                                            <img src="{{ detalle.producto.fk_catalogo_producto.fk_producto.imagen.url }}"
+                                                 class="img-responsive center-block"
+                                                 style="max-height: 200px; max-width: 200px">
+                                        </td>
+                                        <td class="text-center">{{ detalle.producto.fk_catalogo_producto.fk_producto.nombre }}</td>
+                                        <td class="text-center">{{ detalle.producto.cantidad }}</td>
+                                        <td class="text-center">{{ detalle.producto.fk_catalogo_producto.fk_producto.unidad_medida }}</td>
+                                        <td class="text-center">
+                                            $ {{ detalle.producto.fk_catalogo_producto.precio }}</td>
+                                        <td class="text-center">$ {{ detalle.valor }}</td>
+                                        <td class="text-center" disabled>
+                                            <input  type="button" {{ disable }} {{ detalle.disable_button_producto }} type="submit" class="btn btn-primary" value="Calificar" onclick="location.href='{% url 'cliente:calificar-mis-pedidos' fk_pedido_producto=detalle.producto.id fk_productor=detalle.producto.fk_oferta_producto.fk_oferta.fk_productor_id producto=detalle.producto.fk_catalogo_producto.fk_producto.id pedido=pedido.id %}';"/>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td class="text-center" colspan="6">Valor Total</td>
+                                    <td class="text-center" colspan="2">$ {{ pedido.valor_total }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

@@ -10,60 +10,64 @@
         </div>
         <div class="img-wrapper">
             <a href="#" style="cursor: pointer;">
-                <img v-bind:id="'product-image-index-' + producto.id" v-bind:alt="producto.nombre"
-                     v-on:click="verDetalleCarrito(producto)" v-bind:src="producto.imagen"
+                <img :id="'product-image-index-' + producto.id" :alt="producto.nombre"
+                     @click="verDetalleCarrito(producto)" :src="producto.imagen"
                      class="img-responsive center-block product-preview">
             </a>
 
-            <div class="option" style="cursor: pointer;" v-on:click="verDetalleCarrito(producto)">
+            <div class="option" style="cursor: pointer;" @click="verDetalleCarrito(producto)">
                 <a title="" data-original-title="Descripcion">
                     [[ producto.descripcion ]]
                 </a>
             </div>
         </div>
         <h5>
-            <a v-bind:id="'product-name-index-'+[[ producto.id ]]" class="link" style="cursor: pointer;"
-               v-on:click="verDetalleCarrito(producto)">[[ producto.nombre ]]</a>
+            <a :id="'product-name-index-'+[[ producto.id ]]" class="link" style="cursor: pointer;"
+               @click="verDetalleCarrito(producto)">[[ producto.nombre ]]</a>
         </h5>
-        <div class="price">
-            <h6 v-bind:id="'product-price-index-'+producto.id">
-                $[[ producto.precio_cop ]] [[ producto.unidad_medida ]]
-            </h6>
+        <div class="row">
+            <div class="col">
+                 <div class="price">
+                    <h6 :id="'product-price-index-'+producto.id">
+                        $[[ producto.precio_cop ]] / [[ producto.unidad_medida ]]
+                    </h6>
+                </div>
+            </div>
+            <div class="col">
+                <p>Disponibles: <b>[[ producto.cantidad_disponible ]]</b></p>
+            </div>
         </div>
-
-
-
 
         <div class="input-group">
             <span class="input-group-btn clickable">
-                <button v-on:click="disminuirCantidadCarrito(producto)" v-bind:disabled="producto.cantidad_carrito == 0" type="button" class="btn btn-danger">
+                <button @click="disminuirCantidadCarrito(producto)" :disabled="producto.cantidad_carrito == 0" type="button" class="btn btn-danger">
                     <i class="fa fa-2x fa-minus-circle"></i>
                 </button>
             </span>
-            <input name="quantity" class="form-control" v-on:change="cambioCantidadCarrito" v-model="producto.cantidad_carrito" type="number" min="0" step="1"
+            <input name="quantity" class="form-control" @change="cambioCantidadCarrito($event, producto)" v-model="producto.cantidad_carrito" type="number" min="0" step="1"
                    pattern="\d*">
             <span class="input-group-btn clickable">
-                <button v-on:click="incrementarCantidadCarrito(producto)" type="button" class="btn btn-success">
+                <button @click="incrementarCantidadCarrito(producto)" type="button" class="btn btn-success" :disabled="producto.cantidad_carrito >= producto.cantidad_disponible">
                     <i class="fa fa-2x fa-plus-circle"></i>
                 </button>
             </span>
             <span class="input-group-btn clickable">
-                <button v-on:click="agregarAlCarrito(producto)" class="btn btn-link add-to-cart" data-toggle="modal" v-bind:disabled="producto.cantidad_carrito < 1">
+                <button @click="agregarAlCarrito(producto)" class="btn btn-link add-to-cart" data-toggle="modal" :disabled="producto.cantidad_carrito < 1">
                     <i class="fa fa-2x fa-cart-plus"></i>
                 </button>
             </span>
         </div>
-        <div v-bind:id="'sectionPopUpDescripcion'+[[ producto.id ]]" class="sectionPopUpDescripcion">
+        <div :id="'sectionPopUpDescripcion'+[[ producto.id ]]" class="sectionPopUpDescripcion">
             <div class="popUpDescripcionProducto container">
                 <div class="headerPopUpDescripcion row">
-                    <h5 v-bind:id="'product-name-popup-'+[[ producto.id ]]"
+                    <h5 :id="'product-name-popup-'+[[ producto.id ]]"
                         style="font-weight: bold;margin-top: 5px;margin-left: 30px;">[[ producto.nombre ]]</h5>
-                    <a v-on:click="verDetalleCarrito(producto)"
+                    <a @click="verDetalleCarrito(producto)"
                        class="cerrarPopUpDetalleProducto close-btn popup-close">x</a>
                 </div>
                 <div class="bodyPopUpDescripcion row">
                     <div class="sectionImage col-md-4 col-sm-6">
-                        <img class="imagenDescripcionProducto" v-bind:src="[[ producto.imagen ]]">
+                        <img class="imagenDescripcionProducto" :src="[[ producto.imagen ]]">
                     </div>
                     <div class="contentPopUp col-md-8 col-sm-6">
                         <div class="list-group">
@@ -71,50 +75,51 @@
                                style="padding: 5px 15px;">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1" style="font-weight: bold;">Categoria</h6>
-                                    <small></small>
                                 </div>
                                 <p class="mb-1">[[ producto.categoria.nombre ]]</p>
-                                <small></small>
                             </a>
                             <a class="list-group-item list-group-item-action flex-column align-items-start"
                                style="padding: 5px 15px;">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1" style="font-weight: bold;">Descripción</h6>
-                                    <small></small>
                                 </div>
-                                <p v-bind:id="'description-popup-'+[[ producto.id ]]"
+                                <p :id="'description-popup-'+[[ producto.id ]]"
                                    class="mb-1">[[ producto.descripcion ]]</p>
-                                <small></small>
                             </a>
                             <a class="list-group-item list-group-item-action flex-column align-items-start"
                                style="padding: 5px 15px;">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1" style="font-weight: bold;">Precio</h6>
-                                    <small></small>
                                 </div>
-                                <p v-bind:id="'product-price-popup-'+[[ producto.id ]]" class="mb-1">
+                                <p :id="'product-price-popup-'+[[ producto.id ]]" class="mb-1">
                                     $[[ producto.precio_cop ]] [[ producto.unidad_medida ]]</p>
-                                <small></small>
+                            </a>
+                            <a class="list-group-item list-group-item-action flex-column align-items-start"
+                               style="padding: 5px 15px;">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1" style="font-weight: bold;">Cantidad disponible</h6>
+                                </div>
+                                <p class="mb-1">[[ producto.cantidad_disponible ]]</p>
                             </a>
                         </div>
                         <form method="post" action="{% url 'cliente:actualizar-carrito-compras' %}"
                               style="margin: 15px 0px; " class="form-inline">
                             {% csrf_token %}
-                            <input type="hidden" name="product_id" v-bind:value="producto.id">
+                            <input type="hidden" name="product_id" :value="producto.id">
                             <div class="input-group">
                                 <span class="input-group-btn clickable">
-                                    <button v-on:click="disminuirCantidadCarrito(producto)" v-bind:disabled="producto.cantidad_carrito == 0" type="button" class="btn btn-danger">
+                                    <button @click="disminuirCantidadCarrito(producto)" :disabled="producto.cantidad_carrito == 0" type="button" class="btn btn-danger">
                                         <i class="fa fa-2x fa-minus-circle"></i>
                                     </button>
                                 </span>
-                                <input name="quantity" class="form-control" v-on:change="cambioCantidadCarrito" v-model="producto.cantidad_carrito" type="number" min="0" step="1" pattern="\d*">
+                                <input name="quantity" class="form-control" @change="cambioCantidadCarrito($event, producto)" v-model="producto.cantidad_carrito" type="number" min="0" :max="producto.cantidad_disponible" step="1" pattern="\d*">
                                 <span class="input-group-btn clickable">
-                                    <button v-on:click="incrementarCantidadCarrito(producto)" type="button" class="btn btn-success">
+                                    <button @click="incrementarCantidadCarrito(producto)" type="button" class="btn btn-success" :disabled="producto.cantidad_carrito >= producto.cantidad_disponible">
                                         <i class="fa fa-2x fa-plus-circle"></i>
                                     </button>
                                 </span>
                                 <span class="input-group-btn clickable">
-                                    <button class="btn btn-link add-to-cart" data-toggle="modal" v-bind:disabled="producto.cantidad_carrito < 1">
+                                    <button class="btn btn-link add-to-cart" data-toggle="modal" :disabled="producto.cantidad_carrito < 1">
                                         <i class="fa fa-2x fa-cart-plus"></i>
                                     </button>
                                 </span>

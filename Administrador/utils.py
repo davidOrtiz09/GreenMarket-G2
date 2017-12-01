@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto
+from MarketPlace.models import Catalogo, Semana, Cooperativa, Oferta_Producto, EvaluacionProducto
 
 
 # Se obtiene el catalogo más reciente creado
@@ -60,3 +60,19 @@ def get_cooperativa_global(request):
 
 def get_id_cooperativa_global(request):
     return(get_cooperativa_global(request)['id'])
+
+def calcular_promedio(prod_list):
+    calificacion_list = EvaluacionProducto.objects.filter(fk_productor=prod_list)
+    promedio = 0.0
+    if len(calificacion_list) != 0:
+        calificacion_sum = 0.0
+        conteo= 0.0
+        for calif_list in calificacion_list:
+            calificacion= float(calif_list.calificacion)
+            calificacion_sum = calificacion_sum + calificacion
+            conteo += 1
+        promedio = calificacion_sum / conteo
+    else:
+        promedio=0.0
+    return promedio
+

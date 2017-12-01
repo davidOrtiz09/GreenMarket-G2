@@ -1,0 +1,44 @@
+{% extends 'MarketPlace/_common/base.html' %}
+{% block main %}
+    <section>
+        <div class="container-fluid" style="margin-top: 10px" align="center">
+        <br>
+        <br>
+        <br>
+            <h1 class="text-center"> Mejores Productores </h1>
+            <br/>
+            <form >
+                <div>
+                    <table id="mejoresProdcutores" class="table dataTable" cellspacing="2"
+                                   width="100%"
+                                   border="1" align="center">
+                                <thead>
+                                <th colspan="3" bgcolor="#228b22" class="text-white text-center">Ranking de los productores según la calificación de los clientes</th>
+                                <tr bgcolor="#deb887">
+                                    <th class="text-center">Productor</th>
+                                    <th class="text-center">Cooperativa</th>
+                                    <th class="text-center">Calificación</th>
+                                </tr>
+                                </thead>
+                                {% for mejProd in datos %}
+                            <tr>
+                                <td class="text-center">
+                                    {{ mejProd.productor.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.productor.fk_cooperativa.nombre }}
+                                </td>
+                                <td class="text-center">
+                                    {{ mejProd.calificacion }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                <br>
+                <br>
+                <br>
+                </div>
+            </form>
+        </div>
+    </section>
+{% endblock %}

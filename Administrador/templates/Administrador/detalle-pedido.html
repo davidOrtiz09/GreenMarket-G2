@@ -13,7 +13,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="id_pedido" value="{{ id_pedido }}">
                         <div class="container-fluid">
-                            <table id="detallePedidoTable" class="table dataTable table-primary" cellspacing="2"
+                            <table id="detallePedidoTable" class="table dataTable" cellspacing="2"
                                    width="100%"
                                    border="1" align="center">
                                 <thead>
@@ -28,7 +28,7 @@
                                 <tbody>
                                 {% for detalle in detalle_pedido %}
                                     <tr>
-                                        <td>
+                                        <td class="text-center">
                                             <img src="{{ detalle.fk_catalogo_producto.fk_producto.imagen.url }}"
                                                  class="img-responsive center-block" style="max-height: 200px; max-width: 200px">
                                         </td>

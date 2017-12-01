@@ -3,17 +3,19 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
+from operator import itemgetter
+from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, cantidad_disponible_producto_catalogo
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
@@ -87,8 +89,17 @@ class Index(View):
 
         categorias = Categoria.objects.all()
 
+
+        productos = []
+        for producto in producto_catalogo:
+            cantidad_disponible = cantidad_disponible_producto_catalogo(producto)
+            if cantidad_disponible > 0:
+                product_dict = producto.to_dict(request.user)
+                product_dict['cantidad_disponible'] = cantidad_disponible
+                productos.append(product_dict)
+
         return render(request, 'Cliente/index.html', {
-            'productos_json': json.dumps([x.to_dict(request.user) for x in producto_catalogo]),
+            'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
@@ -348,7 +359,7 @@ class DoPayment(AbstractClienteLoggedView):
         savepoint_commit(checkpoint)
 
         request.session['cartCompra'] = request.session['cart']
-        request.session['cart']=""
+        request.session['cart'] = ""
         return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
                       {'compra': True})
 
@@ -421,3 +432,82 @@ class EliminarFavoritoView(AbstractClienteLoggedView):
             return JsonResponse({"Mensaje": "OK"})
         except:
             return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class DetalleMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, id_pedido):
+        pedido = Pedido.objects.get(id=id_pedido)
+        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido_id=id_pedido)
+        lista_productos=[]
+        for detPed in detalle_mi_pedido:
+            productoPedido=detPed
+            valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
+            categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto_id=productoPedido.id)
+            if len(evalProducto) == 0:
+                disable_button_producto = ''
+            else:
+                disable_button_producto = 'disabled'
+            lista_productos.append({
+                'categoria': categoria,
+                'producto': productoPedido,
+                'valor': valor,
+                'disable_button_producto': disable_button_producto
+            })
+        if pedido.estado != 'EN':
+            disable_button = 'disabled'
+        else:
+            disable_button = ''
+
+
+        return render(request, 'Cliente/detalle-mis-pedidos.html', {
+            'detalle_pedido': lista_productos,
+            'pedido' : pedido,
+            'disable' : disable_button
+        })
+
+
+class CalificarMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, fk_pedido_producto, fk_productor, producto, pedido):
+        productoSelected= Producto.objects.filter(id=producto).first
+        return render(request, 'Cliente/calificar-mis-pedidos.html', {
+            'producto': productoSelected,
+            'fk_pedido_producto': fk_pedido_producto,
+            'fk_productor': fk_productor,
+            'pedido': pedido
+        })
+
+
+class InsertCalificacionProductoVew(AbstractClienteLoggedView):
+    def post(self, request, pedido_producto, productor,id_pedido):
+        productor = Productor.objects.filter(id=productor).first()
+        pedidoProducto = PedidoProducto.objects.filter(id=pedido_producto).first()
+        ValorCalificacion = request.POST.get('calificacion', '')
+        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto, calificacion=ValorCalificacion)
+        evaluacion.save()
+        messages.add_message(
+            request, messages.SUCCESS,
+                'La calificacion fue guardada exitosamente'
+            )
+        return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
+
+
+class MejoresProductores(View):
+    def get(self, request):
+        productores_list = Productor.objects.all()
+        respuesta = []
+        promedio = 0.0
+        if len(productores_list) != 0:
+            for prod_list in productores_list:
+                promedio= calcular_promedio(prod_list)
+                respuesta.append({
+                    'productor': prod_list,
+                    'calificacion': "{0:.4f}".format(promedio)
+                })
+            productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        else:
+            messages.add_message(
+                request, messages.SUCCESS,
+                'No se encontraron productores'
+            )
+        return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
