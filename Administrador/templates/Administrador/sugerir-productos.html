@@ -1,0 +1,165 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Sugerir Productos al Cliente</h1>
+                    <br/>
+                    <br>
+                    <div class="col-12">
+                        <form method="post" action="{% url 'administrador:crear-canasta' %}"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <div class="well well-sm text-center">
+                                    <label>
+                                        Sugeridos Actuales:
+                                    </label>
+                                    <div class="btn-group" data-toggle="buttons">
+                                        <label class="btn btn-success active">
+                                            <input type="radio" name="options" id="option2" autocomplete="off" chacked>
+                                            <span class="fa fa-check-circle"></span>Conservar
+                                        </label>
+                                        <label class="btn btn-success">
+                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                            <span class="fa fa-check-circle"></span>Reemplazar
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="well well-sm text-center">
+                                    <label>
+                                        Sugerir a :
+                                    </label>
+                                    <div class="btn-group" data-toggle="buttons">
+                                        <label class="btn btn-success active">
+                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                            <span class="fa fa-check-circle"></span>Compradores Opcionados
+                                        </label>
+                                        <label class="btn btn-success">
+                                            <input type="radio" name="options" id="option2" autocomplete="off" chacked>
+                                            <span class="fa fa-check-circle"></span>Todos Los Usuarios
+                                        </label>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                    <label>Número de Usuarios Producto</label>
+                                    <div class="col-8 col-sm-2">
+                                        <input name="nombre" type="text" class="form-control" value="10" required>
+                                    </div>
+
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="container-fluid" id="orden-Pago-detalle">
+                        <table id="SugerirProductoTable" class="table dataTable" cellspacing="2"
+                               width="100%"
+                               border="1" align="center">
+                            <thead>
+                            <th colspan="6" bgcolor="#228b22" class="text-white text-center">Seleccione los productos
+                                que desea Sugerir
+                            </th>
+                            <tr bgcolor="#deb887">
+                                <th class="text-center">Imagen del producto</th>
+                                <th class="text-center">Nombre</th>
+                                <th class="text-center">Cantidad Ofertada</th>
+                                <th class="text-center">Unidad de medida</th>
+                                <th class="text-center">Valor Total</th>
+                                <th class="text-center">Sugerir</th>
+                            </tr>
+                            </thead>
+                            <tbody onload="actualizarTotalPagar();">
+                            <input class="productor-id" type="hidden" value="{{ productor.id }}" readonly disabled></td>
+                            {% for oferta in oferta_producto %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <tr class="sugerir-producto-tr">
+                                        <td>
+                                            <img src="{{ oferta.fk_producto.imagen.url }}"
+                                                 style="width:100px;height:100px;">
+                                        </td>
+                                        <td class="text-center">{{ oferta.fk_producto.nombre }}
+                                        <td class="text-center">{{ oferta.cantidad_ofertada }}</td>
+                                        <td class="text-center">{{ oferta.fk_producto.unidad_medida }}</td>
+                                        <td class="text-center">
+                                            ${{ oferta.precioProvedor }}
+                                        </td>
+                                        <td>
+                                            {#                                            <input class="oferta-producto-id" type="hidden" value="{{ oferta.id }}"#}
+                                            {#                                                   readonly disabled>#}
+                                            {#                                            <input class="check-pago change-check" type="radio" name="pagar" value="1"#}
+                                            {#                                                   checked> Sugerir<br>#}
+                                            {#                                            <div class="btn-group" data-toggle="buttons">#}
+                                            {#                                            	<label class="btn btn-success active">#}
+                                            {#				<input type="checkbox" autocomplete="off" checked>#}
+                                            {#				<span class="fa fa-check-circle"></span>#}
+                                            {#			</label>#}
+                                            {#                                                </div>#}
+                                            {#                                            <input class="change-check" type="radio" name="pagar" value="0">#}
+                                            {#                                            Rechazar<br>#}
+
+                                            <div class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-success active">
+                                                    <input type="checkbox" autocomplete="off" checked>
+                                                    <span class="fa fa-check-circle"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </form>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="4">
+                                    <h1 class="text-right">Productos a Sugerir: </h1>
+                                </td>
+                                <td colspan="2">
+                                    <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
+                                    <input class="total-a-pagar" type="hidden" readonly disabled>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <br>
+                        <form method="post" id="form-sugerir-producto"
+                              action="{% url 'administrador:generar-orden-pago-productores' %}">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="sugerir-producto-form" id="json-form-sugerir">
+                            {#                        <input type="submit" class="btn btn-primary" value="Generar Pago"/>#}
+
+                                                        {% comment %}{% endcomment %}<div class="form-group row">
+                                <div class="col-12 text-right">
+                                    <button id="sugerirProductos" class="btn btn-success">
+                                        <i class="fa fa-save"></i>
+                                        Sugerir Productos
+                                    </button>
+
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/scripts.js' %}"></script>
+
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+
+{% endblock %}
