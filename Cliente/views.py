@@ -379,7 +379,7 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
             productoPedido=detPed
             valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
             categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
-            evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto=productoPedido.id)
+            evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto_id=productoPedido.id)
 
             if len(evalProducto) == 0:
                 disable_button_producto = ''
