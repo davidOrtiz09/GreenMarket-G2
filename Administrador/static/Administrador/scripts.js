@@ -86,3 +86,32 @@ function TotalPagar() {
 function toCop(number){
     return number.toLocaleString('en-us', {minimumFractionDigits: 0 });
 }
+
+$('button#sugerirProductos').click(function () {
+
+    var container = $('div#orden-Pago-detalle');
+    var response = [];
+    var sugerir_productos = [];
+    var productRows = container.find('tr.sugerir-producto-tr');
+    for (var i = 0; i < productRows.length; i++) {
+        var row = $(productRows[i]);
+        var productId = row.find('input.oferta-producto-id').val();
+        if (row.find('input.check-pago').is(':checked')) {
+            sugerir_productos.push({
+                productos: productId
+            })
+        }
+
+    }
+
+    response={
+                sugerir_productos: sugerir_productos
+            }
+
+    var formJson = response;
+    var stringPago = JSON.stringify(formJson);
+    var form = $('form#form-sugerir-producto');
+    var inputJson = form.find('input#json-form-sugerir');
+    inputJson.val(stringPago);
+    form.submit();
+});
