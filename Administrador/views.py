@@ -508,7 +508,7 @@ class InventarioView(View):
 
 class Productores(AbstractAdministradorLoggedView):
     def get(self, request):
-        productores = Productor.objects.all().order_by('id')
+        productores = Productor.objects.filter(fk_cooperativa_id=get_id_cooperativa_global(request)).order_by('id')
         return render(request, 'Administrador/Productores.html', {'listaProductores': productores})
 
 
