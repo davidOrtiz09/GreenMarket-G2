@@ -706,7 +706,7 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
 class InformesMejoresProductores(View):
     def get(self, request):
         productores_destacados = list()
-        for productor in Productor.objects.all():
+        for productor in Productor.objects.filter(fk_cooperativa_id=get_id_cooperativa_global(request)):
             ordenes = Orden_Compra.objects.filter(fk_productor=productor, estado='PA')
             cantidad_ordenes = ordenes.count()
             if cantidad_ordenes > 0:
