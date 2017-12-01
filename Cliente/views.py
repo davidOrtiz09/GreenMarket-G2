@@ -6,7 +6,7 @@ from django.contrib import messages
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -381,3 +381,33 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+class AgregarProductoFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
+            exist = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id).exists()
+            if not exist:
+                favorito = Favorito(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id)
+                favorito.save()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class EliminarFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            user_id = request.user.id
+            favorito = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente__fk_django_user_id=user_id)
+            favorito.delete()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)

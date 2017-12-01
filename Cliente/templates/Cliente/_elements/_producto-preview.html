@@ -1,5 +1,13 @@
 <div class="col-12 col-md-6 col-lg-3 mb-4" v-for="producto in productosFiltrados">
     <div class="box-product">
+        <div class="text-right" v-if="esta_autenticado">
+            <button v-if="!producto.es_favorito" type="button" class="btn btn-link" @click="agregarFavorito(producto)">
+                <i class="fa fa-2x fa-star-o text-warning"></i>
+            </button>
+            <button v-if="producto.es_favorito" type="button" class="btn btn-link" @click="eliminarFavorito(producto)">
+                <i class="fa fa-2x fa-star text-warning"></i>
+            </button>
+        </div>
         <div class="img-wrapper">
             <a href="#" style="cursor: pointer;">
                 <img :id="'product-image-index-' + producto.id" :alt="producto.nombre"
@@ -29,8 +37,6 @@
                 <p>Disponibles: <b>[[ producto.cantidad_disponible ]]</b></p>
             </div>
         </div>
-
-
 
         <div class="input-group">
             <span class="input-group-btn clickable">
