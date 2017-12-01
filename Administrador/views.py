@@ -489,20 +489,20 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class InventarioView(View):
     def get(self, request):
-        today = datetime.date.today()
-        prev_monday = today - datetime.timedelta(days=today.weekday())
-        next_sunday = prev_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
-        semana = Semana.objects.filter(fecha_inicio=prev_monday, fecha_fin=next_sunday).first()
+
+        semana = get_or_create_week()
 
         ofertas_pro = Oferta_Producto \
-            .objects.filter(estado=1, fk_oferta__fk_semana_id=semana) \
+            .objects.filter(estado=1, fk_oferta__fk_semana=semana,
+                            fk_oferta__fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)) \
             .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
             .annotate(canAceptada=Sum('cantidad_aceptada'), canVendida=Sum('cantidad_vendida'),
                       canDisponible=Sum(F('cantidad_aceptada') - F('cantidad_vendida'))) \
             .distinct()
 
         return render(request, 'Administrador/Informes/inventario.html', {
-            'ofertas_pro': ofertas_pro
+            'ofertas_pro': ofertas_pro,
+            'semana': semana
         })
 
 
