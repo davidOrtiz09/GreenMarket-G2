@@ -310,12 +310,18 @@ class DoPayment(AbstractClienteLoggedView):
 
         valor_total = 0
         for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto.objects.get(id=item.get('product_id'))
+            producto_catalogo = Catalogo_Producto.objects.get(fk_producto_id=item.get('product_id'),
+                                                              fk_catalogo__fk_cooperativa_id=1,
+                                                              fk_catalogo__fk_semana= get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
-                cantidad=cantidad
+                cantidad=cantidad,
+                fk_oferta_producto = Oferta_Producto \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1).first()
             )
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
@@ -334,7 +340,9 @@ class DoPayment(AbstractClienteLoggedView):
                         cantidad = cantidad - cantidad_disponible
                     else:
                         oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto) \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1) \
                             .exclude(cantidad_vendida=F('cantidad_aceptada')) \
                             .order_by('precioProvedor').first()
                         cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
@@ -342,7 +350,7 @@ class DoPayment(AbstractClienteLoggedView):
                 cart = request.session.get('cart', None)
                 if cart:
                     items = cart.get('items', [])
-                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
+                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.fk_producto_id, items))
                     request.session['cart'] = cart
                 messages.add_message(
                     request,
