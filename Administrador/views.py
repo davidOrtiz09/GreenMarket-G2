@@ -594,16 +594,21 @@ class ConsultarPagosPendientes(View):
 
 class DetalleOrdenPagoProductores(View):
     def get(self, request, id_productor):
-        semana = Semana.objects.last()
-        ofertas_por_pagar = Oferta_Producto.objects. \
-            filter(fk_orden_compra__isnull=True, fk_oferta__fk_productor_id=id_productor, cantidad_vendida__gt=0) \
-            .exclude(fk_oferta__fk_semana=semana)
+        productor = Productor.objects.filter(id=id_productor,
+                                             fk_cooperativa_id=get_id_cooperativa_global(request)).first()
+        if productor:
+            semana = Semana.objects.last()
+            ofertas_por_pagar = Oferta_Producto.objects. \
+                filter(fk_orden_compra__isnull=True, fk_oferta__fk_productor_id=id_productor, cantidad_vendida__gt=0) \
+                .exclude(fk_oferta__fk_semana=semana)
 
-        productor = Productor.objects.filter(id=id_productor)[0]
-        return render(request, 'Administrador/detalle-productos-orden-pago.html', {
-            'ofertas_por_pagar': ofertas_por_pagar,
-            'productor': productor
-        })
+            productor = Productor.objects.filter(id=id_productor)[0]
+            return render(request, 'Administrador/detalle-productos-orden-pago.html', {
+                'ofertas_por_pagar': ofertas_por_pagar,
+                'productor': productor
+            })
+        else:
+            return redirect(reverse('administrador:pagos-pendientes-productor'))
 
 
 class GenerarOrdenPagoProductores(View):
