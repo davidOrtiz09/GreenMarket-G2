@@ -29,6 +29,7 @@
                     <th class="text-center">Nombre</th>
                     <th class="text-center">Departamento</th>
                     <th class="text-center">Ciudad</th>
+                    <th class="text-center">Coordenadas</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -45,6 +46,9 @@
                         </td>
                          <td class="text-center">
                             {{ item.ciudad }}
+                        </td>
+                         <td class="text-center">
+                            {{ item.coordenadas_gps }}
                         </td>
                     </tr>
                 {% endfor %}

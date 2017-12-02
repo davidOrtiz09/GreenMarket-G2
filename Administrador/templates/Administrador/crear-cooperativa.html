@@ -13,19 +13,35 @@
 
                 <div id="seccionDepartamento" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Departamento</strong>
-                    <select class="col-md-6 col-sm-12 form-control" id="selectDepartamento" name="departamento">
+                    <select class="col-md-6 col-sm-12 form-control" id="selectDepartamentoCooperativa" name="departamento">
+                        {% for departamento in departamentos %}
+                            <option value="{{departamento.nombre}}">{{ departamento.nombre }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div id="seccionCiudad" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Ciudad</strong>
-                    <select class="col-md-6 col-sm-12 form-control" id="selectCiudad" name="ciudad">
+                    <select class="col-md-6 col-sm-12 form-control" id="selectCiudadCooperativa" name="ciudad">
+                        {% for ciudad in ciudades %}
+                            <option value="{{ciudad.nombre}}">{{ ciudad.nombre }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div id="seccionNombre" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Nombre</strong>
-                    <input type="text" id="inputNombre" class="col-md-6 col-sm-12 form-control" name="nombre">
+                    <input type="text" id="inputNombre" class="col-md-6 col-sm-12 form-control" name="nombre" required>
+                    <input type="text" id="inputCoordenadas" class="col-md-6 col-sm-12 form-control" name="coordenadas_gps" style="display: none;">
+                </div>
+
+                <div id="seccionSeleccionarUbicacion" class="col-md-12 row secciones">
+                    <strong class="col-md-6 col-sm-12">Defina la ubicación de la ciudad de la cooperativa</strong>
+                    <div class="col-md-6 col-sm-12 row" style="margin-left: 0px;margin-right: 0px;">
+                        <button onclick="verMapa();" class="col-md-6 col-sm-12 btn btn-success" type="button">Mapa</button>
+                        <p id="coordenadasMapa" class="col-md-6" style="line-height: 45px; margin-bottom: 0px !important;">
+                        </p>
+                    </div>
                 </div>
 
                 <div id="seccionAgregarProductor" class="col-md-12 row secciones" style="margin-top: 40px;">
@@ -36,6 +52,21 @@
             </div>
             <div class="col-md-2 col-sm-1"></div>
         </div>
+         <div id="sectionMapa">
+            <div class="popUpMapa container">
+                <div class="headerPopUpDescripcion row">
+                    <h3 id="" class="col-md-12" style="font-weight: bold;margin-top: 5px; text-align: center;">
+                        Selecciona la ubicación de la finca en el mapa.
+                    </h3>
+                    <a id="cerrarPopUpDetalleProducto" class="close-btn popup-close">x</a>
+                </div>
+                <div class="bodyPopUpDescripcion col-md-12 row" style="margin-left: 0; margin-right: 0;">
+                    <div id="mapa">
+                    </div>
+                    <button id="seleccionMapa" type="button" onclick="seleccionarUbicacion();" class="btn btn-primary" style="position: absolute; top: 5px; left: 21px;">Seleccionar Ubicación</button>
+                </div>
+            </div>
+        </div>
         <div id="sectionLoading">
             <img id="loadingIcon" src="{% static  '/images/loading.gif' %}">
         </div>
@@ -43,7 +74,14 @@
     </section>
 {% endblock %}
 {% block scripts %}
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBW8AoH_Jh_QtuL0d-BC0RUAIMckKEZYiM"
+    async defer></script>
     <script src="{% static 'Administrador/productores/js/productores.js' %}"></script>
+    <script>
+        $( "#seleccionMapa" ).click(function() {
+            $('#inputCoordenadas').val($( "#coordenadasMapa" ).html());
+        });
+    </script>
 {% endblock %}
 {% block styles %}
     <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">

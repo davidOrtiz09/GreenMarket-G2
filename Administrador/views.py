@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from Administrador.forms import CooperativaForm
-from Administrador.models import MejoresClientes, ProductorDestacado
+from Administrador.models import MejoresClientes, ProductorDestacado, Ciudad, Departamento
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
@@ -687,7 +687,9 @@ class Cooperativas(AbstractAdministradorLoggedView):
 class CrearCooperativas(AbstractAdministradorLoggedView):
 
     def get(self, request):
-        return render(request, 'Administrador/crear-cooperativa.html', {})
+        ciudades = Ciudad.get_all_ciudades()
+        departamentos = Departamento.get_all_departamentos()
+        return render(request, 'Administrador/crear-cooperativa.html', {'ciudades': ciudades, 'departamentos': departamentos})
 
     def post(self, request):
         form = CooperativaForm(request.POST)
@@ -696,7 +698,8 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
             nombre = cleaned_data.get('nombre')
             ciudad = cleaned_data.get('ciudad')
             departamento = cleaned_data.get('departamento')
-            Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento)
+            coordenada = cleaned_data.get('coordenadas_gps')
+            Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento, coordenadas_gps=coordenada)
             cooperativas = Cooperativa.objects.all().order_by('id')
             return render(request, 'Administrador/Cooperativas.html', {'listaCooperativas': cooperativas})
         else:
