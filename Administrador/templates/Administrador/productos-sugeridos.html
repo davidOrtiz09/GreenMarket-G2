@@ -1,0 +1,88 @@
+{% extends 'Administrador/_common/base.html' %}
+{% load static %}
+{% load marketplace_filters %}
+{% block main %}
+    <section>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <br>
+                    <br>
+                    <h1 class="text-center"> Productos Sugeridos De La Semana</h1>
+                    <br/>
+                    <br>
+                    <div class="col-12">
+                        <div class="form-group row">
+                            <div class="col-12 text-right">
+                                <button id="sugerirProductos" class="btn btn-success">
+                                    <a href="{% url 'administrador:sugerir-productos' %}">
+                                        <i class="fa fa-bars"></i>
+                                    </a>
+
+                                    Cambiar Productos Sugeridos
+                                </button>
+
+                            </div>
+                        </div>
+
+                        <div class="container-fluid" id="orden-Pago-detalle">
+                            <table id="SugerirProductoTable" class="table dataTable" cellspacing="2"
+                                   width="100%"
+                                   border="1" align="center">
+                                <thead>
+                                <th colspan="6" bgcolor="#228b22" class="text-white text-center">
+                                    Prductos Sugeridos durante la semana
+                                </th>
+                                <tr bgcolor="#deb887">
+                                    <th class="text-center">Imagen del producto</th>
+                                    <th class="text-center">Nombre</th>
+                                    <th class="text-center">Unidad de medida</th>
+                                    <th class="text-center">Cantidad Vendida</th>
+                                    <th class="text-center">Usuarios Sugeridos</th>
+                                </tr>
+                                </thead>
+                                <tbody onload="actualizarTotalPagar();">
+                                <input class="productor-id" type="hidden" value="{{ productor.id }}" readonly
+                                       disabled></td>
+                                {% for producto_sugerido in productos_sugeridos %}
+                                    <tr class="sugerir-producto-tr">
+                                    <td>
+                                        <img src="{{ producto_sugerido.imagen.url }}"
+                                             style="width:100px;height:100px;">
+                                    </td>
+                                    <td class="text-center">{{ producto_sugerido.nombre }}
+                                    <td class="text-center">{{ producto_sugerido.unidad_medida }}</td>
+                                    <td class="text-center">{{ producto_sugerido.cantidad }}</td>
+                                    <td class="text-center">
+                                    {{ producto_sugerido.num_usuarios }}
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="4">
+                                        <h1 class="text-right">Productos a Sugerir: </h1>
+                                    </td>
+                                    <td colspan="2">
+                                        <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
+                                        <input class="total-a-pagar" type="hidden" readonly disabled>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                            <br>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'Administrador/scripts.js' %}"></script>
+
+{% endblock %}
+{% block styles %}
+    <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">
+
+{% endblock %}
