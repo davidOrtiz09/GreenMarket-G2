@@ -298,11 +298,11 @@ class Pedido(models.Model):
 
 @python_2_unicode_compatible
 class PedidoProducto(models.Model):
-    cantidad = models.IntegerField(default=0, blank=True, null=True)
+    cantidad = models.PositiveIntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
-    fk_oferta_producto = models.ForeignKey (Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
+    fk_oferta_producto = models.ForeignKey(Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
 
     def __str__(self):
         return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad),
@@ -404,6 +404,23 @@ class CanastaProducto(models.Model):
     def __str__(self):
         return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre,
                                                        producto=self.fk_producto_catalogo.fk_producto)
+
+
+@python_2_unicode_compatible
+class PedidoCanasta(models.Model):
+    cantidad = models.PositiveIntegerField(default=0, blank=False, null=False)
+    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
+    fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
+
+    @property
+    def subtotal(self):
+        return self.cantidad * self.fk_canasta.precio
+
+    def __str__(self):
+        return '{cantidad} de {canasta}'.format(
+            cantidad=str(self.cantidad),
+            canasta=self.fk_canasta
+        )
 
 
 class Favorito(models.Model):

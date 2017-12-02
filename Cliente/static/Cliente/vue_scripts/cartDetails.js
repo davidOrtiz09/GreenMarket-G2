@@ -18,11 +18,35 @@ var cartDetailsApp = new Vue({
         }
     },
     computed: {
+        detalles_productos: function () {
+            var response = [];
+            for (var i = 0; i < this.cart.items.length; i++) {
+                var item = this.cart.items[i];
+                response.push({
+                    quantity: item.quantity,
+                    product_id: item.product_id
+                })
+            }
+            return response;
+        },
+        detalles_canastas: function(){
+            var response = [];
+            for (var i = 0; i < this.cart.canastas.length; i++) {
+                var canasta = this.cart.canastas[i];
+                response.push({
+                    quantity: canasta.quantity,
+                    canasta_id: canasta.id
+                })
+            }
+            return response;
+        },
         checkout_form: function () {
-            var detallesPedido = this.getJsonDetallesPedido();
+            var detallesProductos = this.detalles_productos;
+            var detallesCanastas = this.detalles_canastas;
 
             var formJson = {
-                detalles_pedido: detallesPedido,
+                detalles_productos: detallesProductos,
+                detalles_canastas: detallesCanastas,
                 informacion_envio: this.envio,
                 informacion_pago: this.pago
             };
@@ -65,7 +89,7 @@ var cartDetailsApp = new Vue({
         },
         cambioCantidad: function (event, item) {
             var newValue = parseInt(event.target.value);
-            var previousQuantity = item.quantity;
+            var previousQuantity = parseInt(item.quantity);
             if (newValue < 1 || newValue === '') {
                 item.quantity = 1;
             }
@@ -146,7 +170,6 @@ var cartDetailsApp = new Vue({
         cambioCantidadCanasta: function (event, canasta) {
             var newValue = parseInt(event.target.value);
             var previousQuantity = parseInt(canasta.quantity);
-            console.log(newValue, previousQuantity);
             if (newValue < 1 || newValue === '') {
                 canasta.quantity = 1;
             }
@@ -287,17 +310,6 @@ var cartDetailsApp = new Vue({
                     }
                 }
             });
-        },
-        getJsonDetallesPedido: function () {
-            var response = [];
-            for (var i = 0; i < this.cart.items.length; i++) {
-                var item = this.cart.items[i];
-                response.push({
-                    quantity: item.quantity,
-                    product_id: item.product_id
-                })
-            }
-            return response;
         }
     }
 });

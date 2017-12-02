@@ -2,7 +2,7 @@ import datetime
 from MarketPlace.models import Productor, Cliente, Semana, Cooperativa, Oferta_Producto
 from django.contrib.auth import logout
 from django.shortcuts import redirect, reverse
-
+from django.db.models import F
 
 def es_productor(usuario):
     return Productor.objects.filter(fk_django_user_id=usuario.id).exists()
@@ -61,31 +61,13 @@ def get_or_create_next_week():
         return nueva
 
 
-def get_or_create_prev_week():
-    today = datetime.date.today()
-    a_week_ago = today - datetime.timedelta(weeks=1)
-    existe = Semana.objects.filter(fecha_inicio__lte=a_week_ago, fecha_fin__gte=a_week_ago).first()
-    if existe:
-        return existe
-    else:
-        that_monday = a_week_ago - datetime.timedelta(days=a_week_ago.weekday())
-        that_sunday = that_monday + datetime.timedelta(weeks=1) - datetime.timedelta(days=1)
-        nueva = Semana(
-            fk_cooperativa_id=Cooperativa.objects.first().id,
-            fecha_inicio=that_monday,
-            fecha_fin=that_sunday
-        )
-        nueva.save()
-        return nueva
-
-
 def cantidad_disponible_producto_catalogo(producto_catalogo, cooperativa_id):
     response = 0
     ofertas_producto = Oferta_Producto.objects.filter(
         fk_producto_id=producto_catalogo.fk_producto_id,
-        fk_oferta__fk_semana_id=get_or_create_prev_week().id,
+        fk_oferta__fk_semana_id=get_or_create_week().id,
         fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id
-    )
+    ).exclude(cantidad_vendida=F('cantidad_aceptada'))
     for oferta_producto in ofertas_producto:
         response += oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
     return response

@@ -8,7 +8,7 @@ from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto
+    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto, PedidoCanasta
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -16,10 +16,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
-    formatear_lista_productos, get_id_cooperativa_global, formatear_lista_canastas
+    formatear_lista_productos, get_id_cooperativa_global, formatear_lista_canastas, cantidad_disponible_canasta, cantidad_disponible_producto_catalogo
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
-from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart
+from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart, actualizar_inventario
 from django.http import JsonResponse
 
 
@@ -274,7 +274,8 @@ class DoPayment(AbstractClienteLoggedView):
     @atomic
     def post(self, request):
         checkout_Json = json.loads(request.POST.get('checkout_form'))
-        detalles_pedido = checkout_Json.get('detalles_pedido')
+        detalles_productos = checkout_Json.get('detalles_productos')
+        detalles_canastas = checkout_Json.get('detalles_canastas')
         informacion_envio = checkout_Json.get('informacion_envio')
         informacion_pago = checkout_Json.get('informacion_pago')
         nombre_envio = informacion_envio.get('nombre')
@@ -305,47 +306,29 @@ class DoPayment(AbstractClienteLoggedView):
         )
         checkpoint = savepoint()
         pedido_model.save()
-
+        id_cooperativa = get_id_cooperativa_global(request)
         valor_total = 0
-        for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto \
-                .objects.get(fk_producto_id=item.get('product_id'),
-                             fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
-                             fk_catalogo__fk_semana=get_or_create_week())
+        for item in detalles_productos:
+            producto_catalogo = Catalogo_Producto.objects.get(
+                fk_producto_id=item.get('product_id'),
+                fk_catalogo__fk_cooperativa_id=id_cooperativa,
+                fk_catalogo__fk_semana=get_or_create_week()
+            )
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
                 cantidad=cantidad,
-                fk_oferta_producto=Oferta_Producto \
-                    .objects.filter(fk_producto=producto_catalogo.fk_producto,
-                                    fk_oferta__fk_semana=get_or_create_week(),
-                                    estado=1).first()
+                fk_oferta_producto=Oferta_Producto.objects.filter(
+                    fk_producto=producto_catalogo.fk_producto,
+                    fk_oferta__fk_semana=get_or_create_week(),
+                    estado=1).first()
             )
             pedido_producto_model.save()
-            valor_total += producto_catalogo.precio * cantidad
-            cantidad_disponible = 0
 
-            try:
-                while cantidad != 0:
-                    if cantidad_disponible > cantidad:
-                        oferta_producto.cantidad_vendida = cantidad
-                        oferta_producto.save()
-                        cantidad = 0
+            cantidad_restante = actualizar_inventario(producto_catalogo, cantidad)
 
-                    elif cantidad_disponible > 0:
-                        oferta_producto.cantidad_vendida = oferta_producto.cantidad_aceptada
-                        oferta_producto.save()
-                        cantidad = cantidad - cantidad_disponible
-                    else:
-                        oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
-                                            fk_oferta__fk_semana=get_or_create_week(),
-                                            estado=1) \
-                            .exclude(cantidad_vendida=F('cantidad_aceptada')) \
-                            .order_by('precioProvedor').first()
-                        cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
-            except:
+            if cantidad_restante > 0:
                 cart = get_or_create_cart(request)
 
                 items = cart.get('items', [])
@@ -359,15 +342,54 @@ class DoPayment(AbstractClienteLoggedView):
                 )
                 savepoint_rollback(checkpoint)
                 return redirect(reverse('cliente:checkout'))
+            else:
+                valor_total += producto_catalogo.precio * cantidad
+
+        canastas_query = Canasta.objects.filter(
+            esta_publicada=True,
+            fk_semana=get_or_create_week(),
+            fk_cooperativa_id=get_id_cooperativa_global(request)
+        )
+        for canasta_carrito in detalles_canastas:
+            canasta = canastas_query.get(id=canasta_carrito.get('canasta_id'))
+            cantidad_canasta = int(canasta_carrito.get('quantity'))
+            pedido_canasta_model = PedidoCanasta(
+                cantidad=cantidad_canasta,
+                fk_pedido=pedido_model,
+                fk_canasta=canasta,
+            )
+            for canasta_producto in canasta.productos:
+                producto_catalogo = canasta_producto.fk_producto_catalogo
+                cantidad_producto = canasta_producto.cantidad * cantidad_canasta
+                cantidad_restante = actualizar_inventario(producto_catalogo, cantidad_producto)
+                if cantidad_restante > 0:
+                    cart = get_or_create_cart(request)
+                    canastas_carrito = cart.get('canastas', [])
+                    cart['canastas'] = list(filter(lambda x: x['canasta_id'] != canasta.id, canastas_carrito))
+                    request.session['cart'] = cart
+                    messages.add_message(
+                        request,
+                        messages.ERROR,
+                        'La canasta {canasta} ya no se encuentra disponible'.format(canasta=canasta.nombre)
+                    )
+                    savepoint_rollback(checkpoint)
+                    return redirect(reverse('cliente:checkout'))
+
+            valor_total += canasta.precio * cantidad_canasta
+            pedido_canasta_model.save()
+
+
 
         pedido_model.valor_total = valor_total
         pedido_model.save()
         savepoint_commit(checkpoint)
-
-        request.session['cartCompra'] = request.session['cart']
         request.session['cart'] = ""
-        return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
-                      {'compra': True})
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            'La compra se realizó exitosamente'
+        )
+        return redirect(reverse('cliente:detalle-mis-pedidos', kwargs={'id_pedido': pedido_model.id}))
 
 
 class Canastas(View):
@@ -491,6 +513,9 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
                 'valor': valor,
                 'disable_button_producto': disable_button_producto
             })
+
+        pedido_canastas = PedidoCanasta.objects.filter(fk_pedido_id=id_pedido)
+
         if pedido.estado != 'EN':
             disable_button = 'disabled'
         else:
@@ -498,6 +523,7 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
 
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
             'detalle_pedido': lista_productos,
+            'pedido_canastas': pedido_canastas,
             'pedido': pedido,
             'disable': disable_button
         })

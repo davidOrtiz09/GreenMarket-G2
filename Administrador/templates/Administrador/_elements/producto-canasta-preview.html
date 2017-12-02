@@ -21,7 +21,7 @@
             </div>
             <div class="col">
                 <p class="card-text">
-                    Disponibles: <b>{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo }}</b>
+                    Disponibles: <b>{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo:request }}</b>
                 </p>
             </div>
         </div>
@@ -43,7 +43,7 @@
                         <input name="cantidad" class="form-control product-quantity" type="number" min="1" step="1"
                                onchange="modificarCanastaInput('#canasta-producto-{{ canasta_producto.id }}', this.value)"
                                id="canasta-producto-{{ canasta_producto.id }}"
-                               max="{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo }}"
+                               max="{{ canasta_producto.fk_producto_catalogo|get_cantidad_disponible_producto_catalogo:request }}"
                                pattern="\d*"
                                value="{{ canasta_producto.cantidad }}">
                         <span class="input-group-btn">

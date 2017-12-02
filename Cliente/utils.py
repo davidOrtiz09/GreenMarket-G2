@@ -1,5 +1,6 @@
-from MarketPlace.models import Catalogo_Producto, Canasta
+from MarketPlace.models import Catalogo_Producto, Canasta, Oferta_Producto
 from MarketPlace.utils import cantidad_disponible_producto_catalogo, get_or_create_week, get_id_cooperativa_global, cantidad_disponible_canasta
+from django.db.models import F
 
 
 def get_or_create_cart(request):
@@ -79,3 +80,24 @@ def agregar_canasta_carrito(request, canasta_id, quantity):
         })
     cart['canastas'] = canastas
     return cart
+
+
+def actualizar_inventario(producto_catalogo, cantidad):
+    cantidad_restante = cantidad
+    ofertas_productos = Oferta_Producto.objects \
+        .filter(fk_producto=producto_catalogo.fk_producto, fk_oferta__fk_semana=get_or_create_week(), estado=1) \
+        .exclude(cantidad_vendida=F('cantidad_aceptada')) \
+        .order_by('precioProvedor')
+
+    for oferta_producto in ofertas_productos:
+        disponible_productos = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
+        if cantidad_restante == 0:
+            break
+        if disponible_productos >= cantidad_restante:
+            oferta_producto.cantidad_vendida += cantidad_restante
+            cantidad_restante = 0
+        else:
+            cantidad_restante -= disponible_productos
+            oferta_producto.cantidad_vendida += disponible_productos
+        oferta_producto.save()
+    return cantidad_restante

@@ -10,7 +10,7 @@
                 <p class="card-text">$ {{ producto.precio|to_cop }} / {{ producto.fk_producto.unidad_medida }}</p>
             </div>
             <div class="col">
-                Disponibles: <b>{{ producto|get_cantidad_disponible_producto_catalogo }}</b>
+                Disponibles: <b>{{ producto|get_cantidad_disponible_producto_catalogo:request }}</b>
             </div>
         </div>
 
