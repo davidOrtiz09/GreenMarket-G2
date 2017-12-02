@@ -608,6 +608,23 @@ class ActualizarProductor(AbstractAdministradorLoggedView):
 
         return JsonResponse({"Mensaje": "Finalizó con exito"})
 
+@method_decorator(csrf_exempt, name='dispatch')
+class EliminarProductor(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        idProductor = body["productorId"]
+
+        productor = Productor.objects.filter(id=idProductor).first()
+
+        productor.delete()
+
+        return JsonResponse({"Mensaje": "Finalizó con exito"})
+
 class ConsultarPagosPendientes(View):
     def get(self, request):
         semana = Semana.objects.last()

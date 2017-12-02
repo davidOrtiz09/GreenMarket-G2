@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^agregarProductor/$', views.AgregarProductor.as_view(), name='agregar-productor'),
     url(r'^productores/actualizar-productor/$', views.ActualizarProductorView.as_view(), name='actualizar-productor'),
     url(r'^actualizarProductor/$', views.ActualizarProductor.as_view(), name='actualizarProductor'),
+    url(r'^eliminarProductor/$', views.EliminarProductor.as_view(), name='eliminar-Productor'),
 
     url(r'^pagos-pendientes-productor$', views.ConsultarPagosPendientes.as_view(), name='pagos-pendientes-productor'),
     url(r'^detalle-producto-orden-pago/(?P<id_productor>\d+)$', views.DetalleOrdenPagoProductores.as_view(), name='detalle-producto-orden-pago'),

@@ -222,5 +222,17 @@ function ActualizarProductor( id ){
 
 
 function deleteProductor(id){
-    alert('Eliminar produtor');
+    $("#sectionLoading").show();
+    $.ajax({
+            url: URLDomain+"administrador/eliminarProductor/",
+            data: JSON.stringify({"productorId":id}),
+            type: 'POST',
+            contentType: "application/json; charset=utf-8;",
+            dataType: "json",
+            success: function (data) {
+                $("#sectionLoading").hide();
+                alert("El productor ha sido eliminado de forma satisfactoria.");
+                window.location = URLDomain+"administrador/productores"
+            }
+        });
 }
