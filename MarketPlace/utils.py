@@ -100,3 +100,16 @@ def formatear_lista_productos(productos_catalogo, request ,cooperativa_id):
             productos.append(product_dict)
 
     return productos
+
+def get_cooperativa_global(request):
+    cooperativa = None
+    if es_administrador(request.user):
+        cooperativa = request.session.get('cooperativa', None)
+
+    if (cooperativa is None):
+        cooperativa = Cooperativa.objects.first().to_json()
+
+    return cooperativa
+
+def get_id_cooperativa_global(request):
+    return(get_cooperativa_global(request)['id'])

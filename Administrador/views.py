@@ -14,11 +14,11 @@ from Administrador.models import MejoresClientes, ProductorDestacado
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
-from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida, \
-    get_id_cooperativa_global
+from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
-from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week, get_or_create_next_week
+from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week, get_or_create_next_week, \
+    get_id_cooperativa_global
 from django.db.transaction import atomic
 from django.http import JsonResponse
 from django.db.models.expressions import F

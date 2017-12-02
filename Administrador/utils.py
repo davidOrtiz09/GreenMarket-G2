@@ -52,14 +52,6 @@ def obtener_valor_compra(semana, id_producto):
     valorPromedio = sumPrecios / len(ofertaProducto)
     return valorPromedio
 
-def get_cooperativa_global(request):
-    cooperativa = request.session.get('cooperativa')
-    if (cooperativa is None):
-        cooperativa = Cooperativa.objects.first().to_json()
-    return cooperativa
-
-def get_id_cooperativa_global(request):
-    return(get_cooperativa_global(request)['id'])
 
 def calcular_promedio(prod_list):
     calificacion_list = EvaluacionProducto.objects.filter(fk_productor=prod_list)

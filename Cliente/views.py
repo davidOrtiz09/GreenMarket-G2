@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
-    cantidad_disponible_producto_catalogo, formatear_lista_productos
+     formatear_lista_productos, get_id_cooperativa_global
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
@@ -83,16 +83,16 @@ class Index(View):
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
 
-        cooperativa = cooperativas.first()
+        cooperativa_id = get_id_cooperativa_global(request)
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
-                                           fk_cooperativa=cooperativa)
+                                           fk_cooperativa_id=cooperativa_id)
         producto_catalogo = Catalogo_Producto.objects \
             .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
 
         categorias = Categoria.objects.all()
 
 
-        productos = formatear_lista_productos(producto_catalogo, request, cooperativa.id)
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
         return render(request, 'Cliente/index.html', {
             'productos_json': json.dumps(productos),
@@ -310,9 +310,10 @@ class DoPayment(AbstractClienteLoggedView):
 
         valor_total = 0
         for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto.objects.get(fk_producto_id=item.get('product_id'),
-                                                              fk_catalogo__fk_cooperativa_id=1,
-                                                              fk_catalogo__fk_semana= get_or_create_week())
+            producto_catalogo = Catalogo_Producto \
+                .objects.get(fk_producto_id=item.get('product_id'),
+                             fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
+                             fk_catalogo__fk_semana= get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
