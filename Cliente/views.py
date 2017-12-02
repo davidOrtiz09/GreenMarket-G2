@@ -8,7 +8,7 @@ from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
+    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -18,7 +18,7 @@ import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, cantidad_disponible_producto_catalogo
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
-from Cliente.utils import agregar_producto_carrito
+from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart
 from django.http import JsonResponse
 
 
@@ -126,12 +126,10 @@ class Checkout(AbstractClienteLoggedView):
         # Obtenemos el carrito y sus items
         # Si no encontramos nada, redirijimos el usuario al home y le notificamos que no tiene items en el carrito
         # De lo contrario mostramos la página de checkout
-        cart = request.session.get('cart', None)
-        items = []
-        if cart:
-            items = cart.get('items', [])
+        cart = get_or_create_cart(request)
+        items = cart.get('items', [])
 
-        if not cart or len(items) == 0:
+        if len(items) == 0:
             messages.add_message(request, messages.WARNING, 'No tienes productos en tu carrito de compras')
             return redirect(reverse('cliente:index'))
         else:
@@ -145,7 +143,7 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
 
-        json_body = json.loads(request.body)
+        json_body = json.loads(request.body.decode('utf-8'))
         product_id = json_body.get('product_id', 0)
         quantity = json_body.get('quantity', 0)
 
@@ -165,23 +163,23 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
 
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
-        cart = request.session.get('cart', None)
-        json_body = json.loads(request.body)
+        cart = get_or_create_cart(request)
+        json_body = json.loads(request.body.decode('utf-8'))
         product_id = json_body.get('product_id', -1)
-        if cart:
-            items = cart.get('items', [])
-            index = -1
-            i = 0
-            while i < len(items) and index == -1:
-                item = items[i]
-                if item['product_id'] == product_id:
-                    index = i
-                i += 1
 
-            if index >= 0:
-                items.remove(items[index])
-                cart['items'] = items
-                request.session['cart'] = cart
+        items = cart.get('items', [])
+        index = -1
+        i = 0
+        while i < len(items) and index == -1:
+            item = items[i]
+            if item['product_id'] == product_id:
+                index = i
+            i += 1
+
+        if index >= 0:
+            items.remove(items[index])
+            cart['items'] = items
+            request.session['cart'] = cart
         return JsonResponse(request.session['cart'])
 
 
@@ -322,11 +320,11 @@ class DoPayment(AbstractClienteLoggedView):
                             .order_by('precioProvedor').first()
                         cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
             except:
-                cart = request.session.get('cart', None)
-                if cart:
-                    items = cart.get('items', [])
-                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
-                    request.session['cart'] = cart
+                cart = get_or_create_cart(request)
+
+                items = cart.get('items', [])
+                cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
+                request.session['cart'] = cart
                 messages.add_message(
                     request,
                     messages.ERROR,
@@ -348,8 +346,9 @@ class DoPayment(AbstractClienteLoggedView):
 class Canastas(View):
     def get(self, request):
         canastas = Canasta.objects.filter(esta_publicada=True, fk_semana=get_or_create_week())
+        canastas_json = json.dumps([x.to_dict for x in canastas])
         if canastas:
-            return render(request, 'Cliente/canastas.html', {'canastas': canastas})
+            return render(request, 'Cliente/canastas.html', {'canastas': canastas, 'canastas_json': canastas_json})
         else:
             messages.add_message(request, messages.INFO, 'Actualmente no hay canastas disponibles')
             return redirect(reverse('cliente:index'))
@@ -360,29 +359,14 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
 
     @atomic
     def post(self, request):
-        id_canasta = request.POST.get('id_canasta', '0')
+        body = json.loads(request.body.decode('utf-8'))
+        id_canasta = body.get('id_canasta', '0')
         canasta = Canasta.objects.filter(id=id_canasta, esta_publicada=True, fk_semana=get_or_create_week()).first()
         if canasta:
-            productos_canasta = CanastaProducto.objects.filter(fk_canasta_id=canasta)
-            for producto_canasta in productos_canasta:
-                request.session['cart'] = agregar_producto_carrito(
-                    request=request,
-                    product_id=producto_canasta.fk_producto_catalogo_id,
-                    quantity=producto_canasta.cantidad
-                )
-
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                'Los productos de la canasta fueron añadidos al carrito'
-            )
+            agregar_canasta_carrito(request, canasta)
+            return JsonResponse({'status': 'ok'})
         else:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                'La canasta que estas buscando ya no se encuentra disponible'
-            )
-        return redirect(reverse('cliente:canastas'))
+            return JsonResponse({'status': 'error'}, status=500)
 
 
 class AgregarProductoFavoritoView(AbstractClienteLoggedView):
@@ -443,8 +427,8 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
 
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
             'detalle_pedido': lista_productos,
-            'pedido' : pedido,
-            'disable' : disable_button
+            'pedido': pedido,
+            'disable': disable_button
         })
 
 
@@ -478,6 +462,7 @@ class MejoresProductores(View):
         productores_list = Productor.objects.all()
         respuesta = []
         promedio = 0.0
+        productores_ordenado = []
         if len(productores_list) != 0:
             for prod_list in productores_list:
                 promedio= calcular_promedio(prod_list)

@@ -333,7 +333,7 @@ class Canasta(models.Model):
     def precio_sin_descuento(self):
         precio = Decimal('0')
         for producto in self.productos:
-            precio += Decimal(str(producto.fk_producto_catalogo.precio)) * producto.cantidad
+            precio += Decimal(str(producto.precio_producto)) * producto.cantidad
         return precio
 
     @property
@@ -346,6 +346,25 @@ class Canasta(models.Model):
     @property
     def get_estado(self):
         return 'Publicada' if self.esta_publicada else 'Sin publicar'
+
+    @property
+    def to_dict(self):
+        productos = []
+        for producto in self.productos:
+            productos.append({
+                'nombre_producto': producto.nombre_producto,
+                'cantidad': producto.cantidad,
+                'precio_unitario_cop': to_cop(float(producto.precio_producto)),
+                'unidad_producto': producto.unidad_producto
+            })
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'precio_cop': to_cop(float(self.precio)),
+            'descuento': self.get_descuento,
+            'productos': productos,
+            'imagen': self.imagen.url if self.imagen else ''
+        }
 
     class Meta:
         verbose_name = 'Canasta'

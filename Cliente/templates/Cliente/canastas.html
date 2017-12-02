@@ -20,20 +20,20 @@
         </div>
     </section>
 
-    <section>
+    <section id="lista-canastas-app">
         <div class="container">
-            <div class="row">
-                {% for canasta in canastas %}
-                    <div class="col-12 col-md-6 col-lg-3 mb-4">
-                        {% include 'Cliente/_elements/canasta-preview.html' with canasta=canasta %}
-                    </div>
-                {% endfor %}
+            <div class="row mt-3">
+                {% include 'Cliente/_elements/canasta-preview.html' %}
             </div>
         </div>
     </section>
 
 {% endblock %}
 
-{% block scripts %}
-    <script src="{% static  '/js/cliente.js' %}"></script>
+{% block vue_scripts %}
+    <script type="text/javascript">
+        var canastas = {{ canastas_json|safe }};
+        var urlAgregarCanastaCarrito = '{% url 'cliente:agregar-canasta-carrito' %}';
+    </script>
+    <script src="{% static 'Cliente/vue_scripts/canastas_list.js' %}"></script>
 {% endblock %}
