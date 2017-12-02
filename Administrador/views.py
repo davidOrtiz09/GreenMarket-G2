@@ -13,7 +13,7 @@ from Administrador.forms import CooperativaForm
 from Administrador.models import MejoresClientes, ProductorDestacado
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra, ClienteProducto
 from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
@@ -201,14 +201,14 @@ class ListarOfertasView(AbstractAdministradorLoggedView):
             if cantidad_ofertas > 0:
                 ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
-        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas, 'semana':semana})
+        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas, 'semana': semana})
 
 
 class DetalleOfertaView(AbstractAdministradorLoggedView):
     def get(self, request, id_oferta, guardado_exitoso):
 
-        if(Oferta.objects.filter(id=id_oferta,
-                                 fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)).exists()):
+        if (Oferta.objects.filter(id=id_oferta,
+                                  fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)).exists()):
             ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
 
             return render(request, 'Administrador/detalle-oferta.html', {
@@ -281,7 +281,8 @@ class ObtenerMejoresProductos(View):
         semanas = request.POST.getlist('semana', [])
         respuesta = []
         catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas,
-                                                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request))
+                                                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(
+                                                            request))
         for pro in catalogoProd:
             valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
@@ -490,12 +491,11 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class InventarioView(View):
     def get(self, request):
-
         semana = get_or_create_week()
 
         ofertas_pro = Oferta_Producto \
             .objects.filter(estado=1, fk_oferta__fk_semana=semana,
-                            fk_oferta__fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)) \
+                            fk_oferta__fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
             .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
             .annotate(canAceptada=Sum('cantidad_aceptada'), canVendida=Sum('cantidad_vendida'),
                       canDisponible=Sum(F('cantidad_aceptada') - F('cantidad_vendida'))) \
@@ -581,7 +581,7 @@ class ConsultarPagosPendientes(View):
     def get(self, request):
         semana = Semana.objects.last()
         ofertas_por_pagar = Oferta_Producto \
-            .objects.filter(fk_orden_compra__isnull=True,cantidad_vendida__gt=0,
+            .objects.filter(fk_orden_compra__isnull=True, cantidad_vendida__gt=0,
                             fk_oferta__fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
             .exclude(fk_oferta__fk_semana=semana) \
             .distinct('fk_oferta__fk_productor')
@@ -653,17 +653,18 @@ class GenerarOrdenPagoProductores(View):
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
-        productor = Productor.objects.filter(id=id_productor, fk_cooperativa_id=get_id_cooperativa_global(request)).first()
+        productor = Productor.objects.filter(id=id_productor,
+                                             fk_cooperativa_id=get_id_cooperativa_global(request)).first()
         if productor:
             orden_compra = Orden_Compra.objects.filter(fk_productor_id=id_productor,
-                                                       fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
+                                                       fk_productor__fk_cooperativa_id=get_id_cooperativa_global(
+                                                           request)) \
                 .order_by('-id')
             return render(request, 'Administrador/ordenes-pago-productor.html',
-                      {'ordenes_compra': orden_compra,
-                       'productor':  productor})
+                          {'ordenes_compra': orden_compra,
+                           'productor': productor})
         else:
             return redirect(reverse('administrador:pagos-pendientes-productor'))
-
 
 
 class DetalleOrdenPago(View):
@@ -685,7 +686,6 @@ class Cooperativas(AbstractAdministradorLoggedView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearCooperativas(AbstractAdministradorLoggedView):
-
     def get(self, request):
         return render(request, 'Administrador/crear-cooperativa.html', {})
 
@@ -702,6 +702,7 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
         else:
             print(form.errors)
             return render(request, 'Administrador/crear-cooperativa.html', {'form': form})
+
 
 class InformesMejoresProductores(View):
     def get(self, request):
@@ -722,6 +723,7 @@ class InformesMejoresProductores(View):
             'productores_destacados': productores_ordenados
         })
 
+
 class SeleccionCooperativaView(View):
     # Retorna el template con las cooperativas del sistema.
     def get(self, request):
@@ -731,7 +733,6 @@ class SeleccionCooperativaView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SeleccionCooperativaFijarView(AbstractAdministradorLoggedView):
-
     def get(self, request):
         return JsonResponse({"Mensaje": "Aquí llegó"})
 
@@ -743,6 +744,7 @@ class SeleccionCooperativaFijarView(AbstractAdministradorLoggedView):
             return JsonResponse({"Mensaje": "OK"})
         except:
             return JsonResponse({"Mensaje": "Fallo"})
+
 
 class ConsultarProductosSugerir(View):
     def get(self, request):
@@ -776,10 +778,17 @@ class RegistrarProductosSugeridos(View):
         num_usuarios = configuracion.get('numUsuarios')
         productos_actuales = configuracion.get('reemplazar')
         usuarios = configuracion.get('todos')
+        semana = Semana.objects.last()
 
-        print num_usuarios
-        print productos_actuales
-        print usuarios
+        if productos_actuales:
+            ClienteProducto.objects.filter(fk_semana=semana).update(sugerir=False)
+
+        for producto_id in sugerir_producto_Json.get('sugerir_productos'):
+            if usuarios:
+                self.sugeridosProductosTodosClientes(producto_id.get('productos'))
+            else:
+                self.grabarPruductosSugeridos(producto_id.get('productos'), semana, num_usuarios)
+
         # orden_compra = Orden_Compra.objects \
         #     .create(fk_productor=productor, valor_total=valor_total_json, estado='PA')
 
@@ -791,4 +800,27 @@ class RegistrarProductosSugeridos(View):
         return render(request, 'Administrador/detalle-orden-pago.html', {
             'ofertas_producto': 1
         })
+
+    def grabarPruductosSugeridos(self, producto_id, semana, numUsuarios):
+        producto = Producto.objects.filter(id=producto_id)[0]
+
+        producto_sugerido = ClienteProducto.objects.filter(fk_producto=producto, sugerir=False)\
+            .order_by('cantidad').values('id')[:numUsuarios]
+
+        ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
+
+
+    def sugeridosProductosTodosClientes(self, producto_id):
+        producto = Producto.objects.filter(id=producto_id)[0]
+
+        for cliente in Cliente.objects.all():
+            cliente_producto_model = ClienteProducto(
+                fk_cliente=cliente,
+                fk_producto=producto,
+                fk_semana=get_or_create_week(),
+                cantidad=0,
+                frecuencia=0,
+                sugerir=True
+            )
+            cliente_producto_model.save()
 
