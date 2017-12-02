@@ -12,6 +12,8 @@ class Cooperativa(models.Model):
     ciudad = models.CharField(max_length=150, verbose_name='Ciudad de la Cooperativa', null=False, blank=False)
     departamento = models.CharField(max_length=150, verbose_name='Departamento de la Cooperativa', null=False,
                                     blank=False)
+    coordenadas_gps = models.CharField(max_length=150, verbose_name='Ubicación de la cooperativa', null=False,
+                                       blank=False)
 
     class Meta:
         verbose_name = 'Cooperativa'
@@ -25,7 +27,8 @@ class Cooperativa(models.Model):
             "nombre": self.nombre,
             "ciudad": self.ciudad,
             "departamento": self.departamento,
-            "id": self.id
+            "id": self.id,
+            "coordenadas_gps": self.coordenadas_gps
         }
 
 
