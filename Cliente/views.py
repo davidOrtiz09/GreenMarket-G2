@@ -533,3 +533,45 @@ class MejoresProductores(View):
                 'No se encontraron productores'
             )
         return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
+
+class ProductosSugeridos(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated and not es_cliente(self.request.user):
+            rol = 'productor' if es_productor(self.request.user) else 'administrador'
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                'Para acceder a las funcionalidades de cliente, por favor salga de su cuenta de {rol}'
+                    .format(rol=rol)
+            )
+            return redirect_user_to_home(self.request)
+        else:
+            return super(ProductosSugeridos, self).dispatch(*args, **kwargs)
+
+    def get(self, request):
+        cooperativas = Cooperativa.objects.all()
+
+        cooperativa_id = get_id_cooperativa_global(request)
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
+
+        cliente_model=Cliente.objects.filter(fk_django_user=self.request.user).first()
+        cliente_producto=ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+
+        producto_catalogo = Catalogo_Producto.objects \
+            .filter(fk_catalogo=catalogo,fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
+
+        categorias = Categoria.objects.all()
+
+
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
+        return render(request, 'Cliente/productos-sugeridos.html', {
+            'productos_json': json.dumps(productos),
+            'productos_catalogo': producto_catalogo,
+            'categorias': categorias,
+            'cooperativas': cooperativas,
+            'solo_favoritos': False
+        })
+
+

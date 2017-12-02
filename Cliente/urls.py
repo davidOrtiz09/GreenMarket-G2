@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^guardar-calificacion-mis-pedidos/(?P<pedido_producto>\d+)(?P<productor>\d+)(?P<id_pedido>\d+)$', views.InsertCalificacionProductoVew.as_view(), name='guardar-calificacion-mis-pedidos'),
     url(r'^mejores-productores', views.MejoresProductores.as_view(), name='mejores-productores'),
 
+    url(r'^productos-sugeridos', views.ProductosSugeridos.as_view(), name='productos-sugeridos'),
+
 ]
