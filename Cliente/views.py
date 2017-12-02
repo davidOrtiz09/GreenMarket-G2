@@ -8,7 +8,7 @@ from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto, ClienteProducto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -327,7 +327,22 @@ class DoPayment(AbstractClienteLoggedView):
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
             cantidad_disponible = 0
+            cliente_producto_model=ClienteProducto.objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                           fk_cliente=cliente_model)
+            if cliente_producto_model.exists():
+                cliente_producto_model[0].cantidad=cliente_producto_model[0].cantidad + cantidad
+                cliente_producto_model[0].frecuencia=cliente_producto_model[0].frecuencia+1
 
+            else:
+                cliente_producto_model = ClienteProducto(
+                    fk_cliente=cliente_model,
+                    fk_producto=producto_catalogo.fk_producto,
+                    fk_semana=get_or_create_week(),
+                    cantidad=cantidad,
+                    frecuencia=1,
+                    sugerir=False
+                )
+                cliente_producto_model.save()
             try:
                 while cantidad != 0:
                     if cantidad_disponible > cantidad:
