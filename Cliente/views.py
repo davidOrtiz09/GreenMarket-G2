@@ -15,7 +15,8 @@ from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, cantidad_disponible_producto_catalogo
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
+     formatear_lista_productos, get_id_cooperativa_global
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart
@@ -81,41 +82,57 @@ class Index(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+
+        cooperativa_id = get_id_cooperativa_global(request)
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
-            .order_by('fk_producto__nombre')
+            .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+
         categorias = Categoria.objects.all()
 
-        productos = []
-        for producto in producto_catalogo:
-            cantidad_disponible = cantidad_disponible_producto_catalogo(producto)
-            if cantidad_disponible > 0:
-                product_dict = producto.to_dict(request.user)
-                product_dict['cantidad_disponible'] = cantidad_disponible
-                productos.append(product_dict)
+
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
         return render(request, 'Cliente/index.html', {
             'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
+            'solo_favoritos': False
         })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
-        producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
-            .order_by(ordenar_por)
+        favoritos = request.POST.get('favoritos', '')
+
+        cliente = None if self.request.user.is_anonymous \
+            else Cliente.objects.filter(fk_django_user=self.request.user).first()
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
+
+        if (favoritos == ''):
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo=catalogo).order_by(ordenar_por)
+        else:
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo=catalogo,fk_producto__favorito__fk_cliente=cliente) \
+                .order_by(ordenar_por)
+
         categorias = Categoria.objects.all()
+
         cooperativas = Cooperativa.objects.all()
 
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
         return render(request, 'Cliente/index.html', {
-            'productos_catalogo': producto_catalogo,
+            'productos_json': json.dumps(productos),
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'solo_favoritos': favoritos != ''
         })
 
 
@@ -291,12 +308,19 @@ class DoPayment(AbstractClienteLoggedView):
 
         valor_total = 0
         for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto.objects.get(id=item.get('product_id'))
+            producto_catalogo = Catalogo_Producto \
+                .objects.get(fk_producto_id=item.get('product_id'),
+                             fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
+                             fk_catalogo__fk_semana= get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
-                cantidad=cantidad
+                cantidad=cantidad,
+                fk_oferta_producto = Oferta_Producto \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1).first()
             )
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
@@ -315,7 +339,9 @@ class DoPayment(AbstractClienteLoggedView):
                         cantidad = cantidad - cantidad_disponible
                     else:
                         oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto) \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1) \
                             .exclude(cantidad_vendida=F('cantidad_aceptada')) \
                             .order_by('precioProvedor').first()
                         cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
@@ -323,7 +349,7 @@ class DoPayment(AbstractClienteLoggedView):
                 cart = get_or_create_cart(request)
 
                 items = cart.get('items', [])
-                cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
+                cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.fk_producto_id, items))
                 request.session['cart'] = cart
                 messages.add_message(
                     request,

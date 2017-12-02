@@ -98,7 +98,8 @@ var listaProductosApp = new Vue({
                     url: urlAgregarAlCarrito,
                     type: 'POST',
                     data: JSON.stringify({
-                        id_producto: producto.id_producto
+                        product_id: producto.id_producto,
+                        quantity: producto.cantidad_carrito
                     }),
                     headers: {
                         'X-CSRFToken': $.cookie('csrftoken')

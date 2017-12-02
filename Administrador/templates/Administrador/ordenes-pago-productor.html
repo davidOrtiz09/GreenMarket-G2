@@ -3,7 +3,7 @@
 {% block main %}
     <section>
         <div class="container-fluid" style="margin-top: 10px">
-            <h1 class="text-center"> Ordenes de Pago Productor: {{ ordenes_compra.0.fk_productor.nombre }}</h1>
+            <h1 class="text-center"> Ordenes de Pago Productor: {{ productor.nombre }}</h1>
             <br/>
             <br>
             <div class="panel panel panel-success">
@@ -12,9 +12,10 @@
                     <table class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
-                        <br/>
-                        <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ordenes de Pago Generadas
-                        </th>
+                        <tr>
+                            <th colspan="7" bgcolor="#228b22" class="text-white text-center">Ordenes de Pago Generadas
+                            </th>
+                        </tr>
                         <tr bgcolor="#deb887">
                              <th class="text-center">Nro. Comprobante</th>
                             <th class="text-center">Productor</th>
