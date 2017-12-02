@@ -97,29 +97,16 @@ class Index(View):
             'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas,
-            'solo_favoritos': False
+            'cooperativas': cooperativas
         })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
-        ordenar_por = request.POST.get('ordenar', '')
-        favoritos = request.POST.get('favoritos', '')
 
-        cliente = None if self.request.user.is_anonymous \
-            else Cliente.objects.filter(fk_django_user=self.request.user).first()
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
 
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
-                                           fk_cooperativa_id=cooperativa_id)
-
-        if (favoritos == ''):
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo).order_by(ordenar_por)
-        else:
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo, fk_producto__favorito__fk_cliente=cliente) \
-                .order_by(ordenar_por)
+        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
 
         categorias = Categoria.objects.all()
 
@@ -131,7 +118,6 @@ class Index(View):
             'productos_json': json.dumps(productos),
             'categorias': categorias,
             'cooperativas': cooperativas,
-            'solo_favoritos': favoritos != ''
         })
 
 

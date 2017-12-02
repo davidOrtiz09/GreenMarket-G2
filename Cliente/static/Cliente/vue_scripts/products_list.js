@@ -1,9 +1,41 @@
+var listaOrdenes = [
+    {
+        texto: 'Producto: A-Z',
+        orden: 'nombre'
+    },
+    {
+        texto: 'Producto: Z-A',
+        orden: '-nombre'
+    },
+    {
+        texto: 'Precio: Menor a mayor',
+        orden: 'precio'
+    },
+    {
+        texto: 'Precio: Mayor a menor',
+        orden: '-precio'
+    }
+];
 var listaProductosApp = new Vue({
     el: '#lista-productos-app',
     delimiters: ['[[', ']]'],
     data: {
         productos: productos,
-        productosFiltrados: []
+        productosFiltrados: [],
+        ordenes: listaOrdenes,
+        ordenSeleccionado: listaOrdenes[0],
+        soloFavoritos: false
+    },
+    watch: {
+        soloFavoritos: function(newValue){
+            this.productosFiltrados = this.productos.filter(function(producto){
+                if(listaProductosApp.soloFavoritos){
+                    return producto.es_favorito;
+                }
+                return true;
+            });
+            this.cambioOrden();
+        }
     },
     mounted: function () {
         this.productosFiltrados = this.productos;
@@ -14,6 +46,42 @@ var listaProductosApp = new Vue({
         }
     },
     methods: {
+        cambioOrden: function(){
+            var orden = this.ordenSeleccionado.orden;
+            if(orden === 'nombre'){
+                this.ordenarPorNombreAZ();
+            }
+            else if(orden === '-nombre'){
+                this.ordenarPorNombreZA();
+            }
+            else if(orden === 'precio'){
+                this.ordenarPorPrecioMenorMayor();
+            }
+            else if(orden === '-precio'){
+                this.ordenarPorPrecioMayorMenor()
+            }
+        },
+        ordenarPorNombreAZ: function(){
+            this.productosFiltrados = this.productosFiltrados.sort(function(a, b){
+                return a.nombre.localeCompare(b.nombre);
+            });
+        },
+        ordenarPorNombreZA: function(){
+            console.log("entra");
+            this.productosFiltrados = this.productosFiltrados.sort(function(a, b){
+                return b.nombre.localeCompare(a.nombre);
+            });
+        },
+        ordenarPorPrecioMenorMayor: function(){
+            this.productosFiltrados = this.productosFiltrados.sort(function(a, b){
+                return a.precio > b.precio;
+            });
+        },
+        ordenarPorPrecioMayorMenor: function(){
+            this.productosFiltrados = this.productosFiltrados.sort(function(a, b){
+                return a.precio < b.precio;
+            });
+        },
         verDetalleCarrito: function (producto) {
             $("#sectionPopUpDescripcion" + producto.id).toggle();
         },
