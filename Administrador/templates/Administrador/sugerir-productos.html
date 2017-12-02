@@ -3,7 +3,7 @@
 {% load marketplace_filters %}
 {% block main %}
     <section>
-        <div class="container-fluid">
+        <div class="container-fluid"  id="sugerir-productos-div">
             <div class="row">
                 <div class="col-12">
                     <br>
@@ -22,11 +22,12 @@
                                     </label>
                                     <div class="btn-group" data-toggle="buttons">
                                         <label class="btn btn-success active">
-                                            <input type="radio" name="options" id="option2" autocomplete="off" chacked>
+                                            <input class="conservar" type="radio"
+                                                   name="reemplazar" checked value="1">Sugerir
                                             <span class="fa fa-check-circle"></span>Conservar
                                         </label>
                                         <label class="btn btn-success">
-                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                            <input type="radio" name="reemplazar" class="reemplazar" value="2"> casa
                                             <span class="fa fa-check-circle"></span>Reemplazar
                                         </label>
                                     </div>
@@ -39,34 +40,34 @@
                                     </label>
                                     <div class="btn-group" data-toggle="buttons">
                                         <label class="btn btn-success active">
-                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                            <input type="radio" name="todos" class="opcionados" checked value="3">
                                             <span class="fa fa-check-circle"></span>Compradores Opcionados
                                         </label>
                                         <label class="btn btn-success">
-                                            <input type="radio" name="options" id="option2" autocomplete="off" chacked>
+                                            <input type="radio" name="todos" class="todos" value="4">
                                             <span class="fa fa-check-circle"></span>Todos Los Usuarios
                                         </label>
-
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                    <label>Número de Usuarios Producto</label>
-                                    <div class="col-8 col-sm-2">
-                                        <input name="nombre" type="text" class="form-control" value="10" required>
-                                    </div>
+                                <label>Número de Usuarios Producto</label>
+                                <div class="col-8 col-sm-2">
+                                    <input name="nombre" type="text" class="form-control nUsuarios" value=10
+                                           required>
+                                </div>
 
                             </div>
                         </form>
                     </div>
 
-                    <div class="container-fluid" id="orden-Pago-detalle">
+                    <div class="container-fluid">
                         <table id="SugerirProductoTable" class="table dataTable" cellspacing="2"
                                width="100%"
                                border="1" align="center">
                             <thead>
                             <th colspan="6" bgcolor="#228b22" class="text-white text-center">Seleccione los productos
-                                que desea Sugerir
+                                que desea Sugeriro
                             </th>
                             <tr bgcolor="#deb887">
                                 <th class="text-center">Imagen del producto</th>
@@ -94,25 +95,19 @@
                                             ${{ oferta.precioProvedor }}
                                         </td>
                                         <td>
-                                            {#                                            <input class="oferta-producto-id" type="hidden" value="{{ oferta.id }}"#}
-                                            {#                                                   readonly disabled>#}
-                                            {#                                            <input class="check-pago change-check" type="radio" name="pagar" value="1"#}
-                                            {#                                                   checked> Sugerir<br>#}
-                                            {#                                            <div class="btn-group" data-toggle="buttons">#}
-                                            {#                                            	<label class="btn btn-success active">#}
-                                            {#				<input type="checkbox" autocomplete="off" checked>#}
-                                            {#				<span class="fa fa-check-circle"></span>#}
-                                            {#			</label>#}
-                                            {#                                                </div>#}
-                                            {#                                            <input class="change-check" type="radio" name="pagar" value="0">#}
-                                            {#                                            Rechazar<br>#}
+                                            <input class="oferta-producto-id" type="hidden" value="{{ oferta.id }}"
+                                                   readonly disabled>
+{#                                            <input class="check-pago change-check" type="radio" name="pagar" value="1"#}
+{#                                                   checked> Sugerir<br>#}
+{#                                            <input class="change-check" type="radio" name="pagar" value="0">#}
+{#                                            Rechazar<br>#}
 
-                                            <div class="btn-group" data-toggle="buttons">
-                                                <label class="btn btn-success active">
-                                                    <input type="checkbox" autocomplete="off" checked>
-                                                    <span class="fa fa-check-circle"></span>
-                                                </label>
-                                            </div>
+                                                                                        <div class="btn-group" data-toggle="buttons">
+                                                                                            <label class="btn btn-success active">
+                                                                                                <input class="check-sugerir" type="checkbox" checked>
+                                                                                                <span class="fa fa-check-circle"></span>
+                                                                                            </label>
+                                                                                        </div>
                                         </td>
                                     </tr>
                                 </form>
@@ -132,20 +127,21 @@
                         </table>
                         <br>
                         <form method="post" id="form-sugerir-producto"
-                              action="{% url 'administrador:generar-orden-pago-productores' %}">
+                              action="{% url 'administrador:registrar-productos-sugeridos' %}">
                             {% csrf_token %}
 
                             <input type="hidden" name="sugerir-producto-form" id="json-form-sugerir">
                             {#                        <input type="submit" class="btn btn-primary" value="Generar Pago"/>#}
 
-                                                        {% comment %}{% endcomment %}<div class="form-group row">
+                            {% comment %}{% endcomment %}
+                            <div class="form-group row">
                                 <div class="col-12 text-right">
                                     <button id="sugerirProductos" class="btn btn-success">
                                         <i class="fa fa-save"></i>
                                         Sugerir Productos
                                     </button>
 
-                            </div>
+                                </div>
                         </form>
                     </div>
 

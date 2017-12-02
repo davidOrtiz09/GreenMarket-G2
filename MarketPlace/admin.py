@@ -47,9 +47,9 @@ class ProductorAdmin(admin.ModelAdmin):
 
 
 class SemanaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'fecha_inicio', 'fecha_fin', 'fk_cooperativa')
+    list_display = ('id', 'fecha_inicio', 'fecha_fin')
     list_display_links = ('id',)
-    search_fields = ('id', 'fk_cooperativa',)
+    search_fields = ('id',)
 
 
 class CanastaAdmin(admin.ModelAdmin):

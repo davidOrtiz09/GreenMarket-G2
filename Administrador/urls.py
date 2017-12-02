@@ -52,6 +52,10 @@ urlpatterns = [
     url(r'^cooperativas$', views.Cooperativas.as_view(), name='cooperativas'),
     url(r'^cooperativas/crear$', views.CrearCooperativas.as_view(), name='crear-cooperativas'),
 
+    url(r'^seleccion-cooperativa/fijar$', views.SeleccionCooperativaFijarView.as_view(),
+        name='seleccion-cooperativa-fijar'),
+    url(r'^seleccion-cooperativa$', views.SeleccionCooperativaView.as_view(), name='seleccion-cooperativa'),
+
     url(r'^sugerir-productos$', views.ConsultarProductosSugerir.as_view(), name='sugerir-productos'),
 
 ]
