@@ -3,20 +3,24 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, reverse, render_to_response
 from django.views import View
 from django.contrib import messages
+from operator import itemgetter
+from Administrador.utils import calcular_promedio
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto
+    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week
+from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
+     formatear_lista_productos, get_id_cooperativa_global
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
+from django.http import JsonResponse
 
 
 class AbstractClienteLoggedView(View):
@@ -78,31 +82,57 @@ class Index(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+
+        cooperativa_id = get_id_cooperativa_global(request)
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
-            .order_by('fk_producto__nombre')
+            .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+
         categorias = Categoria.objects.all()
+
+
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
         return render(request, 'Cliente/index.html', {
+            'productos_json': json.dumps(productos),
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'solo_favoritos': False
         })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
-        producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id) \
-            .order_by(ordenar_por)
+        favoritos = request.POST.get('favoritos', '')
+
+        cliente = None if self.request.user.is_anonymous \
+            else Cliente.objects.filter(fk_django_user=self.request.user).first()
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
+
+        if (favoritos == ''):
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo=catalogo).order_by(ordenar_por)
+        else:
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo=catalogo,fk_producto__favorito__fk_cliente=cliente) \
+                .order_by(ordenar_por)
+
         categorias = Categoria.objects.all()
+
         cooperativas = Cooperativa.objects.all()
 
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
         return render(request, 'Cliente/index.html', {
-            'productos_catalogo': producto_catalogo,
+            'productos_json': json.dumps(productos),
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'solo_favoritos': favoritos != ''
         })
 
 
@@ -131,8 +161,10 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
-        product_id = int(request.POST.get('product_id', '0'))
-        quantity = int(request.POST.get('quantity', '0'))
+
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', 0)
+        quantity = json_body.get('quantity', 0)
 
         if product_id > 0 and quantity != 0:
             request.session['cart'] = agregar_producto_carrito(
@@ -140,8 +172,9 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
                 product_id=product_id,
                 quantity=quantity
             )
-            messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
@@ -150,7 +183,8 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
         cart = request.session.get('cart', None)
-        product_id = int(request.POST.get('product-id', '-1'))
+        json_body = json.loads(request.body)
+        product_id = json_body.get('product_id', -1)
         if cart:
             items = cart.get('items', [])
             index = -1
@@ -165,7 +199,7 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
                 items.remove(items[index])
                 cart['items'] = items
                 request.session['cart'] = cart
-        return redirect(reverse('cliente:checkout'))
+        return JsonResponse(request.session['cart'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -276,12 +310,19 @@ class DoPayment(AbstractClienteLoggedView):
 
         valor_total = 0
         for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto.objects.get(id=item.get('product_id'))
+            producto_catalogo = Catalogo_Producto \
+                .objects.get(fk_producto_id=item.get('product_id'),
+                             fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
+                             fk_catalogo__fk_semana= get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
-                cantidad=cantidad
+                cantidad=cantidad,
+                fk_oferta_producto = Oferta_Producto \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1).first()
             )
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
@@ -300,7 +341,9 @@ class DoPayment(AbstractClienteLoggedView):
                         cantidad = cantidad - cantidad_disponible
                     else:
                         oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto) \
+                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                            fk_oferta__fk_semana=get_or_create_week(),
+                                            estado=1) \
                             .exclude(cantidad_vendida=F('cantidad_aceptada')) \
                             .order_by('precioProvedor').first()
                         cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
@@ -308,7 +351,7 @@ class DoPayment(AbstractClienteLoggedView):
                 cart = request.session.get('cart', None)
                 if cart:
                     items = cart.get('items', [])
-                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.id, items))
+                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.fk_producto_id, items))
                     request.session['cart'] = cart
                 messages.add_message(
                     request,
@@ -323,7 +366,7 @@ class DoPayment(AbstractClienteLoggedView):
         savepoint_commit(checkpoint)
 
         request.session['cartCompra'] = request.session['cart']
-        request.session['cart']=""
+        request.session['cart'] = ""
         return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
                       {'compra': True})
 
@@ -366,3 +409,112 @@ class AgregarCanastaCarrito(AbstractClienteLoggedView):
                 'La canasta que estas buscando ya no se encuentra disponible'
             )
         return redirect(reverse('cliente:canastas'))
+
+
+class AgregarProductoFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            cliente = Cliente.objects.filter(fk_django_user_id=request.user.id).first()
+            exist = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id).exists()
+            if not exist:
+                favorito = Favorito(fk_producto_id=int(id_producto), fk_cliente_id=cliente.id)
+                favorito.save()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class EliminarFavoritoView(AbstractClienteLoggedView):
+    def post(self, request):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+            id_producto = body.get('id_producto', '0')
+            user_id = request.user.id
+            favorito = Favorito.objects.filter(fk_producto_id=int(id_producto), fk_cliente__fk_django_user_id=user_id)
+            favorito.delete()
+            return JsonResponse({"Mensaje": "OK"})
+        except:
+            return JsonResponse({"Mensaje": "Fallo"}, status=500)
+
+
+class DetalleMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, id_pedido):
+        pedido = Pedido.objects.get(id=id_pedido)
+        detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido_id=id_pedido)
+        lista_productos=[]
+        for detPed in detalle_mi_pedido:
+            productoPedido=detPed
+            valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
+            categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto_id=productoPedido.id)
+            if len(evalProducto) == 0:
+                disable_button_producto = ''
+            else:
+                disable_button_producto = 'disabled'
+            lista_productos.append({
+                'categoria': categoria,
+                'producto': productoPedido,
+                'valor': valor,
+                'disable_button_producto': disable_button_producto
+            })
+        if pedido.estado != 'EN':
+            disable_button = 'disabled'
+        else:
+            disable_button = ''
+
+
+        return render(request, 'Cliente/detalle-mis-pedidos.html', {
+            'detalle_pedido': lista_productos,
+            'pedido' : pedido,
+            'disable' : disable_button
+        })
+
+
+class CalificarMisPedidoView(AbstractClienteLoggedView):
+    def get(self, request, fk_pedido_producto, fk_productor, producto, pedido):
+        productoSelected= Producto.objects.filter(id=producto).first
+        return render(request, 'Cliente/calificar-mis-pedidos.html', {
+            'producto': productoSelected,
+            'fk_pedido_producto': fk_pedido_producto,
+            'fk_productor': fk_productor,
+            'pedido': pedido
+        })
+
+
+class InsertCalificacionProductoVew(AbstractClienteLoggedView):
+    def post(self, request, pedido_producto, productor,id_pedido):
+        productor = Productor.objects.filter(id=productor).first()
+        pedidoProducto = PedidoProducto.objects.filter(id=pedido_producto).first()
+        ValorCalificacion = request.POST.get('calificacion', '')
+        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto, calificacion=ValorCalificacion)
+        evaluacion.save()
+        messages.add_message(
+            request, messages.SUCCESS,
+                'La calificacion fue guardada exitosamente'
+            )
+        return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
+
+
+class MejoresProductores(View):
+    def get(self, request):
+        productores_list = Productor.objects.all()
+        respuesta = []
+        promedio = 0.0
+        if len(productores_list) != 0:
+            for prod_list in productores_list:
+                promedio= calcular_promedio(prod_list)
+                respuesta.append({
+                    'productor': prod_list,
+                    'calificacion': "{0:.4f}".format(promedio)
+                })
+            productores_ordenado = sorted(respuesta, key=itemgetter('calificacion'), reverse=True)
+        else:
+            messages.add_message(
+                request, messages.SUCCESS,
+                'No se encontraron productores'
+            )
+        return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})

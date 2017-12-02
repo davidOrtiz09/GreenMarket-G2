@@ -1,4 +1,5 @@
 {% load static %}
+{% load marketplace_filters %}
 <!DOCTYPE html>
 <html lang="es">
 
@@ -41,12 +42,35 @@
     {% include 'MarketPlace/_common/footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
+    <script src="https://unpkg.com/vue"></script>
     <script src="{% static 'MarketPlace/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'MarketPlace/jquery/jquery.cookie.js' %}"></script>
     <script src="{% static 'MarketPlace/popper/popper.min.js' %}"></script>
     <script src="{% static 'MarketPlace/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'Administrador/theme/js/jquery.validate.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
     {% block scripts %}
+    {% endblock %}
+
+    <script type="text/javascript">
+        {% if user.is_authenticated %}
+            var autenticado = true;
+        {% else %}
+            var autenticado = false;
+        {% endif %}
+        {% if request.session.cart.items %}
+            var cart = {{ request.session.cart|dumps_filter|safe }};
+        {% else %}
+            var cart = {
+                items: []
+            };
+        {% endif %}
+    </script>
+
+    <script src="{% static 'Cliente/vue_scripts/cartPreview.js' %}"></script>
+    {% block vue_scripts %}
+
     {% endblock %}
 </body>
 

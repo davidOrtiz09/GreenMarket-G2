@@ -3,6 +3,7 @@
     <section>
         <div class="container-fluid" style="margin-top: 10px">
             <h1 class="text-center"> Ofertas de Proveedores por aprobar </h1>
+            <h2 class="text-center">{{ semana }} </h2>
             <br/>
             <form method="post" action="{% url 'administrador:ofertas' %}">
                 {% csrf_token %}
@@ -11,8 +12,9 @@
                     <table id="pedidosTable" class="table dataTable" cellspacing="2" width="100%" border="1"
                            align="center">
                         <thead>
-                        <br/>
-                        <th colspan="6" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        <tr>
+                            <th colspan="6" bgcolor="#228b22" class="text-white text-center">Ofertas</th>
+                        </tr>
                         <tr bgcolor="#deb887">
                             <th class="text-center">Nombre Provedor</th>
                             <th class="text-center">Productos Ofertados</th>

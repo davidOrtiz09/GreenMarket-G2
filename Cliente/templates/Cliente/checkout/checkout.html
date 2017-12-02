@@ -1,6 +1,7 @@
-{% extends 'MarketPlace/_common/base.html' %}+
+{% extends 'MarketPlace/_common/base.html' %}
+{% load static %}
 {% block main %}
-    <section class="mt-3 mb-3">
+    <section class="mt-3 mb-3" id="cart-details-app">
         <div class="container">
             <div class="row">
                 <div class="col mb-3">
@@ -36,84 +37,51 @@
                             <div class="card">
                                 <div class="card-header" role="tab">
                                     <a data-toggle="collapse" href="#informacion-envio" class="btn btn-link">
-                                        <h5 class="mb-0">Información de envío</h5>
+                                        <h5 class="mb-0">Envío y pago</h5>
                                     </a>
                                 </div>
                                 <div id="informacion-envio" class="collapse" role="tabpanel"
                                      data-parent="#proceso-checkout">
                                     <div class="card-body">
-                                        {% include 'Cliente/checkout/_informacion-envio.html' %}
-
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6">
+                                                <h5 class="mb-3 text-center">Información de envío</h5>
+                                                {% include 'Cliente/checkout/_informacion-envio.html' %}
+                                            </div>
+                                            <div class="col-12 col-sm-6">
+                                                <h5 class="mb-3 text-center">Información de pago</h5>
+                                                {% include 'Cliente/checkout/_informacion-pago.html' %}
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col text-left">
                                                 <a data-toggle="collapse" href="#detalles-pedido"
                                                    class="btn btn-outline-info">Anterior</a>
                                             </div>
-                                            <div class="col text-right">
-                                                <a data-toggle="collapse" href="#informacion-pago"
-                                                   class="btn btn-outline-success">Siguiente</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-header" role="tab">
-                                    <a data-toggle="collapse" href="#informacion-pago" class="btn btn-link">
-                                        <h5 class="mb-0">Información de pago</h5>
-                                    </a>
-                                </div>
-                                <div id="informacion-pago" class="collapse" role="tabpanel"
-                                     data-parent="#proceso-checkout">
-                                    <div class="card-body">
-                                        {% include 'Cliente/checkout/_informacion-pago.html' %}
-
-                                        <div class="row">
-                                            <div class="col text-left">
-                                                <a data-toggle="collapse" href="#informacion-envio"
-                                                   class="btn btn-outline-info">Anterior</a>
-                                            </div>
 
                                             <div class="col text-right">
-                                                <button id="pagar" class="btn btn-success"><i
+                                                <button @click="pagarPedido()" id="pagar" class="btn btn-success"><i
                                                         class="fa fa-money mr-2"></i> Pagar
                                                 </button>
-                                                <input type="hidden" name="checkout_form" id="json-form">
+                                                <input v-model="checkout_form" type="hidden" name="checkout_form" id="json-form">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                       </div>
+                    </div>
                 </div>
             </form>
         </div>
-    </section>
 
-    {% for cart_item in request.session.cart.items %}
-        <div class="modal fade" id="modal-eliminar-carrito-{{ cart_item.product_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="text-center">¿Desea eliminar este producto?</h6>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <form id="form-eliminar-carrito-{{ forloop.counter }}" action="{% url 'cliente:eliminar-producto-carrito' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="product-id" value="{{ cart_item.product_id }}">
-                                    <button form="form-eliminar-carrito-{{ forloop.counter }}" type="submit" class="btn btn-danger btn-block clickable">Eliminar</button>
-                                </form>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-secondary btn-block clickable" data-dismiss="modal">Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+    </section>
+{% endblock %}
+
+{% block vue_scripts %}
+    <script type="text/javascript">
+        var urlAgregarAlCarrito = '{% url 'cliente:actualizar-carrito-compras' %}';
+        var urlEliminarDelCarrito = '{% url 'cliente:eliminar-producto-carrito' %}';
+    </script>
+    <script src="{% static 'Cliente/vue_scripts/cartDetails.js' %}" type="text/javascript"></script>
 {% endblock %}

@@ -10,3 +10,7 @@ def get_error(dictionary, key):
 @register.filter(name='get_len')
 def get_len(list):
     return len(list)
+
+@register.filter(name='is_favorito')
+def is_favorito(producto,cliente):
+    return not(cliente is None) and producto.fk_producto.favorito_set.filter(fk_cliente=cliente).count() > 0
