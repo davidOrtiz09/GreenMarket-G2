@@ -57,5 +57,7 @@ urlpatterns = [
     url(r'^seleccion-cooperativa$', views.SeleccionCooperativaView.as_view(), name='seleccion-cooperativa'),
 
     url(r'^sugerir-productos$', views.ConsultarProductosSugerir.as_view(), name='sugerir-productos'),
+    url(r'^registrar-productos-sugeridos$', views.RegistrarProductosSugeridos.as_view(),
+        name='registrar-productos-sugeridos'),
 
 ]

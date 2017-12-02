@@ -755,3 +755,40 @@ class ConsultarProductosSugerir(View):
 
         return render(request, 'Administrador/sugerir-productos.html',
                       {'oferta_producto': oferta_producto})
+
+    
+class RegistrarProductosSugeridos(View):
+    def get(self, request):
+        semana = Semana.objects.last()
+        oferta_producto = Oferta_Producto.objects \
+            .distinct('fk_producto')
+
+        # oferta_producto = Oferta_Producto.objects.filter(fk_oferta__fk_semana=semana) \
+        #     .distinct('fk_producto')
+
+        return render(request, 'Administrador/sugerir-productos.html',
+                      {'oferta_producto': oferta_producto})
+
+    def post(self, request):
+        sugerir_producto_Json = json.loads(request.POST.get('sugerir-producto-form'))
+        print sugerir_producto_Json
+        configuracion = sugerir_producto_Json.get('configuracion')
+        num_usuarios = configuracion.get('numUsuarios')
+        productos_actuales = configuracion.get('reemplazar')
+        usuarios = configuracion.get('todos')
+
+        print num_usuarios
+        print productos_actuales
+        print usuarios
+        # orden_compra = Orden_Compra.objects \
+        #     .create(fk_productor=productor, valor_total=valor_total_json, estado='PA')
+
+        # for oferta_producto in sugerir_producto_Json.get('sugerir_productos'):
+        #     ofertas_por_pagar = Oferta_Producto.objects.filter(id=oferta_producto.get('oferta_profucto'))[0]
+        #     ofertas_por_pagar.fk_orden_compra = orden_compra
+        #     ofertas_por_pagar.save()
+
+        return render(request, 'Administrador/detalle-orden-pago.html', {
+            'ofertas_producto': 1
+        })
+
