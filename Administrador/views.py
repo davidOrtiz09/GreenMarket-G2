@@ -5,12 +5,12 @@ import datetime
 import json
 from operator import itemgetter
 from django.contrib.auth.models import User
-from django.db.models import Sum, Min, Max
+from django.db.models import Sum, Min, Max, Count
 from django.shortcuts import render, redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from Administrador.forms import CooperativaForm
-from Administrador.models import MejoresClientes, ProductorDestacado
+from Administrador.models import MejoresClientes, ProductorDestacado, ProductosSugeridos
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra, ClienteProducto
@@ -752,11 +752,28 @@ class ConsultarProductosSugerir(View):
         oferta_producto = Oferta_Producto.objects \
             .distinct('fk_producto')
 
+        productos_sugeridos=list()
+
+        cliente_productos=ClienteProducto.objects.filter(sugerir=True).distinct('fk_producto')
+
         # oferta_producto = Oferta_Producto.objects.filter(fk_oferta__fk_semana=semana) \
         #     .distinct('fk_producto')
 
-        return render(request, 'Administrador/sugerir-productos.html',
-                      {'oferta_producto': oferta_producto})
+        for cliente_producto in cliente_productos:
+            productos_sugeridos.append(
+                ProductosSugeridos(cliente_producto.fk_producto.id, cliente_producto.fk_producto.nombre,
+                                   cliente_producto.fk_producto.imagen, cliente_producto.fk_producto.unidad_medida,
+                                ClienteProducto.objects.filter(sugerir=True, fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Sum('cantidad'))['cantidad__sum'],
+                                   ClienteProducto.objects.filter(sugerir=True,
+                                                                  fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Count('fk_cliente'))['fk_cliente__count']
+
+                                   )
+            )
+
+        return render(request, 'Administrador/productos-sugeridos.html',
+                      {'productos_sugeridos': productos_sugeridos})
 
 
 class RegistrarProductosSugeridos(View):
@@ -785,7 +802,7 @@ class RegistrarProductosSugeridos(View):
 
         for producto_id in sugerir_producto_Json.get('sugerir_productos'):
             if usuarios:
-                self.sugeridosProductosTodosClientes(producto_id.get('productos'))
+                self.sugerirProductosTodosClientes(producto_id.get('productos'))
             else:
                 self.grabarPruductosSugeridos(producto_id.get('productos'), semana, num_usuarios)
 
@@ -810,7 +827,7 @@ class RegistrarProductosSugeridos(View):
         ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
 
 
-    def sugeridosProductosTodosClientes(self, producto_id):
+    def sugerirProductosTodosClientes(self, producto_id):
         producto = Producto.objects.filter(id=producto_id)[0]
 
         for cliente in Cliente.objects.all():
