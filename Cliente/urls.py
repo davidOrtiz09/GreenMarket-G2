@@ -16,6 +16,8 @@ urlpatterns = [
 
     url(r'^canastas$', views.Canastas.as_view(), name='canastas'),
     url(r'^agregar-canasta-carrito$', views.AgregarCanastaCarrito.as_view(), name='agregar-canasta-carrito'),
+    url(r'^eliminar-canasta-carrito$', views.EliminarCanastaCarritoCompras.as_view(), name='eliminar-canasta-carrito'),
+    url(r'^actualizar-canasta-carrito-compras$', views.ActualizarCanastaCarritoCompras.as_view(), name='actualizar-canasta-carrito-compras'),
 
     url(r'^agregar-favorito$', views.AgregarProductoFavoritoView.as_view(), name='agregar-favorito'),
     url(r'^eliminar-favorito$', views.EliminarFavoritoView.as_view(), name='eliminar-favorito'),

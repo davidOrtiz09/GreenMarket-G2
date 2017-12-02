@@ -59,11 +59,12 @@
         {% else %}
             var autenticado = false;
         {% endif %}
-        {% if request.session.cart.items %}
+        {% if request.session.cart.items or request.session.cart.canastas %}
             var cart = {{ request.session.cart|dumps_filter|safe }};
         {% else %}
             var cart = {
-                items: []
+                items: [],
+                canastas: []
             };
         {% endif %}
     </script>

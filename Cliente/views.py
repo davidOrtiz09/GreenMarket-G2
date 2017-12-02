@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
-     formatear_lista_productos, get_id_cooperativa_global
+    formatear_lista_productos, get_id_cooperativa_global, formatear_lista_canastas
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart
@@ -91,7 +91,6 @@ class Index(View):
 
         categorias = Categoria.objects.all()
 
-
         productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
         return render(request, 'Cliente/index.html', {
@@ -119,7 +118,7 @@ class Index(View):
                 .filter(fk_catalogo=catalogo).order_by(ordenar_por)
         else:
             producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo,fk_producto__favorito__fk_cliente=cliente) \
+                .filter(fk_catalogo=catalogo, fk_producto__favorito__fk_cliente=cliente) \
                 .order_by(ordenar_por)
 
         categorias = Categoria.objects.all()
@@ -145,8 +144,9 @@ class Checkout(AbstractClienteLoggedView):
         # De lo contrario mostramos la página de checkout
         cart = get_or_create_cart(request)
         items = cart.get('items', [])
+        canastas = cart.get('canastas', [])
 
-        if len(items) == 0:
+        if len(items) == 0 and len(canastas) == 0:
             messages.add_message(request, messages.WARNING, 'No tienes productos en tu carrito de compras')
             return redirect(reverse('cliente:index'))
         else:
@@ -311,16 +311,16 @@ class DoPayment(AbstractClienteLoggedView):
             producto_catalogo = Catalogo_Producto \
                 .objects.get(fk_producto_id=item.get('product_id'),
                              fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
-                             fk_catalogo__fk_semana= get_or_create_week())
+                             fk_catalogo__fk_semana=get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
                 cantidad=cantidad,
-                fk_oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
-                                            fk_oferta__fk_semana=get_or_create_week(),
-                                            estado=1).first()
+                fk_oferta_producto=Oferta_Producto \
+                    .objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                    fk_oferta__fk_semana=get_or_create_week(),
+                                    estado=1).first()
             )
             pedido_producto_model.save()
             valor_total += producto_catalogo.precio * cantidad
@@ -354,7 +354,8 @@ class DoPayment(AbstractClienteLoggedView):
                 messages.add_message(
                     request,
                     messages.ERROR,
-                    'El producto {producto} ya no se encuentra disponible'.format(producto=producto_catalogo.fk_producto.nombre)
+                    'El producto {producto} ya no se encuentra disponible'.format(
+                        producto=producto_catalogo.fk_producto.nombre)
                 )
                 savepoint_rollback(checkpoint)
                 return redirect(reverse('cliente:checkout'))
@@ -371,28 +372,73 @@ class DoPayment(AbstractClienteLoggedView):
 
 class Canastas(View):
     def get(self, request):
-        canastas = Canasta.objects.filter(esta_publicada=True, fk_semana=get_or_create_week())
-        canastas_json = json.dumps([x.to_dict for x in canastas])
+        canastas = Canasta.objects.filter(
+            esta_publicada=True,
+            fk_semana=get_or_create_week(),
+            fk_cooperativa_id=get_id_cooperativa_global(request)
+        )
         if canastas:
-            return render(request, 'Cliente/canastas.html', {'canastas': canastas, 'canastas_json': canastas_json})
+            arreglo_canastas = formatear_lista_canastas(canastas, get_id_cooperativa_global(request))
+            return render(request, 'Cliente/canastas.html', {
+                'canastas_json': json.dumps(arreglo_canastas)
+            })
         else:
             messages.add_message(request, messages.INFO, 'Actualmente no hay canastas disponibles')
             return redirect(reverse('cliente:index'))
 
 
 class AgregarCanastaCarrito(AbstractClienteLoggedView):
-    logged_out_message = 'Por favor ingresa a tu cuenta para agregar canastas a tu carrito'
-
     @atomic
     def post(self, request):
         body = json.loads(request.body.decode('utf-8'))
-        id_canasta = body.get('id_canasta', '0')
+        id_canasta = body.get('id_canasta', 0)
+        quantity = body.get('quantity', 0)
         canasta = Canasta.objects.filter(id=id_canasta, esta_publicada=True, fk_semana=get_or_create_week()).first()
-        if canasta:
-            agregar_canasta_carrito(request, canasta)
-            return JsonResponse({'status': 'ok'})
+        if canasta and quantity > 0:
+            request.session['cart'] = agregar_canasta_carrito(request, id_canasta, quantity)
+            return JsonResponse(request.session['cart'])
         else:
             return JsonResponse({'status': 'error'}, status=500)
+
+
+class ActualizarCanastaCarritoCompras(AbstractClienteLoggedView):
+    def post(self, request):
+
+        json_body = json.loads(request.body.decode('utf-8'))
+        canasta_id = json_body.get('canasta_id', 0)
+        quantity = json_body.get('quantity', 0)
+
+        if canasta_id > 0 and quantity != 0:
+            request.session['cart'] = agregar_canasta_carrito(
+                request=request,
+                canasta_id=canasta_id,
+                quantity=quantity
+            )
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class EliminarCanastaCarritoCompras(AbstractClienteLoggedView):
+    def post(self, request):
+        cart = get_or_create_cart(request)
+        json_body = json.loads(request.body.decode('utf-8'))
+        canasta_id = json_body.get('canasta_id', -1)
+
+        canastas = cart.get('canastas', [])
+        index = -1
+        i = 0
+        while i < len(canastas) and index == -1:
+            item = canastas[i]
+            if item['id'] == canasta_id:
+                index = i
+            i += 1
+
+        if index >= 0:
+            canastas.remove(canastas[index])
+            cart['canastas'] = canastas
+            request.session['cart'] = cart
+        return JsonResponse(request.session['cart'])
 
 
 class AgregarProductoFavoritoView(AbstractClienteLoggedView):
@@ -429,11 +475,11 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, id_pedido):
         pedido = Pedido.objects.get(id=id_pedido)
         detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido_id=id_pedido)
-        lista_productos=[]
+        lista_productos = []
         for detPed in detalle_mi_pedido:
-            productoPedido=detPed
-            valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
-            categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            productoPedido = detPed
+            valor = detPed.cantidad * detPed.fk_catalogo_producto.precio
+            categoria = detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
             evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto_id=productoPedido.id)
             if len(evalProducto) == 0:
                 disable_button_producto = ''
@@ -450,7 +496,6 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
         else:
             disable_button = ''
 
-
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
             'detalle_pedido': lista_productos,
             'pedido': pedido,
@@ -460,7 +505,7 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
 
 class CalificarMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, fk_pedido_producto, fk_productor, producto, pedido):
-        productoSelected= Producto.objects.filter(id=producto).first
+        productoSelected = Producto.objects.filter(id=producto).first
         return render(request, 'Cliente/calificar-mis-pedidos.html', {
             'producto': productoSelected,
             'fk_pedido_producto': fk_pedido_producto,
@@ -470,16 +515,17 @@ class CalificarMisPedidoView(AbstractClienteLoggedView):
 
 
 class InsertCalificacionProductoVew(AbstractClienteLoggedView):
-    def post(self, request, pedido_producto, productor,id_pedido):
+    def post(self, request, pedido_producto, productor, id_pedido):
         productor = Productor.objects.filter(id=productor).first()
         pedidoProducto = PedidoProducto.objects.filter(id=pedido_producto).first()
         ValorCalificacion = request.POST.get('calificacion', '')
-        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto, calificacion=ValorCalificacion)
+        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto,
+                                        calificacion=ValorCalificacion)
         evaluacion.save()
         messages.add_message(
             request, messages.SUCCESS,
-                'La calificacion fue guardada exitosamente'
-            )
+            'La calificacion fue guardada exitosamente'
+        )
         return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
 
 
@@ -491,7 +537,7 @@ class MejoresProductores(View):
         productores_ordenado = []
         if len(productores_list) != 0:
             for prod_list in productores_list:
-                promedio= calcular_promedio(prod_list)
+                promedio = calcular_promedio(prod_list)
                 respuesta.append({
                     'productor': prod_list,
                     'calificacion': "{0:.4f}".format(promedio)

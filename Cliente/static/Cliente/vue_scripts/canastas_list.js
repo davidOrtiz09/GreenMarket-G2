@@ -22,18 +22,19 @@ var listaCanastasApp = new Vue({
                     url: urlAgregarCanastaCarrito,
                     type: 'POST',
                     data: JSON.stringify({
-                        id_producto: producto.id_producto
+                        id_canasta: canasta.id,
+                        quantity: 1
                     }),
                     headers: {
                         'X-CSRFToken': $.cookie('csrftoken')
                     },
                     dataType: 'json',
-                    success: function (message) {
-                        producto.es_favorito = true;
-                        alert("El producto fue añadido como favorito");
+                    success: function (newCart) {
+                        alert("La canasta se agregó al carrito")
+                        cartPreviewApp.updateCart(newCart);
                     },
                     failure: function (errMsg) {
-                        alert('Se presentó un error. No se pudo agregar como favorito.');
+                        alert('Se presentó un error. No se pudo agregar la canasta al carrito.');
                     }
                 });
             }

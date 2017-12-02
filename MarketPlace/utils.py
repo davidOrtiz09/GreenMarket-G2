@@ -83,11 +83,25 @@ def cantidad_disponible_producto_catalogo(producto_catalogo, cooperativa_id):
     response = 0
     ofertas_producto = Oferta_Producto.objects.filter(
         fk_producto_id=producto_catalogo.fk_producto_id,
-        fk_oferta__fk_semana_id=get_or_create_week().id,
+        fk_oferta__fk_semana_id=get_or_create_prev_week().id,
         fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id
     )
     for oferta_producto in ofertas_producto:
         response += oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
+    return response
+
+
+def cantidad_disponible_canasta(canasta, cooperativa_id):
+    response = -1
+
+    for producto_canasta in canasta.productos:
+        cantidad_producto_individual = cantidad_disponible_producto_catalogo(producto_canasta.fk_producto_catalogo, cooperativa_id)
+        cantidad_producto = cantidad_producto_individual / producto_canasta.cantidad
+        if response == -1:
+            response = cantidad_producto
+        elif cantidad_producto < response:
+            response = cantidad_producto
+
     return response
 
 
@@ -98,7 +112,7 @@ def number_to_cop(number):
         return number
 
 
-def formatear_lista_productos(productos_catalogo, request ,cooperativa_id):
+def formatear_lista_productos(productos_catalogo, request, cooperativa_id):
     productos = []
     for producto in productos_catalogo:
         cantidad_disponible = cantidad_disponible_producto_catalogo(producto, cooperativa_id)
@@ -110,16 +124,27 @@ def formatear_lista_productos(productos_catalogo, request ,cooperativa_id):
     return productos
 
 
+def formatear_lista_canastas(canastas_catalogo, cooperativa_id):
+    canastas = []
+    for canasta in canastas_catalogo:
+        cantidad_disponible = cantidad_disponible_canasta(canasta, cooperativa_id)
+        if cantidad_disponible > 0:
+            canasta_dict = canasta.to_dict
+            canasta_dict['cantidad_disponible'] = cantidad_disponible
+            canastas.append(canasta_dict)
+    return canastas
+
+
 def get_cooperativa_global(request):
     cooperativa = None
     if es_administrador(request.user):
         cooperativa = request.session.get('cooperativa', None)
 
-    if (cooperativa is None):
+    if cooperativa is None:
         cooperativa = Cooperativa.objects.first().to_json()
 
     return cooperativa
 
 
 def get_id_cooperativa_global(request):
-    return(get_cooperativa_global(request)['id'])
+    return get_cooperativa_global(request)['id']

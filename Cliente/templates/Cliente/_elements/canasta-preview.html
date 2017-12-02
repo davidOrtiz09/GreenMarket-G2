@@ -6,11 +6,14 @@
         </div>
         <h5 class="text-center">[[ canasta.nombre ]]</h5>
         <div class="row">
-            <div class="col">
+            <div class="col-6">
                 <h6>$[[ canasta.precio_cop ]]</h6>
             </div>
-            <div class="col">
+            <div class="col-6">
                 <h5 class="text-success text-right">-[[ canasta.descuento ]]%</h5>
+            </div>
+            <div class="col-12">
+                Disponibles: <b>[[ canasta.cantidad_disponible ]]</b>
             </div>
         </div>
         <div class="row mt-2">
@@ -21,14 +24,10 @@
                 </button>
             </div>
             <div class="col">
-                <form action="{% url 'cliente:agregar-canasta-carrito' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="id_canasta" v-model="canasta.id">
-                    <button class="btn btn-info">
-                        <i class="fa fa-cart-plus"></i>
-                        Añadir
-                    </button>
-                </form>
+                <button class="btn btn-info" @click="agregarAlCarrito(canasta)">
+                    <i class="fa fa-cart-plus"></i>
+                    Añadir
+                </button>
             </div>
         </div>
     </div>
