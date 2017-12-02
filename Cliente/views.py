@@ -77,17 +77,50 @@ class Index(View):
             return super(Index, self).dispatch(*args, **kwargs)
 
     def get(self, request):
-        cooperativas = Cooperativa.objects.all()
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
-        producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
-            .order_by('fk_producto__nombre')
-        categorias = Categoria.objects.all()
-        return render(request, 'Cliente/index.html', {
-            'productos_catalogo': producto_catalogo,
-            'categorias': categorias,
-            'cooperativas': cooperativas
-        })
+        ciudadFiltrar = request.GET.get('ciudadGeo')
+        if ciudadFiltrar is not None:
+            # Se listan los productos filtrados por Cooperativa cuando se utiliza la geolocalizacion
+            cooperativa = Cooperativa.objects.all().filter(ciudad=ciudadFiltrar)
+            if cooperativa.first() is not None:
+                cooperativa_id = cooperativa.first().id
+                producto_catalogo = Catalogo_Producto.objects \
+                    .filter(fk_catalogo__fk_semana__fk_cooperativa__id=cooperativa_id)
+                categorias = Categoria.objects.all()
+                cooperativas = Cooperativa.objects.all()
+
+                return render(request, 'Cliente/index.html', {
+                    'productos_catalogo': producto_catalogo,
+                    'categorias': categorias,
+                    'cooperativas': cooperativas,
+                    'cooperativaEncontrada': cooperativa.first().id
+                })
+            else:
+                cooperativas = Cooperativa.objects.all()
+                catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+                producto_catalogo = Catalogo_Producto.objects \
+                    .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
+                    .order_by('fk_producto__nombre')
+                categorias = Categoria.objects.all()
+                return render(request, 'Cliente/index.html', {
+                    'productos_catalogo': producto_catalogo,
+                    'categorias': categorias,
+                    'cooperativas': cooperativas,
+                    'mensajePython' : "No se encontraron cooperativas en la ubicación:"+ciudadFiltrar,
+                    'cooperativaEncontrada': cooperativas.first().id
+                })
+        else:
+            cooperativas = Cooperativa.objects.all()
+            catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week())
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo__fk_semana__fk_cooperativa_id=cooperativas.first(), fk_catalogo=catalogo) \
+                .order_by('fk_producto__nombre')
+            categorias = Categoria.objects.all()
+            return render(request, 'Cliente/index.html', {
+                'productos_catalogo': producto_catalogo,
+                'categorias': categorias,
+                'cooperativas': cooperativas,
+                'cooperativaEncontrada':cooperativas.first().id
+            })
 
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
@@ -98,11 +131,16 @@ class Index(View):
             .order_by(ordenar_por)
         categorias = Categoria.objects.all()
         cooperativas = Cooperativa.objects.all()
+        mensaje = ''
+        if producto_catalogo.first() is None:
+            mensaje = 'La cooperativa seleccionada no cuenta con productos disponibles por el momento.'
 
         return render(request, 'Cliente/index.html', {
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
-            'cooperativas': cooperativas
+            'cooperativas': cooperativas,
+            'mensajePython':mensaje,
+            'cooperativaEncontrada':cooperativa_id
         })
 
 

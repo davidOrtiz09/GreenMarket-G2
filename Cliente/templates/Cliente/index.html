@@ -7,6 +7,12 @@
 
 {% block main %}
     <section>
+        <div id="mensajePython" style="display: none;">
+            {{ mensajePython }}
+        </div>
+        <div id="valueSelectCoop" style="display: none;">
+            {{ cooperativaEncontrada }}
+        </div>
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -36,6 +42,10 @@
                     <form method="post" action="{% url 'cliente:index' %}">
                         {% csrf_token %}
                         <div align="center">
+                            <div id="sectionGeoLocate" >
+                                <img src="{% static  '/images/geolocation.png' %}" style="width: 25px;" onclick="geoFindMe();">
+                                <span id="popupGeolocation">Buscar una cooperativa en tu ubicación actual.</span>
+                            </div>
                             <label for="cooperativa">Cooperativa</label>
                             <select name="cooperativa_id" id="cooperativa">
                                 {% for cooperativa in cooperativas %}
