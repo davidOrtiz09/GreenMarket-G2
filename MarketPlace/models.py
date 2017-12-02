@@ -404,3 +404,10 @@ class EvaluacionProducto(models.Model):
     fk_productor = models.ForeignKey (Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
     fk_pedido_producto = models.ForeignKey (PedidoProducto, on_delete=models.CASCADE, verbose_name='PedidoProducto', null=False, blank=False)
     calificacion = models.PositiveIntegerField (verbose_name='Calificacion', null=False, blank=False)
+
+
+class ProductoSugerido(models.Model):
+    fk_Cliente = models.ForeignKey (Cliente, on_delete=models.CASCADE, verbose_name='Cliente', null=False, blank=False)
+    fk_producto = models.ForeignKey (Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    cantidad = models.PositiveIntegerField (verbose_name='cantidad', null=False, blank=False)
+    frecuencia = models.PositiveIntegerField(verbose_name='frecuencia', null=False, blank=False)

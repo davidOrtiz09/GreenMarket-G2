@@ -756,7 +756,7 @@ class ConsultarProductosSugerir(View):
         return render(request, 'Administrador/sugerir-productos.html',
                       {'oferta_producto': oferta_producto})
 
-    
+
 class RegistrarProductosSugeridos(View):
     def get(self, request):
         semana = Semana.objects.last()
