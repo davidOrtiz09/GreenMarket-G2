@@ -16,7 +16,7 @@
         </div>
         <br>
         <br>
-        <div class="container-fluid" style="width: 80%">
+        <div class="container-fluid" style="width: 90%">
             <table class="table table-responsive" border="1">
                 <thead>
                 <tr>
@@ -27,7 +27,9 @@
                 <tr bgcolor="#dbeb887">
                     <th class="text-center">Productores ID</th>
                     <th class="text-center">Nombre</th>
-                    <th class="text-center">Correo</th>
+                    <th class="text-center">Descripcion</th>
+                    <th class="text-center">Dirección</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,11 +39,19 @@
                             {{ item.id }}
                         </td>
                         <td>
-                            {{ item.fk_django_user.first_name }} {{ item.fk_django_user.last_name }}
+                            {{ item.nombre }}
                         </td>
                         <td>
-                            {{ item.fk_django_user.email }}
+                            {{ item.descripcion }}
                         </td>
+                        <td>
+                            {{ item.direccion }}
+                        </td>
+                        <td>
+                            <a href="productores/actualizar-productor/?id={{ item.id }}">
+                                <button type="button" class="btn btn-info botonTabla"  style="height: 30px; line-height: 9px;margin-right: 7px;">Editar</button>
+                            </a>
+                            <button type="button" class="btn btn-danger botonTabla" style="height: 30px;line-height: 9px;" onclick="deleteProductor({{ item.id }})">Eliminar</button></td>
                     </tr>
 
                 {% endfor %}

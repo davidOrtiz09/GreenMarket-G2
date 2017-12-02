@@ -89,7 +89,6 @@ function agregarProductor(){
     var ciudadSelect = $("option:selected", $("#selectCiudad"));
     var cooperativaSelect = $("option:selected", $("#selectCooperativa"));
     var nombre = $("#inputNombre").val().trim();
-    var apellido = $("#inputApellido").val().trim();
     var correo = $("#inputCorreo").val().trim();
     var direccion = $("#inputDireccion").val().trim();
     var descripcion = $("#inputDescripcionProductor").val().trim();
@@ -115,11 +114,6 @@ function agregarProductor(){
 
     if (nombre=="") {
         alert ("Es necesario ingresar el/los nombre del productor.");
-        return;
-    }
-
-    if (apellido=="") {
-        alert ("Es necesario ingresar los apellidos del productor.");
         return;
     }
 
@@ -163,7 +157,7 @@ function agregarProductor(){
 
     $("#sectionLoading").show();
 
-    JsonProductor = {"cooperativaId":cooperativaSelect.val(),"nombre":nombre,"apellido":apellido,"contrasena":password1,"correo":correo,"direccion":direccion, "descripcion":descripcion, "coordenadas":coordenadas};
+    JsonProductor = {"cooperativaId":cooperativaSelect.val(),"nombre":nombre,"contrasena":password1,"correo":correo,"direccion":direccion, "descripcion":descripcion, "coordenadas":coordenadas};
 
     $.ajax({
             url: URLDomain+"administrador/agregarProductor/",
@@ -177,4 +171,56 @@ function agregarProductor(){
                 window.location = URLDomain+"administrador/productores"
             }
         });
+}
+
+function ActualizarProductor( id ){
+    var nombre = $("#inputNombreActualizar").val().trim();
+    var direccion = $("#inputDireccionActualizar").val().trim();
+    var descripcion = $("#inputDescripcionProductorActualizar").val().trim();
+    var coordenadas;
+
+    if (nombre=="") {
+        alert ("Es necesario ingresar el/los nombre del productor.");
+        return;
+    }
+
+    if (direccion=="") {
+        alert ("Es necesario ingresar la dirección del productor.");
+        return;
+    }
+
+    if (descripcion=="") {
+        alert ("Es necesario ingresar una descripción del productor.");
+        return;
+    }
+
+    if(latSelect || longSelect){
+        coordenadas = latSelect+","+longSelect;
+    }else{
+        alert ("Es necesario seleccionar la ubicación de la finca del productor.");
+        return;
+    }
+
+
+    $("#sectionLoading").show();
+
+    JsonProductor = {"nombre":nombre,"direccion":direccion, "descripcion":descripcion, "coordenadas":coordenadas, "idProductor":id};
+
+    $.ajax({
+            url: URLDomain+"administrador/actualizarProductor/",
+            data: JSON.stringify(JsonProductor),
+            type: 'POST',
+            contentType: "application/json; charset=utf-8;",
+            dataType: "json",
+            success: function (data) {
+                $("#sectionLoading").hide();
+                alert("El productor ha sido actualizado de forma satisfactoria.");
+                window.location = URLDomain+"administrador/productores"
+            }
+        });
+}
+
+
+function deleteProductor(id){
+    alert('Eliminar produtor');
 }
