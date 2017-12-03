@@ -130,7 +130,7 @@ def get_cooperativa_global(request):
 
 
 def get_id_cooperativa_global(request):
-    return(get_cooperativa_global(request)['id'])
+    return get_cooperativa_global(request)['id']
 
 
 def sugerir_productos():
