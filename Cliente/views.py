@@ -68,7 +68,7 @@ class Ingresar(View):
 class Logout(View):
     def get(self, request):
         for key in request.session.keys():
-            del request.session[key]
+            request.session[key] = ''
         logout(request)
         return redirect(reverse('cliente:index'))
 
