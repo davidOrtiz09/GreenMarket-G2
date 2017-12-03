@@ -1,5 +1,6 @@
 from django import template
 from json import dumps
+
 register = template.Library()
 
 
@@ -18,6 +19,7 @@ def dumps_filter(d):
         return dumps(d)
     except Exception as e:
         return d
+
 
 # Funcionalidad para multiplicar en templates y retornar el resultado en formato moneda
 @register.filter(name='multiply_cop')

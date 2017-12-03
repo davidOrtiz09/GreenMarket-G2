@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block main %}
-    <section>
+    <section id="lista-productos-app">
         <div id="mensajePython" style="display: none;">
             {{ mensajePython }}
         </div>
@@ -42,36 +42,33 @@
                             <span class="sr-only">Next</span>
                         </a>
                     </div>
-                    <form method="post" action="{% url 'cliente:index' %}">
-                        {% csrf_token %}
-                        <div class="form-row justify-content-center">
-                            <div class="col-auto">
-                                <label for="cooperativa">Cooperativa</label>
-                                <select name="cooperativa_id" id="cooperativa" class="custom-select">
-                                    {% for cooperativa in cooperativas %}
-                                        <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
-                                    {% endfor %}
+                    <div class="form-row justify-content-center">
+                        <div class="col-auto">
+                            <label for="cooperativa">Cooperativa</label>
+                            <select name="cooperativa_id" id="cooperativa" class="custom-select">
+                                {% for cooperativa in cooperativas %}
+                                    <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="ordenar">Ordenar Por</label>
+                            <select @change="cambioOrden" v-model="ordenSeleccionado" id="ordenar" class="custom-select">
+                                <option v-for="opcionOrden in ordenes" :value="opcionOrden">[[ opcionOrden.texto ]]</option>
+                            </select>
+                        </div>
 
-                                </select>
-                            </div>
-                            <div class="col-auto">
-                                <label for="ordenar">Ordenar Por</label>
-                                <select name="ordenar" id="ordenar" class="custom-select">
-                                    <option value="fk_producto__nombre">Producto: A-Z</option>
-                                    <option value="-fk_producto__nombre">Producto: Z-A</option>
-                                    <option value="precio">Precio: Menor a Mayor</option>
-                                    <option value="-precio">Precio: Mayor a Menor</option>
+                        {% if user.is_authenticated %}
 
-                                </select>
+                            <div class="col-auto">
+                                <label class="custom-control custom-checkbox">
+                                      <input v-model="soloFavoritos" type="checkbox" class="custom-control-input">
+                                      <span class="custom-control-indicator"></span>
+                                      <span class="custom-control-description">Ver solo favoritos</span>
+                                </label>
                             </div>
-                            {% if request.user.is_authenticated %}
-                                <div class="col-auto">
-                                    <label for="favoritos">Favoritos</label>
-                                    <input name="favoritos" type="checkbox" id="favoritos" class="custom-checkbox" {% if solo_favoritos %}
-                                        checked="checked"{% endif %}>
-                                </div>
-                            {% endif %}
-                            <input type="submit" id="botonFiltrarProductos" value="Buscar" class="btn btn-primary">
+                        {% endif %}
+                    <input type="submit" id="botonFiltrarProductos" value="Buscar" class="btn btn-primary">
 
                         </div>
                     </form>

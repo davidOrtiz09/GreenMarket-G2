@@ -18,11 +18,35 @@ var cartDetailsApp = new Vue({
         }
     },
     computed: {
+        detalles_productos: function () {
+            var response = [];
+            for (var i = 0; i < this.cart.items.length; i++) {
+                var item = this.cart.items[i];
+                response.push({
+                    quantity: item.quantity,
+                    product_id: item.product_id
+                })
+            }
+            return response;
+        },
+        detalles_canastas: function(){
+            var response = [];
+            for (var i = 0; i < this.cart.canastas.length; i++) {
+                var canasta = this.cart.canastas[i];
+                response.push({
+                    quantity: canasta.quantity,
+                    canasta_id: canasta.id
+                })
+            }
+            return response;
+        },
         checkout_form: function () {
-            var detallesPedido = this.getJsonDetallesPedido();
+            var detallesProductos = this.detalles_productos;
+            var detallesCanastas = this.detalles_canastas;
 
             var formJson = {
-                detalles_pedido: detallesPedido,
+                detalles_productos: detallesProductos,
+                detalles_canastas: detallesCanastas,
                 informacion_envio: this.envio,
                 informacion_pago: this.pago
             };
@@ -36,13 +60,19 @@ var cartDetailsApp = new Vue({
         },
         getTotal: function () {
             var items = this.cart.items;
+            var canastas = this.cart.canastas;
             var total = 0;
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 total += item.price * parseInt(item.quantity);
             }
+            for(var i=0;i<canastas.length;i++){
+                var canasta = canastas[i];
+                total += canasta.price * parseInt(canasta.quantity);
+            }
             return this.toCop(total);
         },
+
         incrementarCantidad: function (item) {
             var newQuantity = item.quantity + 1;
             if(newQuantity <= item.cantidad_disponible){
@@ -58,8 +88,8 @@ var cartDetailsApp = new Vue({
             }
         },
         cambioCantidad: function (event, item) {
-            var newValue = event.target.value;
-            var previousQuantity = item.quantity;
+            var newValue = parseInt(event.target.value);
+            var previousQuantity = parseInt(item.quantity);
             if (newValue < 1 || newValue === '') {
                 item.quantity = 1;
             }
@@ -77,6 +107,13 @@ var cartDetailsApp = new Vue({
             }
         },
         modificarCantidadCarrito: function (item, quantity) {
+            if(quantity > item.cantidad_disponible){
+                quantity = item.cantidad_disponible - item.quantity;
+            }
+            if(quantity < 1){
+                quantity = 1 - item.quantity;
+            }
+
             $.ajax({
                 url: urlAgregarAlCarrito,
                 type: 'POST',
@@ -115,6 +152,86 @@ var cartDetailsApp = new Vue({
                 }
             });
         },
+
+        incrementarCantidadCanasta: function (canasta) {
+            var newQuantity = canasta.quantity + 1;
+            if(newQuantity <= canasta.cantidad_disponible){
+                canasta.quantity += 1;
+                this.modificarCantidadCanasta(canasta, 1);
+            }
+        },
+        disminuirCantidadCanasta: function (canasta) {
+            var cantidadPrevia = parseInt(canasta.quantity);
+            if (cantidadPrevia > 0) {
+                canasta.quantity -= 1;
+                this.modificarCantidadCanasta(canasta, -1);
+            }
+        },
+        cambioCantidadCanasta: function (event, canasta) {
+            var newValue = parseInt(event.target.value);
+            var previousQuantity = parseInt(canasta.quantity);
+            if (newValue < 1 || newValue === '') {
+                canasta.quantity = 1;
+            }
+            else {
+                if(newValue > canasta.cantidad_disponible){
+                    canasta.quantity = canasta.cantidad_disponible;
+                }
+                else{
+                    canasta.quantity = newValue;
+                }
+            }
+            var diff = canasta.quantity - previousQuantity;
+            if (diff !== 0) {
+                this.modificarCantidadCanasta(canasta, diff);
+            }
+        },
+        eliminarCanasta: function(canasta){
+            $.ajax({
+                url: urlEliminarCanastaDelCarrito,
+                type: 'POST',
+                data: JSON.stringify({
+                    canasta_id: canasta.id
+                }),
+                headers: {
+                    'X-CSRFToken': $.cookie('csrftoken')
+                },
+                dataType: 'json',
+                success: function (newCart) {
+                    cartPreviewApp.updateCart(newCart);
+                    cartDetailsApp.cart = newCart;
+                    $('#modal-eliminar-canasta-' + canasta.id).modal('hide');
+                    if (cartPreviewApp.countItems() === 0) {
+                        window.location.href = '/';
+                    }
+                }
+            });
+        },
+        modificarCantidadCanasta: function (canasta, quantity) {
+            if(quantity > canasta.cantidad_disponible){
+                quantity = canasta.cantidad_disponible - canasta.quantity;
+            }
+            if(quantity < 1){
+                quantity = 1 - canasta.quantity;
+            }
+            $.ajax({
+                url: urlAgregarCanastaAlCarrito,
+                type: 'POST',
+                data: JSON.stringify({
+                    canasta_id: canasta.id,
+                    quantity: quantity
+                }),
+                headers: {
+                    'X-CSRFToken': $.cookie('csrftoken')
+                },
+                dataType: 'json',
+                success: function (newCart) {
+                    cartPreviewApp.updateCart(newCart);
+                    cartDetailsApp.cart = newCart;
+                }
+            });
+        },
+
         pagarPedido: function () {
             var form = $('form#form-ckeckout');
             this.validateForm();
@@ -193,17 +310,6 @@ var cartDetailsApp = new Vue({
                     }
                 }
             });
-        },
-        getJsonDetallesPedido: function () {
-            var response = [];
-            for (var i = 0; i < this.cart.items.length; i++) {
-                var item = this.cart.items[i];
-                response.push({
-                    quantity: item.quantity,
-                    product_id: item.product_id
-                })
-            }
-            return response;
         }
     }
 });

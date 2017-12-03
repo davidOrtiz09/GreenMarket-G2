@@ -82,6 +82,9 @@
     <script type="text/javascript">
         var urlAgregarAlCarrito = '{% url 'cliente:actualizar-carrito-compras' %}';
         var urlEliminarDelCarrito = '{% url 'cliente:eliminar-producto-carrito' %}';
+
+        var urlAgregarCanastaAlCarrito = '{% url 'cliente:actualizar-canasta-carrito-compras' %}';
+        var urlEliminarCanastaDelCarrito = '{% url 'cliente:eliminar-canasta-carrito' %}';
     </script>
     <script src="{% static 'Cliente/vue_scripts/cartDetails.js' %}" type="text/javascript"></script>
 {% endblock %}

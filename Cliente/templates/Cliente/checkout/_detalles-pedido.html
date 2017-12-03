@@ -11,6 +11,7 @@
         </tr>
         </thead>
         <tbody>
+
         <tr class="product-cart" v-for="cartItem in cart.items">
             <td>
                 <div class="row">
@@ -33,9 +34,9 @@
                             <i class="fa fa-2x fa-minus-circle"></i>
                         </button>
                     </span>
-                    <input class="form-control product-quantity cart-details" type="number" min="1"
+                    <input class="form-control product-quantity cart-details" type="number" min="1" :max="cartItem.cantidad_disponible"
                            :value="cartItem.quantity" @change="cambioCantidad($event, cartItem)" step="1" pattern="\d*">
-                    <input class="product-id" type="hidden" v-model="cartItem.product_id" :max="cartItem.cantidad_disponible" readonly disabled>
+                    <input class="product-id" type="hidden" v-model="cartItem.product_id" readonly disabled>
                     <span class="input-group-btn clickable">
                         <button @click="incrementarCantidad(cartItem)" type="button" class="btn btn-success" :disabled="cartItem.quantity >= cartItem.cantidad_disponible">
                             <i class="fa fa-2x fa-plus-circle"></i>
@@ -70,7 +71,7 @@
                             <div class="modal-body">
                                 <div class="row">
                                     <div class="col-6">
-                                        <button @click="eliminarItem(cartItem)" type="submit"
+                                        <button @click="eliminarItem(cartItem)" type="button"
                                                 class="btn btn-danger btn-block clickable">Eliminar
                                         </button>
                                     </div>
@@ -87,6 +88,82 @@
 
             </td>
         </tr>
+
+        <tr class="product-cart" v-for="canasta in cart.canastas">
+            <td>
+                <div class="row">
+                    <div class="col-lg-6 col-sm-12">
+                        <div class="text-center">
+                            <img :src="canasta.image" class="img-fluid mx-auto">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <h5>Canasta [[ canasta.name]]</h5>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="input-group">
+                    <span class="input-group-btn clickable">
+                        <button @click="disminuirCantidadCanasta(canasta)" type="button" class="btn btn-danger"
+                                :disabled="canasta.quantity <= 1">
+                            <i class="fa fa-2x fa-minus-circle"></i>
+                        </button>
+                    </span>
+                    <input class="form-control product-quantity cart-details" type="number" min="1" :max="canasta.cantidad_disponible"
+                           v-model="canasta.quantity" @change="cambioCantidadCanasta($event, canasta)" step="1" pattern="\d*">
+                    <span class="input-group-btn clickable">
+                        <button @click="incrementarCantidadCanasta(canasta)" type="button" class="btn btn-success" :disabled="canasta.quantity >= canasta.cantidad_disponible">
+                            <i class="fa fa-2x fa-plus-circle"></i>
+                        </button>
+                    </span>
+                </div>
+            </td>
+            <td class="text-center">
+                <div class="mt-2">
+                    <input class="unit-price" type="hidden" v-model="canasta.price" readonly disabled>
+                    $[[ toCop(canasta.price) ]]
+                </div>
+            </td>
+            <td class="text-center">
+                <div class="mt-2">
+                    $<span class="subtotal-producto">[[ toCop(canasta.quantity * canasta.price) ]]</span>
+                </div>
+            </td>
+            <td>
+                <button type="button" class="btn btn-link clickable" data-toggle="modal" data-keyboard="false"
+                        :data-target="'#modal-eliminar-canasta-'+canasta.id">
+                    <i class="fa fa-2x fa-times-circle-o text-danger"></i>
+                </button>
+
+                <div :id="'modal-eliminar-canasta-'+canasta.id" tabindex="-1" role="dialog"
+                     aria-hidden="true" class="modal fade">
+                    <div class="modal-dialog modal-sm" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h6 class="text-center">¿Desea eliminar esta canasta?</h6>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button @click="eliminarCanasta(canasta)" type="button"
+                                                class="btn btn-danger btn-block clickable">Eliminar
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-secondary btn-block clickable"
+                                                data-dismiss="modal">Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+
         </tbody>
         <tfoot>
         <tr>

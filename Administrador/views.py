@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import json
+from decimal import Decimal
 from operator import itemgetter
 from django.contrib.auth.models import User
 from django.db.models import Sum, Min, Max
@@ -363,10 +364,12 @@ class DetallesCanasta(AbstractAdministradorLoggedView):
     def post(self, request, id_canasta):
         nombre = request.POST.get('nombre', '')
         imagen = request.FILES.get('imagen', None)
-
+        precio_str = request.POST.get('precio', '0.0')
+        precio = Decimal(precio_str)
         canasta = Canasta.objects.filter(id=id_canasta).first()
         if canasta:
             canasta.nombre = nombre
+            canasta.precio = precio
             if imagen:
                 canasta.imagen = imagen
 

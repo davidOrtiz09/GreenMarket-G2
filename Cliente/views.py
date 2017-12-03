@@ -13,7 +13,7 @@ from Administrador.views import AbstractAdministradorLoggedView
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, CanastaProducto, Favorito, Productor, EvaluacionProducto, Producto
+    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto, PedidoCanasta
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -21,10 +21,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
-     formatear_lista_productos, get_cooperativa_cliente, set_cooperativa_cliente
+    formatear_lista_productos, get_id_cooperativa_global, formatear_lista_canastas, cantidad_disponible_canasta, cantidad_disponible_producto_catalogo, get_cooperativa_cliente, set_cooperativa_cliente
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
-from Cliente.utils import agregar_producto_carrito
+from Cliente.utils import agregar_producto_carrito, agregar_canasta_carrito, get_or_create_cart, actualizar_inventario
 from django.http import JsonResponse
 
 
@@ -110,24 +110,12 @@ class Index(View):
     def post(self, request):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
-        ordenar_por = request.POST.get('ordenar', '')
-        favoritos = request.POST.get('favoritos', '')
 
-        set_cooperativa_cliente(request,cooperativa_id);
+        set_cooperativa_cliente(request, cooperativa_id);
 
-        cliente = None if self.request.user.is_anonymous \
-            else Cliente.objects.filter(fk_django_user=self.request.user).first()
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
 
-        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
-                                           fk_cooperativa_id=cooperativa_id)
-
-        if (favoritos == ''):
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo).order_by(ordenar_por)
-        else:
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo,fk_producto__favorito__fk_cliente=cliente) \
-                .order_by(ordenar_por)
+        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
 
         categorias = Categoria.objects.all()
 
@@ -143,7 +131,6 @@ class Index(View):
             'productos_json': json.dumps(productos),
             'categorias': categorias,
             'cooperativas': cooperativas,
-            'solo_favoritos': favoritos != '',
             'mensajePython': mensaje,
             'cooperativaSeleccionada': get_cooperativa_cliente(request),
             'buscarGeolocation':0
@@ -157,12 +144,11 @@ class Checkout(AbstractClienteLoggedView):
         # Obtenemos el carrito y sus items
         # Si no encontramos nada, redirijimos el usuario al home y le notificamos que no tiene items en el carrito
         # De lo contrario mostramos la página de checkout
-        cart = request.session.get('cart', None)
-        items = []
-        if cart:
-            items = cart.get('items', [])
+        cart = get_or_create_cart(request)
+        items = cart.get('items', [])
+        canastas = cart.get('canastas', [])
 
-        if not cart or len(items) == 0:
+        if len(items) == 0 and len(canastas) == 0:
             messages.add_message(request, messages.WARNING, 'No tienes productos en tu carrito de compras')
             return redirect(reverse('cliente:index'))
         else:
@@ -176,7 +162,7 @@ class UpdateShoppingCart(AbstractClienteLoggedView):
         # Se añade un nuevo item al carrito de compras (almacenado en la sesión) y se le notifica al usuario
         # Se retorna a la página desde el que se añadió el producto al carrito
 
-        json_body = json.loads(request.body)
+        json_body = json.loads(request.body.decode('utf-8'))
         product_id = json_body.get('product_id', 0)
         quantity = json_body.get('quantity', 0)
 
@@ -196,23 +182,23 @@ class DeleteProductFromShoppingCart(AbstractClienteLoggedView):
 
     def post(self, request):
         # Eliminamos el producto con el id dado del carrito de compras
-        cart = request.session.get('cart', None)
-        json_body = json.loads(request.body)
+        cart = get_or_create_cart(request)
+        json_body = json.loads(request.body.decode('utf-8'))
         product_id = json_body.get('product_id', -1)
-        if cart:
-            items = cart.get('items', [])
-            index = -1
-            i = 0
-            while i < len(items) and index == -1:
-                item = items[i]
-                if item['product_id'] == product_id:
-                    index = i
-                i += 1
 
-            if index >= 0:
-                items.remove(items[index])
-                cart['items'] = items
-                request.session['cart'] = cart
+        items = cart.get('items', [])
+        index = -1
+        i = 0
+        while i < len(items) and index == -1:
+            item = items[i]
+            if item['product_id'] == product_id:
+                index = i
+            i += 1
+
+        if index >= 0:
+            items.remove(items[index])
+            cart['items'] = items
+            request.session['cart'] = cart
         return JsonResponse(request.session['cart'])
 
 
@@ -290,7 +276,8 @@ class DoPayment(AbstractClienteLoggedView):
     @atomic
     def post(self, request):
         checkout_Json = json.loads(request.POST.get('checkout_form'))
-        detalles_pedido = checkout_Json.get('detalles_pedido')
+        detalles_productos = checkout_Json.get('detalles_productos')
+        detalles_canastas = checkout_Json.get('detalles_canastas')
         informacion_envio = checkout_Json.get('informacion_envio')
         informacion_pago = checkout_Json.get('informacion_pago')
         nombre_envio = informacion_envio.get('nombre')
@@ -321,127 +308,161 @@ class DoPayment(AbstractClienteLoggedView):
         )
         checkpoint = savepoint()
         pedido_model.save()
-
+        id_cooperativa = get_id_cooperativa_global(request)
         valor_total = 0
-        for item in detalles_pedido:
-            producto_catalogo = Catalogo_Producto \
-                .objects.get(fk_producto_id=item.get('product_id'),
-                             fk_catalogo__fk_cooperativa_id=get_cooperativa_cliente(request),
-                             fk_catalogo__fk_semana= get_or_create_week())
+        for item in detalles_productos:
+            producto_catalogo = Catalogo_Producto.objects.get(
+                fk_producto_id=item.get('product_id'),
+                fk_catalogo__fk_cooperativa_id=id_cooperativa,
+                fk_catalogo__fk_semana=get_or_create_week()
+            )
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
                 fk_catalogo_producto=producto_catalogo,
                 fk_pedido=pedido_model,
                 cantidad=cantidad,
-                fk_oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
-                                            fk_oferta__fk_semana=get_or_create_week(),
-                                            estado=1).first()
+                fk_oferta_producto=Oferta_Producto.objects.filter(
+                    fk_producto=producto_catalogo.fk_producto,
+                    fk_oferta__fk_semana=get_or_create_week(),
+                    estado=1).first()
             )
             pedido_producto_model.save()
-            valor_total += producto_catalogo.precio * cantidad
-            cantidad_disponible = 0
 
-            try:
-                while cantidad != 0:
-                    if cantidad_disponible > cantidad:
-                        oferta_producto.cantidad_vendida = cantidad
-                        oferta_producto.save()
-                        cantidad = 0
+            cantidad_restante = actualizar_inventario(producto_catalogo, cantidad)
 
-                    elif cantidad_disponible > 0:
-                        oferta_producto.cantidad_vendida = oferta_producto.cantidad_aceptada
-                        oferta_producto.save()
-                        cantidad = cantidad - cantidad_disponible
-                    else:
-                        oferta_producto = Oferta_Producto \
-                            .objects.filter(fk_producto=producto_catalogo.fk_producto,
-                                            fk_oferta__fk_semana=get_or_create_week(),
-                                            estado=1) \
-                            .exclude(cantidad_vendida=F('cantidad_aceptada')) \
-                            .order_by('precioProvedor').first()
-                        cantidad_disponible = oferta_producto.cantidad_aceptada - oferta_producto.cantidad_vendida
-            except:
-                cart = request.session.get('cart', None)
-                if cart:
-                    items = cart.get('items', [])
-                    cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.fk_producto_id, items))
-                    request.session['cart'] = cart
+            if cantidad_restante > 0:
+                cart = get_or_create_cart(request)
+
+                items = cart.get('items', [])
+                cart['items'] = list(filter(lambda x: x['product_id'] != producto_catalogo.fk_producto_id, items))
+                request.session['cart'] = cart
                 messages.add_message(
                     request,
                     messages.ERROR,
-                    'El producto {producto} ya no se encuentra disponible'.format(producto=producto_catalogo.fk_producto.nombre)
+                    'El producto {producto} ya no se encuentra disponible'.format(
+                        producto=producto_catalogo.fk_producto.nombre)
                 )
                 savepoint_rollback(checkpoint)
                 return redirect(reverse('cliente:checkout'))
+            else:
+                valor_total += producto_catalogo.precio * cantidad
+
+        canastas_query = Canasta.objects.filter(
+            esta_publicada=True,
+            fk_semana=get_or_create_week(),
+            fk_cooperativa_id=get_id_cooperativa_global(request)
+        )
+        for canasta_carrito in detalles_canastas:
+            canasta = canastas_query.get(id=canasta_carrito.get('canasta_id'))
+            cantidad_canasta = int(canasta_carrito.get('quantity'))
+            pedido_canasta_model = PedidoCanasta(
+                cantidad=cantidad_canasta,
+                fk_pedido=pedido_model,
+                fk_canasta=canasta,
+            )
+            for canasta_producto in canasta.productos:
+                producto_catalogo = canasta_producto.fk_producto_catalogo
+                cantidad_producto = canasta_producto.cantidad * cantidad_canasta
+                cantidad_restante = actualizar_inventario(producto_catalogo, cantidad_producto)
+                if cantidad_restante > 0:
+                    cart = get_or_create_cart(request)
+                    canastas_carrito = cart.get('canastas', [])
+                    cart['canastas'] = list(filter(lambda x: x['canasta_id'] != canasta.id, canastas_carrito))
+                    request.session['cart'] = cart
+                    messages.add_message(
+                        request,
+                        messages.ERROR,
+                        'La canasta {canasta} ya no se encuentra disponible'.format(canasta=canasta.nombre)
+                    )
+                    savepoint_rollback(checkpoint)
+                    return redirect(reverse('cliente:checkout'))
+
+            valor_total += canasta.precio * cantidad_canasta
+            pedido_canasta_model.save()
+
+
 
         pedido_model.valor_total = valor_total
         pedido_model.save()
         savepoint_commit(checkpoint)
-
-        request.session['cartCompra'] = request.session['cart']
         request.session['cart'] = ""
-        return render(request, 'Cliente/checkout/detalle-compra-exitosa.html',
-                      {'compra': True})
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            'La compra se realizó exitosamente'
+        )
+        return redirect(reverse('cliente:detalle-mis-pedidos', kwargs={'id_pedido': pedido_model.id}))
 
 
 class Canastas(View):
     def get(self, request):
-        canastas = Canasta.objects.filter(esta_publicada=True, fk_semana=get_or_create_week())
+        canastas = Canasta.objects.filter(
+            esta_publicada=True,
+            fk_semana=get_or_create_week(),
+            fk_cooperativa_id=get_id_cooperativa_global(request)
+        )
         if canastas:
-            return render(request, 'Cliente/canastas.html', {'canastas': canastas})
+            arreglo_canastas = formatear_lista_canastas(canastas, get_id_cooperativa_global(request))
+            return render(request, 'Cliente/canastas.html', {
+                'canastas_json': json.dumps(arreglo_canastas)
+            })
         else:
             messages.add_message(request, messages.INFO, 'Actualmente no hay canastas disponibles')
-            cooperativas = Cooperativa.objects.all()
-            cooperativa_id = get_cooperativa_cliente(request)
-            catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
-                                               fk_cooperativa_id=cooperativa_id)
-
-            producto_catalogo = Catalogo_Producto.objects \
-                .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
-            categorias = Categoria.objects.all()
-
-            productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
-
-            return render(request, 'Cliente/index.html', {
-                'productos_json': json.dumps(productos),
-                'productos_catalogo': producto_catalogo,
-                'categorias': categorias,
-                'cooperativas': cooperativas,
-                'solo_favoritos': False,
-                'cooperativaSeleccionada': get_cooperativa_cliente(request),
-                'buscarGeolocation': 0
-            })
+            return redirect(reverse('cliente:index'))
 
 
 class AgregarCanastaCarrito(AbstractClienteLoggedView):
-    logged_out_message = 'Por favor ingresa a tu cuenta para agregar canastas a tu carrito'
-
     @atomic
     def post(self, request):
-        id_canasta = request.POST.get('id_canasta', '0')
+        body = json.loads(request.body.decode('utf-8'))
+        id_canasta = body.get('id_canasta', 0)
+        quantity = body.get('quantity', 0)
         canasta = Canasta.objects.filter(id=id_canasta, esta_publicada=True, fk_semana=get_or_create_week()).first()
-        if canasta:
-            productos_canasta = CanastaProducto.objects.filter(fk_canasta_id=canasta)
-            for producto_canasta in productos_canasta:
-                request.session['cart'] = agregar_producto_carrito(
-                    request=request,
-                    product_id=producto_canasta.fk_producto_catalogo_id,
-                    quantity=producto_canasta.cantidad
-                )
-
-            messages.add_message(
-                request,
-                messages.SUCCESS,
-                'Los productos de la canasta fueron añadidos al carrito'
-            )
+        if canasta and quantity > 0:
+            request.session['cart'] = agregar_canasta_carrito(request, id_canasta, quantity)
+            return JsonResponse(request.session['cart'])
         else:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                'La canasta que estas buscando ya no se encuentra disponible'
+            return JsonResponse({'status': 'error'}, status=500)
+
+
+class ActualizarCanastaCarritoCompras(AbstractClienteLoggedView):
+    def post(self, request):
+
+        json_body = json.loads(request.body.decode('utf-8'))
+        canasta_id = json_body.get('canasta_id', 0)
+        quantity = json_body.get('quantity', 0)
+
+        if canasta_id > 0 and quantity != 0:
+            request.session['cart'] = agregar_canasta_carrito(
+                request=request,
+                canasta_id=canasta_id,
+                quantity=quantity
             )
-        return redirect(reverse('cliente:canastas'))
+            # messages.add_message(request, messages.SUCCESS, 'El producto se agregó al carrito satisfactoriamente')
+        return JsonResponse(request.session['cart'])
+        # return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+class EliminarCanastaCarritoCompras(AbstractClienteLoggedView):
+    def post(self, request):
+        cart = get_or_create_cart(request)
+        json_body = json.loads(request.body.decode('utf-8'))
+        canasta_id = json_body.get('canasta_id', -1)
+
+        canastas = cart.get('canastas', [])
+        index = -1
+        i = 0
+        while i < len(canastas) and index == -1:
+            item = canastas[i]
+            if item['id'] == canasta_id:
+                index = i
+            i += 1
+
+        if index >= 0:
+            canastas.remove(canastas[index])
+            cart['canastas'] = canastas
+            request.session['cart'] = cart
+        return JsonResponse(request.session['cart'])
 
 
 class AgregarProductoFavoritoView(AbstractClienteLoggedView):
@@ -478,11 +499,11 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, id_pedido):
         pedido = Pedido.objects.get(id=id_pedido)
         detalle_mi_pedido = PedidoProducto.objects.filter(fk_pedido_id=id_pedido)
-        lista_productos=[]
+        lista_productos = []
         for detPed in detalle_mi_pedido:
-            productoPedido=detPed
-            valor=detPed.cantidad * detPed.fk_catalogo_producto.precio
-            categoria=detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
+            productoPedido = detPed
+            valor = detPed.cantidad * detPed.fk_catalogo_producto.precio
+            categoria = detPed.fk_catalogo_producto.fk_producto.fk_categoria.nombre
             evalProducto = EvaluacionProducto.objects.filter(fk_pedido_producto_id=productoPedido.id)
             if len(evalProducto) == 0:
                 disable_button_producto = ''
@@ -494,22 +515,25 @@ class DetalleMisPedidoView(AbstractClienteLoggedView):
                 'valor': valor,
                 'disable_button_producto': disable_button_producto
             })
+
+        pedido_canastas = PedidoCanasta.objects.filter(fk_pedido_id=id_pedido)
+
         if pedido.estado != 'EN':
             disable_button = 'disabled'
         else:
             disable_button = ''
 
-
         return render(request, 'Cliente/detalle-mis-pedidos.html', {
             'detalle_pedido': lista_productos,
-            'pedido' : pedido,
-            'disable' : disable_button
+            'pedido_canastas': pedido_canastas,
+            'pedido': pedido,
+            'disable': disable_button
         })
 
 
 class CalificarMisPedidoView(AbstractClienteLoggedView):
     def get(self, request, fk_pedido_producto, fk_productor, producto, pedido):
-        productoSelected= Producto.objects.filter(id=producto).first
+        productoSelected = Producto.objects.filter(id=producto).first
         return render(request, 'Cliente/calificar-mis-pedidos.html', {
             'producto': productoSelected,
             'fk_pedido_producto': fk_pedido_producto,
@@ -519,16 +543,17 @@ class CalificarMisPedidoView(AbstractClienteLoggedView):
 
 
 class InsertCalificacionProductoVew(AbstractClienteLoggedView):
-    def post(self, request, pedido_producto, productor,id_pedido):
+    def post(self, request, pedido_producto, productor, id_pedido):
         productor = Productor.objects.filter(id=productor).first()
         pedidoProducto = PedidoProducto.objects.filter(id=pedido_producto).first()
         ValorCalificacion = request.POST.get('calificacion', '')
-        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto, calificacion=ValorCalificacion)
+        evaluacion = EvaluacionProducto(fk_productor=productor, fk_pedido_producto=pedidoProducto,
+                                        calificacion=ValorCalificacion)
         evaluacion.save()
         messages.add_message(
             request, messages.SUCCESS,
-                'La calificacion fue guardada exitosamente'
-            )
+            'La calificacion fue guardada exitosamente'
+        )
         return redirect(reverse('cliente:detalle-mis-pedidos', args=(id_pedido)))
 
 
@@ -537,9 +562,10 @@ class MejoresProductores(View):
         productores_list = Productor.objects.all()
         respuesta = []
         promedio = 0.0
+        productores_ordenado = []
         if len(productores_list) != 0:
             for prod_list in productores_list:
-                promedio= calcular_promedio(prod_list)
+                promedio = calcular_promedio(prod_list)
                 respuesta.append({
                     'productor': prod_list,
                     'calificacion': "{0:.4f}".format(promedio)
