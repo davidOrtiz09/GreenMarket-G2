@@ -53,6 +53,7 @@ class Productor(models.Model):
         return self.nombre
 
 
+@python_2_unicode_compatible
 class Orden_Compra(models.Model):
     ESTADOS = (
         ('PP', 'Por Pagar'),
@@ -73,6 +74,9 @@ class Orden_Compra(models.Model):
         verbose_name = 'Orden de Compra'
         verbose_name_plural = 'Ordenes de Compra'
 
+    def __str__(self):
+        return 'Orden de compra {id}'.format(id=self.id)
+
 
 @python_2_unicode_compatible
 class Categoria(models.Model):
@@ -88,6 +92,7 @@ class Categoria(models.Model):
         verbose_name_plural = 'Categorias'
 
 
+@python_2_unicode_compatible
 class Producto(models.Model):
     UNIDAD_MEDIDA = (
         ('Kg', 'Kilogramos'),
@@ -191,6 +196,7 @@ class Catalogo(models.Model):
         return '{0}'.format(self.id)
 
 
+@python_2_unicode_compatible
 class Catalogo_Producto(models.Model):
     fk_catalogo = models.ForeignKey(Catalogo, on_delete=models.CASCADE, verbose_name='Catálogo', null=False,
                                     blank=False)
@@ -229,6 +235,7 @@ class Catalogo_Producto(models.Model):
         return '{0} (Catalogo {1})'.format(self.fk_producto.nombre, self.fk_catalogo_id)
 
 
+@python_2_unicode_compatible
 class Cliente(models.Model):
     TIPO_DOCUMENTOS = (
         ('CC', 'Cédula de Ciudadanía'),
@@ -263,6 +270,9 @@ class Cliente(models.Model):
     class Meta:
         pass
         # unique_together = ('numero_identificacion', 'tipo_identificacion',)
+
+    def __str__(self):
+        return '{nombre} ({identificacion})'.format(nombre=self.fk_django_user.get_full_name(), identificacion=self.numero_identificacion)
 
 
 @python_2_unicode_compatible
@@ -426,6 +436,7 @@ class PedidoCanasta(models.Model):
         )
 
 
+@python_2_unicode_compatible
 class Favorito(models.Model):
     fk_cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente", null=False, blank=False)
     fk_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto", null=False, blank=False)
@@ -447,12 +458,17 @@ class Favorito(models.Model):
         return 'Cliente {cliente} - {producto}'.format(cliente=self.nombre_cliente, producto=self.nombre_producto)
 
 
+@python_2_unicode_compatible
 class EvaluacionProducto(models.Model):
     fk_productor = models.ForeignKey (Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
     fk_pedido_producto = models.ForeignKey (PedidoProducto, on_delete=models.CASCADE, verbose_name='PedidoProducto', null=False, blank=False)
     calificacion = models.PositiveIntegerField (verbose_name='Calificacion', null=False, blank=False)
 
+    def __str__(self):
+        return 'Evaluación de producto {id}'.format(id=self.id)
 
+
+@python_2_unicode_compatible
 class ClienteProducto(models.Model):
     fk_cliente = models.ForeignKey (Cliente, on_delete=models.CASCADE, verbose_name='Cliente', null=False, blank=False)
     fk_producto = models.ForeignKey (Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
