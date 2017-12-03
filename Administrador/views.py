@@ -749,7 +749,7 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
             nombre = cleaned_data.get('nombre')
             ciudad = cleaned_data.get('ciudad')
             departamento = cleaned_data.get('departamento')
-            coordenada = cleaned_data.get('coordenada')
+            coordenada = cleaned_data.get('coordenadas_gps')
             Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento, coordenadas_gps=coordenada)
             cooperativas = Cooperativa.objects.all().order_by('id')
             return render(request, 'Administrador/Cooperativas.html', {'listaCooperativas': cooperativas})
