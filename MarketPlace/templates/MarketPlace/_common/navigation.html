@@ -24,6 +24,7 @@
                         Canastas de productos
                     </a>
                 </li>
+                {% if user.is_authenticated %}
                 {% url 'cliente:productos-sugeridos' as url_productos_sugeridos %}
                 <li class="nav-item {% if request.path == url_productos_sugeridos%}active{% endif %}">
                     <a class="nav-link" href="{% url 'cliente:productos-sugeridos' %}">
@@ -31,6 +32,7 @@
                         Productos para ti
                     </a>
                 </li>
+            {% endif %}
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if not user.is_authenticated %}

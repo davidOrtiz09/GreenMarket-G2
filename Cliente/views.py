@@ -330,9 +330,9 @@ class DoPayment(AbstractClienteLoggedView):
             cliente_producto_model=ClienteProducto.objects.filter(fk_producto=producto_catalogo.fk_producto,
                                            fk_cliente=cliente_model)
             if cliente_producto_model.exists():
-                cliente_producto_model[0].cantidad=cliente_producto_model[0].cantidad + cantidad
-                cliente_producto_model[0].frecuencia=cliente_producto_model[0].frecuencia+1
-
+                total_cantidad=cliente_producto_model[0].cantidad+cantidad
+                total_frecuencia=cliente_producto_model[0].frecuencia+1
+                cliente_producto_model.update(cantidad=total_cantidad, frecuencia=total_frecuencia)
             else:
                 cliente_producto_model = ClienteProducto(
                     fk_cliente=cliente_model,
