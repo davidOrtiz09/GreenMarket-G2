@@ -312,6 +312,23 @@ class DoPayment(AbstractClienteLoggedView):
             )
             pedido_producto_model.save()
 
+            cliente_producto_model = ClienteProducto.objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                                                    fk_cliente=cliente_model)
+            if cliente_producto_model.exists():
+                total_cantidad = cliente_producto_model[0].cantidad + cantidad
+                total_frecuencia = cliente_producto_model[0].frecuencia + 1
+                cliente_producto_model.update(cantidad=total_cantidad, frecuencia=total_frecuencia)
+            else:
+                cliente_producto_model = ClienteProducto(
+                    fk_cliente=cliente_model,
+                    fk_producto=producto_catalogo.fk_producto,
+                    fk_semana=get_or_create_week(),
+                    cantidad=cantidad,
+                    frecuencia=1,
+                    sugerir=False
+                )
+                cliente_producto_model.save()
+
             cantidad_restante = actualizar_inventario(producto_catalogo, cantidad)
 
             if cantidad_restante > 0:
