@@ -111,7 +111,7 @@ class Index(View):
         # Se listan los productos por Cooperativa y se ordenan segun filtro
         cooperativa_id = request.POST.get('cooperativa_id', '')
 
-        set_cooperativa_cliente(request, cooperativa_id);
+        set_cooperativa_cliente(request, cooperativa_id)
 
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
 
@@ -121,7 +121,7 @@ class Index(View):
 
         cooperativas = Cooperativa.objects.all()
 
-        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+        productos = formatear_lista_productos(producto_catalogo, request, int(cooperativa_id))
 
         mensaje= ''
         if len(productos) == 0:
@@ -249,7 +249,12 @@ class RegisterClientView(View):
                 tipo_identificacion=tipo_identificacion
             )
             cliente_model.save()
-            return render(request, 'Cliente/index.html', {})
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Tu cuenta fue creada exitosamente, ya puedes ingresar a Green Market'
+            )
+            return redirect(reverse('cliente:registrar-cliente'))
         else:
             return render_to_response('Cliente/registrar_cliente.html', {'form': form})
 
