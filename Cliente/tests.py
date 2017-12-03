@@ -29,8 +29,6 @@ class ClienteTestCase(TestCase):
         )
         cooperativa.save()
 
-        print Cooperativa.objects.filter(nombre='Cooperativa')[0].nombre
-
         semana = get_or_create_week()
         categoria = Categoria(
             nombre='Nombre de la categoría',
@@ -67,8 +65,6 @@ class ClienteTestCase(TestCase):
                 precio=Decimal('1600')
             ).save()
 
-
-        print platform.system()
         if platform.system() == 'Darwin':
             self.browser = webdriver.Chrome(os.path.join(BASE_DIR, 'Administrador', 'chromedriver', 'chromedriver'))
         elif platform.system() == 'Linux':
