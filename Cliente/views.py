@@ -674,10 +674,10 @@ class ProductosSugeridos(View):
                                            fk_cooperativa_id=cooperativa_id)
 
         cliente_model = Cliente.objects.filter(fk_django_user=self.request.user).first()
-        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('fk_producto_id')
 
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
+            .filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto)
         categorias = Categoria.objects.all()
 
         productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
@@ -701,9 +701,10 @@ class ProductosSugeridos(View):
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
 
         cliente_model = Cliente.objects.filter(fk_django_user=self.request.user).first()
-        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('fk_producto_id')
 
-        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
+        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto)\
+            .order_by('fk_producto__nombre')
 
         categorias = Categoria.objects.all()
 
