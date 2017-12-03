@@ -808,7 +808,6 @@ class RegistrarProductosSugeridos(View):
 
     def post(self, request):
         sugerir_producto_Json = json.loads(request.POST.get('sugerir-producto-form'))
-        print sugerir_producto_Json
         configuracion = sugerir_producto_Json.get('configuracion')
         num_usuarios = configuracion.get('numUsuarios')
         productos_actuales = configuracion.get('reemplazar')
@@ -827,16 +826,19 @@ class RegistrarProductosSugeridos(View):
         return redirect(reverse('administrador:consultar-productos-sugeridos'))
 
     def grabarPruductosSugeridos(self, producto_id, semana, numUsuarios):
-        producto = Producto.objects.filter(id=producto_id)[0]
+        productos = Producto.objects.filter(id=producto_id)
 
-        producto_sugerido = ClienteProducto.objects.filter(fk_producto=producto, sugerir=False)\
-            .order_by('cantidad').values('id')[:numUsuarios]
+        if productos.exists():
+            producto_sugerido = ClienteProducto.objects.filter(fk_producto=productos[0], sugerir=False)\
+                .order_by('cantidad').values('id')[:numUsuarios]
 
-        ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
+            ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
 
 
     def sugerirProductosTodosClientes(self, producto_id):
-        producto = Producto.objects.filter(id=producto_id)[0]
+        productos = Producto.objects.filter(id=producto_id)
+        if productos.exists():
+            producto = productos[0]
 
         for cliente in Cliente.objects.all():
             cliente_producto_model=ClienteProducto.objects.filter(fk_producto=producto, fk_cliente=cliente)
