@@ -34,11 +34,18 @@
                                 <input name="imagen" type="file" class="form-control">
                             </div>
                         </div>
+
                         <div class="form-group row">
-                            <label class="col-4 col-sm-2 col-form-label">Precio</label>
+                            <label class="col-4 col-sm-2 col-form-label">Precio (sin descuento)</label>
                             <div class="col-8 col-sm-4">
-                                <input type="text" class="form-control" readonly
-                                       value="$ {{ canasta.get_precio|to_cop }}">
+                                <input type="text" class="form-control" value="$ {{ canasta.precio_sin_descuento|to_cop }}" readonly>
+                            </div>
+
+
+                            <label class="col-4 col-sm-2 col-form-label">Precio (con descuento)</label>
+                            <div class="col-8 col-sm-4">
+                                <input name="precio" type="number" class="form-control" value="{{ canasta.get_precio }}">
+                                <p class="text-success"><b>Descuento: </b> {{ canasta.get_descuento }}%</p>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -100,5 +107,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'MarketPlace/scripts.js' %}"></script>
+    <script type="text/javascript" src="{% static 'Administrador/scripts.js' %}"></script>
+    <
 {% endblock %}

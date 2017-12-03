@@ -1,56 +1,77 @@
 {% load marketplace_filters %}
-<div class="box-product">
-    <div class="img-wrapper">
-        <img src="{{ canasta.imagen.url }}" class="img-responsive center-block product-preview">
-    </div>
-    <h5 class="text-center">{{ canasta.nombre }}</h5>
-    <div class="row">
-        <div class="col">
-            <h6>${{ canasta.precio|to_cop }}</h6>
+<div v-for="canasta in canastas" class="col-12 col-md-6 col-lg-3 mb-4">
+    <div class="box-product">
+        <div class="img-wrapper">
+            <img :src="canasta.imagen" class="img-responsive center-block product-preview">
         </div>
-        <div class="col">
-            <button class="btn btn-outline-success" data-toggle="modal" data-target="#productos-canasta-{{ canasta.id }}">
-                Ver productos
-            </button>
+        <h5 class="text-center">[[ canasta.nombre ]]</h5>
+        <div class="row">
+            <div class="col-6">
+                <h6>$[[ canasta.precio_cop ]]</h6>
+            </div>
+            <div class="col-6">
+                <h5 class="text-success text-right">-[[ canasta.descuento ]]%</h5>
+            </div>
+            <div class="col-12">
+                Disponibles: <b>[[ canasta.cantidad_disponible ]]</b>
+            </div>
         </div>
-    </div>
-    <div class="text-center mt-2">
-        <form action="{% url 'cliente:agregar-canasta-carrito' %}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="id_canasta" value="{{ canasta.id }}">
-            <button class="btn btn-info">
-                <i class="fa fa-cart-plus"></i>
-                Añade estos productos
-            </button>
-        </form>
-    </div>
-</div>
-
-
-<div class="modal fade" id="productos-canasta-{{ canasta.id }}">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    {{ canasta.nombre }}
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+        <div class="row mt-2">
+            <div class="col">
+                <button class="btn btn-outline-success" data-toggle="modal"
+                        :data-target="'#productos-canasta-'+canasta.id">
+                    Ver productos
                 </button>
             </div>
-            <div class="modal-body">
-                <ul>
-                {% for canasta_producto in canasta.productos %}
-                    <li>
-                        {{ canasta_producto.cantidad }}
-                        {{ canasta_producto.nombre_producto }}
-                        ( ${{ canasta_producto.precio_producto|to_cop }} c/u )
-                    </li>
-                {% endfor %}
-                </ul>
+            <div class="col">
+                <button class="btn btn-info" @click="agregarAlCarrito(canasta)">
+                    <i class="fa fa-cart-plus"></i>
+                    Añadir
+                </button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+
+
+    <div class="modal fade" :id="'productos-canasta-'+canasta.id">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center">
+                        [[ canasta.nombre ]]
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Nombre del producto</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio individual</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2" class="text-right">Descuento</th>
+                                <th><h5 class="text-success">[[ canasta.descuento ]]%</h5></th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <tr v-for="canasta_producto in canasta.productos">
+                                <td>[[ canasta_producto.nombre_producto ]]</td>
+                                <th>[[ canasta_producto.cantidad ]]</th>
+                                <td>$[[ canasta_producto.precio_unitario_cop ]] c/[[ canasta_producto.unidad_producto ]]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>

@@ -298,11 +298,11 @@ class Pedido(models.Model):
 
 @python_2_unicode_compatible
 class PedidoProducto(models.Model):
-    cantidad = models.IntegerField(default=0, blank=True, null=True)
+    cantidad = models.PositiveIntegerField(default=0, blank=True, null=True)
     fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
     fk_catalogo_producto = models.ForeignKey(Catalogo_Producto, on_delete=models.CASCADE,
                                              verbose_name='CatalogoProducto', null=False, blank=False)
-    fk_oferta_producto = models.ForeignKey (Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
+    fk_oferta_producto = models.ForeignKey(Oferta_Producto, on_delete=models.CASCADE, verbose_name='OfertaProducto', null=False, blank=False)
 
     def __str__(self):
         return '{cantidad} de {producto}'.format(cantidad=str(self.cantidad),
@@ -314,7 +314,8 @@ class Canasta(models.Model):
     fk_cooperativa = models.ForeignKey(Cooperativa, on_delete=models.CASCADE, verbose_name='Cooperativa', null=False, blank=False)
     fk_semana = models.ForeignKey(Semana, on_delete=models.CASCADE, verbose_name='Semana', null=False, blank=False)
     nombre = models.CharField(max_length=100, verbose_name='Nombre', null=False, blank=False)
-    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagne', null=False, blank=False)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Precio con descuento', null=False, blank=False, default=Decimal('0.0'))
+    imagen = models.ImageField(upload_to='canastas', verbose_name='Imagen', null=False, blank=False)
     esta_publicada = models.BooleanField(default=False, verbose_name='¿Se encuentra publicada?', null=False,
                                          blank=False)
 
@@ -330,15 +331,41 @@ class Canasta(models.Model):
         return '{0:.2f}'.format(self.precio)
 
     @property
-    def precio(self):
+    def precio_sin_descuento(self):
         precio = Decimal('0')
         for producto in self.productos:
-            precio += Decimal(str(producto.fk_producto_catalogo.precio)) * producto.cantidad
+            precio += Decimal(str(producto.precio_producto)) * producto.cantidad
         return precio
+
+    @property
+    def get_descuento(self):
+        if self.precio_sin_descuento <= 0:
+            return 0
+        descuento = (self.precio / self.precio_sin_descuento) * 100
+        return '{0:.0f}'.format(descuento)
 
     @property
     def get_estado(self):
         return 'Publicada' if self.esta_publicada else 'Sin publicar'
+
+    @property
+    def to_dict(self):
+        productos = []
+        for producto in self.productos:
+            productos.append({
+                'nombre_producto': producto.nombre_producto,
+                'cantidad': producto.cantidad,
+                'precio_unitario_cop': to_cop(float(producto.precio_producto)),
+                'unidad_producto': producto.unidad_producto
+            })
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'precio_cop': to_cop(float(self.precio)),
+            'descuento': self.get_descuento,
+            'productos': productos,
+            'imagen': self.imagen.url if self.imagen else ''
+        }
 
     class Meta:
         verbose_name = 'Canasta'
@@ -377,6 +404,23 @@ class CanastaProducto(models.Model):
     def __str__(self):
         return 'Canasta {canasta} - {producto}'.format(canasta=self.fk_canasta.nombre,
                                                        producto=self.fk_producto_catalogo.fk_producto)
+
+
+@python_2_unicode_compatible
+class PedidoCanasta(models.Model):
+    cantidad = models.PositiveIntegerField(default=0, blank=False, null=False)
+    fk_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, verbose_name='Pedido', null=False, blank=False)
+    fk_canasta = models.ForeignKey(Canasta, on_delete=models.CASCADE, verbose_name='Canasta', null=False, blank=False)
+
+    @property
+    def subtotal(self):
+        return self.cantidad * self.fk_canasta.precio
+
+    def __str__(self):
+        return '{cantidad} de {canasta}'.format(
+            cantidad=str(self.cantidad),
+            canasta=self.fk_canasta
+        )
 
 
 class Favorito(models.Model):

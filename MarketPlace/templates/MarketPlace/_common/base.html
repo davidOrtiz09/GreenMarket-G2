@@ -59,16 +59,19 @@
         {% else %}
             var autenticado = false;
         {% endif %}
-        {% if request.session.cart.items %}
+        {% if request.session.cart.items or request.session.cart.canastas %}
             var cart = {{ request.session.cart|dumps_filter|safe }};
         {% else %}
             var cart = {
-                items: []
+                items: [],
+                canastas: []
             };
         {% endif %}
     </script>
 
-    <script src="{% static 'Cliente/vue_scripts/cartPreview.js' %}"></script>
+    {% if user.is_authenticated %}
+        <script src="{% static 'Cliente/vue_scripts/cartPreview.js' %}"></script>
+    {% endif %}
     {% block vue_scripts %}
 
     {% endblock %}

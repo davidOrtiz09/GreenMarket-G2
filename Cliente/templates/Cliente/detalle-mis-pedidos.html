@@ -5,8 +5,6 @@
             <div class="row">
                 <div class="col-12">
                     <br>
-                    <br>
-                    <br>
                     <h1 class="text-center"> Detalle de mi Pedido</h1>
                     <br/>
                     <form method="post" action="{% url 'administrador:actualizar-estado-pedido' %}">
@@ -47,6 +45,33 @@
                                             <input  type="button" {{ disable }} {{ detalle.disable_button_producto }} type="submit" class="btn btn-primary" value="Calificar" onclick="location.href='{% url 'cliente:calificar-mis-pedidos' fk_pedido_producto=detalle.producto.id fk_productor=detalle.producto.fk_oferta_producto.fk_oferta.fk_productor_id producto=detalle.producto.fk_catalogo_producto.fk_producto.id pedido=pedido.id %}';"/>
                                         </td>
                                     </tr>
+                                {% endfor %}
+                                {% for pedido_canasta in pedido_canastas  %}
+
+                                    <tr>
+                                        <td class="text-center">Canasta</td>
+                                        <td class="text-center">
+                                            <img src="{{ pedido_canasta.fk_canasta.imagen.url }}"
+                                                 class="img-responsive center-block"
+                                                 style="max-height: 200px; max-width: 200px">
+                                        </td>
+                                        <td class="text-center">
+                                            {{ pedido_canasta.fk_canasta.nombre }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ pedido_canasta.cantidad }}
+                                        </td>
+                                        <td class="text-center">
+                                            N/A
+                                        </td>
+                                        <td class="text-center">
+                                            $ {{ pedido_canasta.fk_canasta.precio }}</td>
+                                        <td class="text-center">$ {{ pedido_canasta.subtotal }}</td>
+                                        <td class="text-center" disabled>
+                                            N/A
+                                        </td>
+                                    </tr>
+
                                 {% endfor %}
                                 <tr>
                                     <td class="text-center" colspan="6">Valor Total</td>
