@@ -699,7 +699,10 @@ class ProductosSugeridos(View):
 
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
 
-        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+        cliente_model = Cliente.objects.filter(fk_django_user=self.request.user).first()
+        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+
+        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
 
         categorias = Categoria.objects.all()
 
