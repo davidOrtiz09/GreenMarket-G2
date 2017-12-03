@@ -82,10 +82,11 @@ def agregar_canasta_carrito(request, canasta_id, quantity):
     return cart
 
 
-def actualizar_inventario(producto_catalogo, cantidad):
+def actualizar_inventario(producto_catalogo, cantidad, cooperativa_id):
     cantidad_restante = cantidad
     ofertas_productos = Oferta_Producto.objects \
-        .filter(fk_producto=producto_catalogo.fk_producto, fk_oferta__fk_semana=get_or_create_week(), estado=1) \
+        .filter(fk_producto=producto_catalogo.fk_producto, fk_oferta__fk_semana=get_or_create_week(), estado=1,
+                fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id) \
         .exclude(cantidad_vendida=F('cantidad_aceptada')) \
         .order_by('precioProvedor')
 

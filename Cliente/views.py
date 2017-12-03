@@ -352,7 +352,7 @@ class DoPayment(AbstractClienteLoggedView):
                 )
                 cliente_producto_model.save()
 
-            cantidad_restante = actualizar_inventario(producto_catalogo, cantidad)
+            cantidad_restante = actualizar_inventario(producto_catalogo, cantidad, get_id_cooperativa_global(request))
 
             if cantidad_restante > 0:
                 cart = get_or_create_cart(request)
@@ -387,7 +387,8 @@ class DoPayment(AbstractClienteLoggedView):
             for canasta_producto in canasta.productos:
                 producto_catalogo = canasta_producto.fk_producto_catalogo
                 cantidad_producto = canasta_producto.cantidad * cantidad_canasta
-                cantidad_restante = actualizar_inventario(producto_catalogo, cantidad_producto)
+                cantidad_restante = actualizar_inventario(producto_catalogo, cantidad_producto,
+                                                          get_id_cooperativa_global(request))
                 if cantidad_restante > 0:
                     cart = get_or_create_cart(request)
                     canastas_carrito = cart.get('canastas', [])
