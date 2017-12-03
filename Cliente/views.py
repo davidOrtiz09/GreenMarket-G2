@@ -652,6 +652,7 @@ class getIdCooperativaByLocation(View):
                     coopId = coop.id
 
         return coopId
+    
 class ProductosSugeridos(View):
     def dispatch(self, *args, **kwargs):
         if self.request.user.is_authenticated and not es_cliente(self.request.user):
@@ -712,7 +713,7 @@ class ProductosSugeridos(View):
 
         mensaje= ''
         if len(productos) == 0:
-            mensaje = 'La cooperativa seleccionada no cuenta con productos disponibles por el momento.'
+            mensaje = 'La cooperativa seleccionada no cuenta con productos sugeridos para ti.'
 
         return render(request, 'Cliente/productos-sugeridos.html', {
             'productos_json': json.dumps(productos),
