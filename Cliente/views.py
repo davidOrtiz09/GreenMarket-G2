@@ -668,19 +668,16 @@ class ProductosSugeridos(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-
-        cooperativa_id = get_id_cooperativa_global(request)
+        cooperativa_id = get_cooperativa_cliente(request)
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
                                            fk_cooperativa_id=cooperativa_id)
 
-        cliente_model=Cliente.objects.filter(fk_django_user=self.request.user).first()
-        cliente_producto=ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+        cliente_model = Cliente.objects.filter(fk_django_user=self.request.user).first()
+        cliente_producto = ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
 
         producto_catalogo = Catalogo_Producto.objects \
-            .filter(fk_catalogo=catalogo,fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
-
+            .filter(fk_catalogo=catalogo, fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
         categorias = Categoria.objects.all()
-
 
         productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
@@ -689,7 +686,38 @@ class ProductosSugeridos(View):
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
-            'solo_favoritos': False
+            'solo_favoritos': False,
+            'cooperativaSeleccionada': get_cooperativa_cliente(request),
+            'buscarGeolocation':1
+        })
+
+    def post(self, request):
+        # Se listan los productos por Cooperativa y se ordenan segun filtro
+        cooperativa_id = request.POST.get('cooperativa_id', '')
+
+        set_cooperativa_cliente(request, cooperativa_id)
+
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(), fk_cooperativa_id=cooperativa_id)
+
+        producto_catalogo = Catalogo_Producto.objects.filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+
+        categorias = Categoria.objects.all()
+
+        cooperativas = Cooperativa.objects.all()
+
+        productos = formatear_lista_productos(producto_catalogo, request, int(cooperativa_id))
+
+        mensaje= ''
+        if len(productos) == 0:
+            mensaje = 'La cooperativa seleccionada no cuenta con productos disponibles por el momento.'
+
+        return render(request, 'Cliente/productos-sugeridos.html', {
+            'productos_json': json.dumps(productos),
+            'categorias': categorias,
+            'cooperativas': cooperativas,
+            'mensajePython': mensaje,
+            'cooperativaSeleccionada': get_cooperativa_cliente(request),
+            'buscarGeolocation':0
         })
 
 

@@ -6,49 +6,95 @@
 {% endblock %}
 
 {% block main %}
-    <section>
+    <section id="lista-productos-app">
+        <div id="mensajePython" style="display: none;">
+            {{ mensajePython }}
+        </div>
+        <div id="valueSelectCoop" style="display: none;">
+            {{ cooperativaSeleccionada }}
+        </div>
+        <div id="valueGeoLocation" onclick="geoFindMe();" style="display:none">
+            {{ buscarGeolocation }}
+        </div>
         <div class="container">
-{#            <div class="row">#}
-{#                <div id="slider">#}
-{#                    <div class="row">#}
-{#                        <div class="col-xs-4" id="carousel-bounding-box">#}
-{#                            <div id="carouselExampleIndicators" class="carousel slide">#}
-{#                                <div class="carousel-inner">#}
-{#                                    <div class="carousel-item active" data-slide-number="0">#}
-{#                                        <img#}
-{#                                             src="{{ productos_catalogo.0.fk_producto.imagen.url }}"#}
-{#                                             >#}
-{#                                    </div>#}
-{#                                    <div class="carousel-item" data-slide-number="1">#}
-{#                                        <img#}
-{#                                             src="{{ productos_catalogo.1.fk_producto.imagen.url }}"#}
-{#                                            >#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                                <a class="left carousel-control-prev" href="#carouselExampleIndicators" role="button"#}
-{#                                   data-slide="prev">#}
-{#                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>#}
-{#                                    <span class="sr-only">Previous</span>#}
-{#                                </a>#}
-{#                                <a class="right carousel-control-next" href="#carouselExampleIndicators" role="button"#}
-{#                                   data-slide="next">#}
-{#                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>#}
-{#                                    <span class="sr-only">Next</span>#}
-{#                                </a>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        <div class="col-xs-2" id="carousel-text"></div>#}
-{#                        <div id="slide-content">#}
-{#                            <div id="slide-content-0">#}
-{#                                <h2>Slider One</h2>#}
-{#                                <p>Lorem Ipsum Dolor</p>#}
-{#                                <p class="sub-text">October 24 2014 - <a href="#">Read more</a></p>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
+            <div class="row">
+                <div class="col mb-3">
+                    <br>
+                    <h1 class="text-center">Productos Especialmente Para Ti!</h1>
+                </div>
+            </div>
+            {#            <div class="row">#}
+            {#                <div id="slider">#}
+            {#                    <div class="row">#}
+            {#                        <div class="col-xs-4" id="carousel-bounding-box">#}
+            {#                            <div id="carouselExampleIndicators" class="carousel slide">#}
+            {#                                <div class="carousel-inner">#}
+            {#                                    <div class="carousel-item active" data-slide-number="0">#}
+            {#                                        <img#}
+            {#                                             src="{{ productos_catalogo.0.fk_producto.imagen.url }}"#}
+            {#                                             >#}
+            {#                                    </div>#}
+            {#                                    <div class="carousel-item" data-slide-number="1">#}
+            {#                                        <img#}
+            {#                                             src="{{ productos_catalogo.1.fk_producto.imagen.url }}"#}
+            {#                                            >#}
+            {#                                    </div>#}
+            {#                                </div>#}
+            {#                                <a class="left carousel-control-prev" href="#carouselExampleIndicators" role="button"#}
+            {#                                   data-slide="prev">#}
+            {#                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>#}
+            {#                                    <span class="sr-only">Previous</span>#}
+            {#                                </a>#}
+            {#                                <a class="right carousel-control-next" href="#carouselExampleIndicators" role="button"#}
+            {#                                   data-slide="next">#}
+            {#                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>#}
+            {#                                    <span class="sr-only">Next</span>#}
+            {#                                </a>#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                        <div class="col-xs-2" id="carousel-text"></div>#}
+            {#                        <div id="slide-content">#}
+            {#                            <div id="slide-content-0">#}
+            {#                                <h2>Slider One</h2>#}
+            {#                                <p>Lorem Ipsum Dolor</p>#}
+            {#                                <p class="sub-text">October 24 2014 - <a href="#">Read more</a></p>#}
+            {#                            </div>#}
+            {#                        </div>#}
+            {#                    </div>#}
+            {#                </div>#}
+            {#            </div>#}
+            <form method="post" action="{% url 'cliente:productos-sugeridos' %}">
+                {% csrf_token %}
+                <div class="form-row justify-content-center">
+                    <div class="col-auto">
+                        <label for="cooperativa">Cooperativa</label>
+                        <select name="cooperativa_id" id="cooperativa" class="custom-select">
+                            {% for cooperativa in cooperativas %}
+                                <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label for="ordenar">Ordenar Por</label>
+                        <select @change="cambioOrden" v-model="ordenSeleccionado" id="ordenar" class="custom-select">
+                            <option v-for="opcionOrden in ordenes" :value="opcionOrden">[[ opcionOrden.texto ]]</option>
+                        </select>
+                    </div>
 
+                    {% if user.is_authenticated %}
+
+                        <div class="col-auto">
+                            <label class="custom-control custom-checkbox">
+                                <input v-model="soloFavoritos" type="checkbox" class="custom-control-input">
+                                <span class="custom-control-indicator"></span>
+                                <span class="custom-control-description">Ver solo favoritos</span>
+                            </label>
+                        </div>
+                    {% endif %}
+                    <input type="submit" id="botonFiltrarProductos" value="Buscar" class="btn btn-primary">
+
+                </div>
+            </form>
             <div class="row" id="lista-productos-app">
                 {% include 'Cliente/_elements/_producto-preview.html' %}
             </div>
@@ -65,7 +111,6 @@
         var urlAgregarFavorito = '{% url 'cliente:agregar-favorito' %}';
     </script>
     <script type="text/javascript" src="{% static 'Cliente/vue_scripts/products_list.js' %}"></script>
-    <script type="text/javascript" src="{% static 'Cliente/js/cliente.js' %}"></script>
 {% endblock %}
 
 {% block scripts %}
