@@ -8,9 +8,9 @@ if IS_DEPLOYED == 'True':
 else:
     DATABASE_DICT = {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'green_market_sp3V2',
+        'NAME': 'green_market',
         'USER': 'postgres',
-        'PASSWORD': 'diegoatg1120',
+        'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'TEST': {
