@@ -30,7 +30,7 @@ def redirect_user_to_home(request):
 
 def get_or_create_week():
     today = datetime.date.today()
-    existe = Semana.objects.filter(fecha_inicio__lte=today, fecha_fin__gte=today).first()
+    existe = Semana.objects.filter(fecha_inicio__lte = today, fecha_fin__gte=today).first()
     if existe:
         return existe
     else:
@@ -113,3 +113,15 @@ def get_cooperativa_global(request):
 
 def get_id_cooperativa_global(request):
     return(get_cooperativa_global(request)['id'])
+
+def get_cooperativa_cliente(request):
+    cooperativa = request.session.get('cooperativa', None)
+
+    if (cooperativa is None):
+        cooperativa = Cooperativa.objects.first()
+        request.session['cooperativa'] = cooperativa.id
+
+    return cooperativa
+
+def set_cooperativa_cliente(request, id):
+    request.session['cooperativa'] = id

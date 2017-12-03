@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+from math import radians, sin, cos, atan2, sqrt
+
 from django.shortcuts import render, redirect, reverse, render_to_response
+from django.utils.translation.trans_real import catalog
 from django.views import View
 from django.contrib import messages
 from operator import itemgetter
 from Administrador.utils import calcular_promedio
+from Administrador.views import AbstractAdministradorLoggedView
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
@@ -16,7 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from MarketPlace.utils import es_cliente, redirect_user_to_home, es_productor, get_or_create_week, \
-     formatear_lista_productos, get_id_cooperativa_global
+     formatear_lista_productos, get_cooperativa_cliente, set_cooperativa_cliente
 from django.contrib.auth import logout, login, authenticate
 from django.db.transaction import atomic, savepoint, savepoint_commit, savepoint_rollback
 from Cliente.utils import agregar_producto_carrito
@@ -82,15 +87,13 @@ class Index(View):
 
     def get(self, request):
         cooperativas = Cooperativa.objects.all()
-
-        cooperativa_id = get_id_cooperativa_global(request)
+        cooperativa_id = get_cooperativa_cliente(request)
         catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
                                            fk_cooperativa_id=cooperativa_id)
+
         producto_catalogo = Catalogo_Producto.objects \
             .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
-
         categorias = Categoria.objects.all()
-
 
         productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
@@ -99,7 +102,9 @@ class Index(View):
             'productos_catalogo': producto_catalogo,
             'categorias': categorias,
             'cooperativas': cooperativas,
-            'solo_favoritos': False
+            'solo_favoritos': False,
+            'cooperativaSeleccionada': get_cooperativa_cliente(request),
+            'buscarGeolocation':1
         })
 
     def post(self, request):
@@ -107,6 +112,8 @@ class Index(View):
         cooperativa_id = request.POST.get('cooperativa_id', '')
         ordenar_por = request.POST.get('ordenar', '')
         favoritos = request.POST.get('favoritos', '')
+
+        set_cooperativa_cliente(request,cooperativa_id);
 
         cliente = None if self.request.user.is_anonymous \
             else Cliente.objects.filter(fk_django_user=self.request.user).first()
@@ -128,11 +135,18 @@ class Index(View):
 
         productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
 
+        mensaje= ''
+        if len(productos) == 0:
+            mensaje = 'La cooperativa seleccionada no cuenta con productos disponibles por el momento.'
+
         return render(request, 'Cliente/index.html', {
             'productos_json': json.dumps(productos),
             'categorias': categorias,
             'cooperativas': cooperativas,
-            'solo_favoritos': favoritos != ''
+            'solo_favoritos': favoritos != '',
+            'mensajePython': mensaje,
+            'cooperativaSeleccionada': get_cooperativa_cliente(request),
+            'buscarGeolocation':0
         })
 
 
@@ -312,7 +326,7 @@ class DoPayment(AbstractClienteLoggedView):
         for item in detalles_pedido:
             producto_catalogo = Catalogo_Producto \
                 .objects.get(fk_producto_id=item.get('product_id'),
-                             fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request),
+                             fk_catalogo__fk_cooperativa_id=get_cooperativa_cliente(request),
                              fk_catalogo__fk_semana= get_or_create_week())
             cantidad = int(item.get('quantity'))
             pedido_producto_model = PedidoProducto(
@@ -378,7 +392,26 @@ class Canastas(View):
             return render(request, 'Cliente/canastas.html', {'canastas': canastas})
         else:
             messages.add_message(request, messages.INFO, 'Actualmente no hay canastas disponibles')
-            return redirect(reverse('cliente:index'))
+            cooperativas = Cooperativa.objects.all()
+            cooperativa_id = get_cooperativa_cliente(request)
+            catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                               fk_cooperativa_id=cooperativa_id)
+
+            producto_catalogo = Catalogo_Producto.objects \
+                .filter(fk_catalogo=catalogo).order_by('fk_producto__nombre')
+            categorias = Categoria.objects.all()
+
+            productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
+            return render(request, 'Cliente/index.html', {
+                'productos_json': json.dumps(productos),
+                'productos_catalogo': producto_catalogo,
+                'categorias': categorias,
+                'cooperativas': cooperativas,
+                'solo_favoritos': False,
+                'cooperativaSeleccionada': get_cooperativa_cliente(request),
+                'buscarGeolocation': 0
+            })
 
 
 class AgregarCanastaCarrito(AbstractClienteLoggedView):
@@ -518,3 +551,53 @@ class MejoresProductores(View):
                 'No se encontraron productores'
             )
         return render(request, 'cliente/mejoresProductores.html', {'datos': productores_ordenado})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class getIdCooperativaByLocation(View):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        longitud = body["longitud"]
+        latitud = body["latitud"]
+
+        idCooperativa = self.get_coop_by_location(longitud,latitud)
+
+        return JsonResponse({"idCooperativa": idCooperativa})
+
+    def get_coop_by_location(self, long, lat):
+        lat1 = radians(lat)
+        lon1 = radians(long)
+        distanciaMasCorta = 0
+        coopId = 0
+        # approximate radius of earth in km
+        R = 6373.0
+
+        cooperativas = Cooperativa.objects.all()
+
+        for coop in cooperativas:
+            coordenadas = coop.coordenadas_gps.split(',')
+            lat2 = radians(float(coordenadas[0]))
+
+            lon2 = radians(float(coordenadas[1]))
+
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+
+            a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+            c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+            distance = R * c
+
+            if distanciaMasCorta == 0:
+                distanciaMasCorta = distance
+                coopId = coop.id
+            else:
+                if distance < distanciaMasCorta:
+                    distanciaMasCorta = distance
+                    coopId = coop.id
+
+        return coopId

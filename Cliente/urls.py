@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^calificar-mis-pedidos/(?P<fk_pedido_producto>\d+)(?P<fk_productor>\d+)(?P<producto>\d+)(?P<pedido>\d+)$', views.CalificarMisPedidoView.as_view(), name='calificar-mis-pedidos'),
     url(r'^guardar-calificacion-mis-pedidos/(?P<pedido_producto>\d+)(?P<productor>\d+)(?P<id_pedido>\d+)$', views.InsertCalificacionProductoVew.as_view(), name='guardar-calificacion-mis-pedidos'),
     url(r'^mejores-productores', views.MejoresProductores.as_view(), name='mejores-productores'),
-
+    url(r'^get-cooperativa-by-location/$', views.getIdCooperativaByLocation.as_view(), name='get-cooperativa-by-location'),
 ]

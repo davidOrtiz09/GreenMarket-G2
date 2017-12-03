@@ -7,6 +7,15 @@
 
 {% block main %}
     <section>
+        <div id="mensajePython" style="display: none;">
+            {{ mensajePython }}
+        </div>
+        <div id="valueSelectCoop" style="display: none;">
+            {{ cooperativaSeleccionada }}
+        </div>
+        <div id="valueGeoLocation" onclick="geoFindMe();" style="display:none">
+            {{ buscarGeolocation }}
+        </div>
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -62,7 +71,7 @@
                                         checked="checked"{% endif %}>
                                 </div>
                             {% endif %}
-                            <input type="submit" value="Buscar" class="btn btn-primary">
+                            <input type="submit" id="botonFiltrarProductos" value="Buscar" class="btn btn-primary">
 
                         </div>
                     </form>
