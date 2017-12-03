@@ -140,8 +140,14 @@ def sugerir_productos():
 
     for oferta_producto in ofertas_productos:
         cliente_producto_id = ClienteProducto.objects.filter(fk_producto=oferta_producto.fk_producto)\
-            .order_by('cantidad').values('id')[:10]
-        ClienteProducto.objects.filter(id__in=cliente_producto_id).update(sugerir=True)
+            .order_by('cantidad').values('id')
+
+        if cliente_producto_id.exists():
+            if cliente_producto_id.count() > 10:
+                ClienteProducto.objects.filter(id__in=cliente_producto_id[:10]).update(sugerir=True)
+            else:
+                ClienteProducto.objects.filter(id__in=cliente_producto_id[:cliente_producto_id.count()]).update(
+                    sugerir=True)
 
 def get_cooperativa_cliente(request):
     cooperativa = request.session.get('cooperativa', None)

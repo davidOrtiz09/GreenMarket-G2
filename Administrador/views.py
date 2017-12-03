@@ -876,7 +876,7 @@ class RegistrarProductosSugeridos(View):
             if usuarios:
                 self.sugerirProductosTodosClientes(producto_id.get('productos'))
             else:
-                self.grabarPruductosSugeridos(producto_id.get('productos'), semana, num_usuarios)
+                self.grabarPruductosSugeridos(producto_id.get('productos'), semana, int(num_usuarios))
 
         return redirect(reverse('administrador:consultar-productos-sugeridos'))
 
@@ -885,9 +885,12 @@ class RegistrarProductosSugeridos(View):
 
         if productos.exists():
             producto_sugerido = ClienteProducto.objects.filter(fk_producto=productos[0], sugerir=False)\
-                .order_by('cantidad').values('id')[:numUsuarios]
-
-            ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
+                .order_by('cantidad').values('id')
+            if producto_sugerido.exists():
+                if producto_sugerido.count() > numUsuarios:
+                    ClienteProducto.objects.filter(id__in=producto_sugerido[:numUsuarios]).update(sugerir=True)
+                else:
+                    ClienteProducto.objects.filter(id__in=producto_sugerido[:producto_sugerido.count()]).update(sugerir=True)
 
 
     def sugerirProductosTodosClientes(self, producto_id):
