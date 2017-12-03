@@ -354,7 +354,7 @@ class Canasta(models.Model):
     def get_descuento(self):
         if self.precio_sin_descuento <= 0:
             return 0
-        descuento = (self.precio / self.precio_sin_descuento) * 100
+        descuento = (1 - (self.precio / self.precio_sin_descuento)) * 100
         return '{0:.0f}'.format(descuento)
 
     @property
