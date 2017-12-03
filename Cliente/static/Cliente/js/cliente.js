@@ -12,9 +12,9 @@ function config(){
     }
 
 }
-
-config();
-
+$( document ).ready(function() {
+  config();
+});
 
 //Función que ejecuta las funcionalidades asociadas a la ubicación del usuario y las cooperativas que corresponder a esa ubicación.
 function geoFindMe() {

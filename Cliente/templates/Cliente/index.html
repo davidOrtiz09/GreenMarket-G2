@@ -42,12 +42,14 @@
                             <span class="sr-only">Next</span>
                         </a>
                     </div>
+                <form method="post" action="{% url 'cliente:index' %}">
+                {% csrf_token %}
                     <div class="form-row justify-content-center">
                         <div class="col-auto">
                             <label for="cooperativa">Cooperativa</label>
                             <select name="cooperativa_id" id="cooperativa" class="custom-select">
                                 {% for cooperativa in cooperativas %}
-                                    <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
+                                    <option value="{{ cooperativa.id }}" >{{ cooperativa.nombre }}</option>
                                 {% endfor %}
                             </select>
                         </div>
