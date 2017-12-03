@@ -3,7 +3,7 @@
 {% load marketplace_filters %}
 {% block main %}
     <section>
-        <div class="container-fluid"  id="sugerir-productos-div">
+        <div class="container-fluid" id="sugerir-productos-div">
             <div class="row">
                 <div class="col-12">
                     <br>
@@ -23,11 +23,11 @@
                                     <div class="btn-group" data-toggle="buttons">
                                         <label class="btn btn-success active">
                                             <input class="conservar" type="radio"
-                                                   name="reemplazar" checked value="1">Sugerir
+                                                   name="reemplazar" checked value="1">
                                             <span class="fa fa-check-circle"></span>Conservar
                                         </label>
                                         <label class="btn btn-success">
-                                            <input type="radio" name="reemplazar" class="reemplazar" value="2"> casa
+                                            <input type="radio" name="reemplazar" class="reemplazar" value="2">
                                             <span class="fa fa-check-circle"></span>Reemplazar
                                         </label>
                                     </div>
@@ -51,7 +51,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label>Número de Usuarios Producto</label>
+                                <label>Número de Usuarios Opcionados</label>
                                 <div class="col-8 col-sm-2">
                                     <input name="nombre" type="text" class="form-control nUsuarios" value=10
                                            required>
@@ -74,13 +74,13 @@
                                 <th class="text-center">Nombre</th>
                                 <th class="text-center">Cantidad Ofertada</th>
                                 <th class="text-center">Unidad de medida</th>
-                                <th class="text-center">Valor Total</th>
+                                <th class="text-center">Precio Unidad</th>
                                 <th class="text-center">Sugerir</th>
                             </tr>
                             </thead>
                             <tbody onload="actualizarTotalPagar();">
                             <input class="productor-id" type="hidden" value="{{ productor.id }}" readonly disabled></td>
-                            {% for oferta in oferta_producto %}
+                            {% for oferta in ofertas_productos %}
                                 <form method="post">
                                     {% csrf_token %}
                                     <tr class="sugerir-producto-tr">
@@ -95,35 +95,20 @@
                                             ${{ oferta.precioProvedor }}
                                         </td>
                                         <td>
-                                            <input class="oferta-producto-id" type="hidden" value="{{ oferta.id }}"
+                                            <input class="oferta-producto-id" type="hidden"
+                                                   value="{{ oferta.fk_producto.id }}"
                                                    readonly disabled>
-{#                                            <input class="check-pago change-check" type="radio" name="pagar" value="1"#}
-{#                                                   checked> Sugerir<br>#}
-{#                                            <input class="change-check" type="radio" name="pagar" value="0">#}
-{#                                            Rechazar<br>#}
-
-                                                                                        <div class="btn-group" data-toggle="buttons">
-                                                                                            <label class="btn btn-success active">
-                                                                                                <input class="check-sugerir" type="checkbox" checked>
-                                                                                                <span class="fa fa-check-circle"></span>
-                                                                                            </label>
-                                                                                        </div>
+                                            <div class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-success active">
+                                                    <input class="check-sugerir" type="checkbox" checked>
+                                                    <span class="fa fa-check-circle"></span>
+                                                </label>
+                                            </div>
                                         </td>
                                     </tr>
                                 </form>
                             {% endfor %}
                             </tbody>
-                            <tfoot>
-                            <tr>
-                                <td colspan="4">
-                                    <h1 class="text-right">Productos a Sugerir: </h1>
-                                </td>
-                                <td colspan="2">
-                                    <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
-                                    <input class="total-a-pagar" type="hidden" readonly disabled>
-                                </td>
-                            </tr>
-                            </tfoot>
                         </table>
                         <br>
                         <form method="post" id="form-sugerir-producto"

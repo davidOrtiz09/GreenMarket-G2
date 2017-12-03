@@ -73,9 +73,9 @@
                         <i class="icon-padnote"></i> <span>Cooperativas</span>
                     </a>
                 </li>
-            {% url 'administrador:sugerir-productos' as url_sugerir_producto %}
+            {% url 'administrador:consultar-productos-sugeridos' as url_sugerir_producto %}
                 <li {% if request.path == url_sugerir_producto %}class="active"{% endif %}>
-                    <a href="{% url 'administrador:sugerir-productos' %}">
+                    <a href="{% url 'administrador:consultar-productos-sugeridos' %}">
                         <i class="icon-padnote"></i> <span>Sugerir P</span>
                     </a>
                 </li>

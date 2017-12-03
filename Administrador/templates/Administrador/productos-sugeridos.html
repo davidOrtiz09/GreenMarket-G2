@@ -12,18 +12,20 @@
                     <br/>
                     <br>
                     <div class="col-12">
-                        <div class="form-group row">
-                            <div class="col-12 text-right">
-                                <button id="sugerirProductos" class="btn btn-success">
-                                    <a href="{% url 'administrador:sugerir-productos' %}">
-                                        <i class="fa fa-bars"></i>
-                                    </a>
+                        <form method="get" id="form-sugerir-producto"
+                              action="{% url 'administrador:modificar-productos-sugeridos' %}">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <div class="col-12 text-right">
+                                    <button id="sugerirProductos" class="btn btn-success">
+                                        <i class="fa fa-save"></i>
+                                        Modificar Productos Sugeridos
+                                    </button>
 
-                                    Cambiar Productos Sugeridos
-                                </button>
+                                </div>
+                                </div>
+                        </form>
 
-                            </div>
-                        </div>
 
                         <div class="container-fluid" id="orden-Pago-detalle">
                             <table id="SugerirProductoTable" class="table dataTable" cellspacing="2"
@@ -41,7 +43,7 @@
                                     <th class="text-center">Usuarios Sugeridos</th>
                                 </tr>
                                 </thead>
-                                <tbody onload="actualizarTotalPagar();">
+                                <tbody>
                                 <input class="productor-id" type="hidden" value="{{ productor.id }}" readonly
                                        disabled></td>
                                 {% for producto_sugerido in productos_sugeridos %}
@@ -57,21 +59,9 @@
                                     {{ producto_sugerido.num_usuarios }}
                                 {% endfor %}
                                 </tbody>
-                                <tfoot>
-                                <tr>
-                                    <td colspan="4">
-                                        <h1 class="text-right">Productos a Sugerir: </h1>
-                                    </td>
-                                    <td colspan="2">
-                                        <h1 class="text-left">$<span id="total-a-pagar-tocop"></span></h1>
-                                        <input class="total-a-pagar" type="hidden" readonly disabled>
-                                    </td>
-                                </tr>
-                                </tfoot>
                             </table>
                             <br>
                         </div>
-
                     </div>
                 </div>
             </div>
