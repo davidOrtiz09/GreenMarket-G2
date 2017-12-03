@@ -19,6 +19,16 @@ class ProductorDestacado:
         self.total_ventas = total_ventas
         self.ultima_fecha_de_venta = ultima_fecha_de_venta
 
+class ProductosSugeridos:
+    def __init__(self, productor_id, nombre, imagen, unidad_medida, cantidad, num_usuarios):
+        self.productor_id = productor_id
+        self.nombre = nombre
+        self.imagen = imagen
+        self.unidad_medida = unidad_medida
+        self.cantidad = cantidad
+        self.num_usuarios=num_usuarios
+
+
 class Ciudad:
     def __init__(self, valor, nombre):
         self.valor = valor

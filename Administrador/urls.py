@@ -59,4 +59,9 @@ urlpatterns = [
         name='seleccion-cooperativa-fijar'),
     url(r'^seleccion-cooperativa$', views.SeleccionCooperativaView.as_view(), name='seleccion-cooperativa'),
 
+    url(r'^consultar-productos-sugeridos$', views.ConsultarProductosSugerir.as_view(), name='consultar-productos-sugeridos'),
+    url(r'^registrar-productos-sugeridos$', views.RegistrarProductosSugeridos.as_view(),
+        name='registrar-productos-sugeridos'),
+    url(r'^modificar-productos-sugeridos$', views.ModificarProductosSugerir.as_view(),
+        name='modificar-productos-sugeridos'),
 ]

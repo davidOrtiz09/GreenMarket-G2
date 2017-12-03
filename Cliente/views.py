@@ -13,7 +13,7 @@ from Administrador.views import AbstractAdministradorLoggedView
 from Cliente.forms import ClientForm, PaymentForm
 from Cliente.models import Ciudad, Departamento
 from MarketPlace.models import Cliente, Catalogo_Producto, Categoria, Cooperativa, Pedido, PedidoProducto, \
-    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto, PedidoCanasta
+    Oferta_Producto, Catalogo, Canasta, Favorito, Productor, EvaluacionProducto, Producto, PedidoCanasta, ClienteProducto
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.db.models import F
@@ -328,6 +328,23 @@ class DoPayment(AbstractClienteLoggedView):
             )
             pedido_producto_model.save()
 
+            cliente_producto_model = ClienteProducto.objects.filter(fk_producto=producto_catalogo.fk_producto,
+                                                                    fk_cliente=cliente_model)
+            if cliente_producto_model.exists():
+                total_cantidad = cliente_producto_model[0].cantidad + cantidad
+                total_frecuencia = cliente_producto_model[0].frecuencia + 1
+                cliente_producto_model.update(cantidad=total_cantidad, frecuencia=total_frecuencia)
+            else:
+                cliente_producto_model = ClienteProducto(
+                    fk_cliente=cliente_model,
+                    fk_producto=producto_catalogo.fk_producto,
+                    fk_semana=get_or_create_week(),
+                    cantidad=cantidad,
+                    frecuencia=1,
+                    sugerir=False
+                )
+                cliente_producto_model.save()
+
             cantidad_restante = actualizar_inventario(producto_catalogo, cantidad)
 
             if cantidad_restante > 0:
@@ -627,3 +644,44 @@ class getIdCooperativaByLocation(View):
                     coopId = coop.id
 
         return coopId
+class ProductosSugeridos(View):
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated and not es_cliente(self.request.user):
+            rol = 'productor' if es_productor(self.request.user) else 'administrador'
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                'Para acceder a las funcionalidades de cliente, por favor salga de su cuenta de {rol}'
+                    .format(rol=rol)
+            )
+            return redirect_user_to_home(self.request)
+        else:
+            return super(ProductosSugeridos, self).dispatch(*args, **kwargs)
+
+    def get(self, request):
+        cooperativas = Cooperativa.objects.all()
+
+        cooperativa_id = get_id_cooperativa_global(request)
+        catalogo = Catalogo.objects.filter(fk_semana=get_or_create_week(),
+                                           fk_cooperativa_id=cooperativa_id)
+
+        cliente_model=Cliente.objects.filter(fk_django_user=self.request.user).first()
+        cliente_producto=ClienteProducto.objects.filter(sugerir=True, fk_cliente=cliente_model).values('id')
+
+        producto_catalogo = Catalogo_Producto.objects \
+            .filter(fk_catalogo=catalogo,fk_producto_id__in=cliente_producto).order_by('fk_producto__nombre')
+
+        categorias = Categoria.objects.all()
+
+
+        productos = formatear_lista_productos(producto_catalogo, request, cooperativa_id)
+
+        return render(request, 'Cliente/productos-sugeridos.html', {
+            'productos_json': json.dumps(productos),
+            'productos_catalogo': producto_catalogo,
+            'categorias': categorias,
+            'cooperativas': cooperativas,
+            'solo_favoritos': False
+        })
+
+

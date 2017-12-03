@@ -109,3 +109,49 @@ function modificarCanastaInput(selector_input, nuevoValor){
         input.val(max);
     }
 }
+
+$('button#sugerirProductos').click(function () {
+
+    var container = $('div#sugerir-productos-div');
+    var response = [];
+    var configuracion = [];
+    var sugerir_productos = [];
+    var productRows = container.find('tr.sugerir-producto-tr');
+    for (var i = 0; i < productRows.length; i++) {
+        var row = $(productRows[i]);
+        var productId = row.find('input.oferta-producto-id').val();
+        if (row.find('input.check-sugerir').is(':checked')) {
+            sugerir_productos.push({
+                productos: productId
+            })
+        }
+
+    }
+
+
+    var conservar = container.find('input.conservar').is(':checked');
+    var reemplazar = container.find('input.reemplazar').is(':checked');
+    var opcionados = container.find('input.opcionados').is(':checked');
+    var todos = container.find('input.todos').is(':checked');
+    var numUsuarios = container.find('input.nUsuarios').val();
+
+    configuracion={
+                reemplazar: reemplazar,
+                todos: todos,
+                numUsuarios:numUsuarios
+            }
+
+    response={
+                sugerir_productos: sugerir_productos,
+                configuracion:configuracion
+
+
+            }
+
+    var formJson = response;
+    var stringPago = JSON.stringify(formJson);
+    var form = $('form#form-sugerir-producto');
+    var inputJson = form.find('input#json-form-sugerir');
+    inputJson.val(stringPago);
+    form.submit();
+});

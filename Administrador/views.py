@@ -6,20 +6,20 @@ import json
 from decimal import Decimal
 from operator import itemgetter
 from django.contrib.auth.models import User
-from django.db.models import Sum, Min, Max
+from django.db.models import Sum, Min, Max, Count
 from django.shortcuts import render, redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from Administrador.forms import CooperativaForm
-from Administrador.models import MejoresClientes, ProductorDestacado, Ciudad, Departamento
+from Administrador.models import MejoresClientes, ProductorDestacado, ProductosSugeridos, Ciudad, Departamento
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
-    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra
+    Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra, ClienteProducto
 from Administrador.utils import catalogo_semana, catalogo_validaciones, obtener_valor_compra, obtener_cantidad_vendida
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login
 from MarketPlace.utils import es_administrador, redirect_user_to_home, get_or_create_week, get_or_create_next_week, \
-    get_id_cooperativa_global
+    get_id_cooperativa_global, sugerir_productos
 from django.db.transaction import atomic
 from django.http import JsonResponse
 from django.db.models.expressions import F
@@ -202,14 +202,14 @@ class ListarOfertasView(AbstractAdministradorLoggedView):
             if cantidad_ofertas > 0:
                 ofertas.append((productor.nombre, cantidad_ofertas, id_oferta))
 
-        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas, 'semana':semana})
+        return render(request, 'Administrador/ofertas.html', {'ofertas': ofertas, 'semana': semana})
 
 
 class DetalleOfertaView(AbstractAdministradorLoggedView):
     def get(self, request, id_oferta, guardado_exitoso):
 
-        if(Oferta.objects.filter(id=id_oferta,
-                                 fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)).exists()):
+        if (Oferta.objects.filter(id=id_oferta,
+                                  fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)).exists()):
             ofertas_producto = Oferta_Producto.cargar_ofertas(id_oferta)
 
             return render(request, 'Administrador/detalle-oferta.html', {
@@ -282,7 +282,8 @@ class ObtenerMejoresProductos(View):
         semanas = request.POST.getlist('semana', [])
         respuesta = []
         catalogoProd = Catalogo_Producto.objects.filter(fk_catalogo__fk_semana_id__in=semanas,
-                                                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(request))
+                                                        fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(
+                                                            request))
         for pro in catalogoProd:
             valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
             valor_venta = pro.precio
@@ -493,12 +494,11 @@ class CambiarCantidadProductoCanasta(AbstractAdministradorLoggedView):
 
 class InventarioView(View):
     def get(self, request):
-
         semana = get_or_create_week()
 
         ofertas_pro = Oferta_Producto \
             .objects.filter(estado=1, fk_oferta__fk_semana=semana,
-                            fk_oferta__fk_productor__fk_cooperativa_id= get_id_cooperativa_global(request)) \
+                            fk_oferta__fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
             .values('fk_producto', 'fk_producto__nombre', 'fk_producto__imagen', 'fk_producto__unidad_medida') \
             .annotate(canAceptada=Sum('cantidad_aceptada'), canVendida=Sum('cantidad_vendida'),
                       canDisponible=Sum(F('cantidad_aceptada') - F('cantidad_vendida'))) \
@@ -632,7 +632,7 @@ class ConsultarPagosPendientes(View):
     def get(self, request):
         semana = Semana.objects.last()
         ofertas_por_pagar = Oferta_Producto \
-            .objects.filter(fk_orden_compra__isnull=True,cantidad_vendida__gt=0,
+            .objects.filter(fk_orden_compra__isnull=True, cantidad_vendida__gt=0,
                             fk_oferta__fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
             .exclude(fk_oferta__fk_semana=semana) \
             .distinct('fk_oferta__fk_productor')
@@ -704,17 +704,18 @@ class GenerarOrdenPagoProductores(View):
 
 class OrdenesPagoProductores(View):
     def get(self, request, id_productor):
-        productor = Productor.objects.filter(id=id_productor, fk_cooperativa_id=get_id_cooperativa_global(request)).first()
+        productor = Productor.objects.filter(id=id_productor,
+                                             fk_cooperativa_id=get_id_cooperativa_global(request)).first()
         if productor:
             orden_compra = Orden_Compra.objects.filter(fk_productor_id=id_productor,
-                                                       fk_productor__fk_cooperativa_id=get_id_cooperativa_global(request)) \
+                                                       fk_productor__fk_cooperativa_id=get_id_cooperativa_global(
+                                                           request)) \
                 .order_by('-id')
             return render(request, 'Administrador/ordenes-pago-productor.html',
-                      {'ordenes_compra': orden_compra,
-                       'productor':  productor})
+                          {'ordenes_compra': orden_compra,
+                           'productor': productor})
         else:
             return redirect(reverse('administrador:pagos-pendientes-productor'))
-
 
 
 class DetalleOrdenPago(View):
@@ -736,7 +737,6 @@ class Cooperativas(AbstractAdministradorLoggedView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearCooperativas(AbstractAdministradorLoggedView):
-
     def get(self, request):
         ciudades = Ciudad.get_all_ciudades()
         departamentos = Departamento.get_all_departamentos()
@@ -758,6 +758,7 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
             print(form.errors)
             return render(request, 'Administrador/crear-cooperativa.html', {'form': form})
 
+
 class InformesMejoresProductores(View):
     def get(self, request):
         productores_destacados = list()
@@ -777,6 +778,7 @@ class InformesMejoresProductores(View):
             'productores_destacados': productores_ordenados
         })
 
+
 class SeleccionCooperativaView(View):
     # Retorna el template con las cooperativas del sistema.
     def get(self, request):
@@ -786,7 +788,6 @@ class SeleccionCooperativaView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SeleccionCooperativaFijarView(AbstractAdministradorLoggedView):
-
     def get(self, request):
         return JsonResponse({"Mensaje": "Aquí llegó"})
 
@@ -798,3 +799,115 @@ class SeleccionCooperativaFijarView(AbstractAdministradorLoggedView):
             return JsonResponse({"Mensaje": "OK"})
         except:
             return JsonResponse({"Mensaje": "Fallo"})
+
+
+class ConsultarProductosSugerir(View):
+    def get(self, request):
+
+        productos_sugeridos=list()
+
+        cliente_productos=ClienteProducto.objects.filter(sugerir=True).distinct('fk_producto')
+
+        for cliente_producto in cliente_productos:
+            productos_sugeridos.append(
+                ProductosSugeridos(cliente_producto.fk_producto.id, cliente_producto.fk_producto.nombre,
+                                   cliente_producto.fk_producto.imagen, cliente_producto.fk_producto.unidad_medida,
+                                ClienteProducto.objects.filter(sugerir=True, fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Sum('cantidad'))['cantidad__sum'],
+                                   ClienteProducto.objects.filter(sugerir=True,
+                                                                  fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Count('fk_cliente'))['fk_cliente__count']
+
+                                   )
+            )
+
+        return render(request, 'Administrador/productos-sugeridos.html',
+                      {'productos_sugeridos': productos_sugeridos})
+
+class ModificarProductosSugerir(View):
+    def get(self, request):
+        ofertas_productos = Oferta_Producto.objects.filter(fk_oferta__fk_semana=get_or_create_week(),
+                                                         cantidad_aceptada__gt=0)\
+            .exclude(cantidad_vendida=F('cantidad_aceptada')).distinct('fk_producto')
+
+
+        return render(request, 'Administrador/sugerir-productos.html',
+                      {'ofertas_productos': ofertas_productos})
+
+class RegistrarProductosSugeridos(View):
+    def get(self, request):
+        productos_sugeridos = list()
+
+        cliente_productos = ClienteProducto.objects.filter(sugerir=True).distinct('fk_producto')
+
+        if not cliente_productos.exists():
+            sugerir_productos()
+            cliente_productos = ClienteProducto.objects.filter(sugerir=True).distinct('fk_producto')
+
+        for cliente_producto in cliente_productos:
+            productos_sugeridos.append(
+                ProductosSugeridos(cliente_producto.fk_producto.id, cliente_producto.fk_producto.nombre,
+                                   cliente_producto.fk_producto.imagen, cliente_producto.fk_producto.unidad_medida,
+                                   ClienteProducto.objects.filter(sugerir=True,
+                                                                  fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Sum('cantidad'))['cantidad__sum'],
+                                   ClienteProducto.objects.filter(sugerir=True,
+                                                                  fk_producto=cliente_producto.fk_producto)
+                                   .aggregate(Count('fk_cliente'))['fk_cliente__count']
+
+                                   )
+            )
+
+        return render(request, 'Administrador/productos-sugeridos.html',
+                      {'productos_sugeridos': productos_sugeridos})
+
+    def post(self, request):
+        sugerir_producto_Json = json.loads(request.POST.get('sugerir-producto-form'))
+        configuracion = sugerir_producto_Json.get('configuracion')
+        num_usuarios = configuracion.get('numUsuarios')
+        productos_actuales = configuracion.get('reemplazar')
+        usuarios = configuracion.get('todos')
+        semana = get_or_create_week()
+
+        if productos_actuales:
+            ClienteProducto.objects.filter(fk_semana=semana).update(sugerir=False)
+
+        for producto_id in sugerir_producto_Json.get('sugerir_productos'):
+            if usuarios:
+                self.sugerirProductosTodosClientes(producto_id.get('productos'))
+            else:
+                self.grabarPruductosSugeridos(producto_id.get('productos'), semana, num_usuarios)
+
+        return redirect(reverse('administrador:consultar-productos-sugeridos'))
+
+    def grabarPruductosSugeridos(self, producto_id, semana, numUsuarios):
+        productos = Producto.objects.filter(id=producto_id)
+
+        if productos.exists():
+            producto_sugerido = ClienteProducto.objects.filter(fk_producto=productos[0], sugerir=False)\
+                .order_by('cantidad').values('id')[:numUsuarios]
+
+            ClienteProducto.objects.filter(id__in=producto_sugerido).update(sugerir=True)
+
+
+    def sugerirProductosTodosClientes(self, producto_id):
+        productos = Producto.objects.filter(id=producto_id)
+        if productos.exists():
+            producto = productos[0]
+
+        for cliente in Cliente.objects.all():
+            cliente_producto_model=ClienteProducto.objects.filter(fk_producto=producto, fk_cliente=cliente)
+            if cliente_producto_model.exists():
+                cliente_producto_model.update(sugerir=True)
+            else:
+                cliente_producto_model = ClienteProducto(
+                    fk_cliente=cliente,
+                    fk_producto=producto,
+                    fk_semana=get_or_create_week(),
+                    cantidad=0,
+                    frecuencia=0,
+                    sugerir=True
+                )
+
+                cliente_producto_model.save()
+

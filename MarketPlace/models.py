@@ -451,3 +451,29 @@ class EvaluacionProducto(models.Model):
     fk_productor = models.ForeignKey (Productor, on_delete=models.CASCADE, verbose_name='Productor', null=False, blank=False)
     fk_pedido_producto = models.ForeignKey (PedidoProducto, on_delete=models.CASCADE, verbose_name='PedidoProducto', null=False, blank=False)
     calificacion = models.PositiveIntegerField (verbose_name='Calificacion', null=False, blank=False)
+
+
+class ClienteProducto(models.Model):
+    fk_cliente = models.ForeignKey (Cliente, on_delete=models.CASCADE, verbose_name='Cliente', null=False, blank=False)
+    fk_producto = models.ForeignKey (Producto, on_delete=models.CASCADE, verbose_name='Producto', null=False, blank=False)
+    fk_semana = models.ForeignKey(Semana, verbose_name='Semana',default=None, blank=False)
+    sugerir = models.BooleanField(default=False, verbose_name='Sugerir Producto', null=False,
+                                         blank=False)
+    cantidad = models.PositiveIntegerField (verbose_name='cantidad', null=False, blank=False)
+    frecuencia = models.PositiveIntegerField(verbose_name='frecuencia', null=False, blank=False)
+
+    @property
+    def nombre_producto(self):
+        return self.fk_producto.nombre
+
+    @property
+    def nombre_cliente(self):
+        return self.fk_cliente.fk_django_user.get_full_name()
+
+    class Meta:
+        verbose_name = 'Cliente Producto'
+        verbose_name_plural = 'Productos Clientes'
+        unique_together = (('fk_cliente', 'fk_producto'),)
+
+    def __str__(self):
+        return 'Cliente {cliente} - {producto}'.format(cliente=self.nombre_cliente, producto=self.nombre_producto)

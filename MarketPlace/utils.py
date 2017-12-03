@@ -1,5 +1,5 @@
 import datetime
-from MarketPlace.models import Productor, Cliente, Semana, Cooperativa, Oferta_Producto
+from MarketPlace.models import Productor, Cliente, Semana, Cooperativa, Oferta_Producto, ClienteProducto
 from django.contrib.auth import logout
 from django.shortcuts import redirect, reverse
 from django.db.models import F
@@ -41,6 +41,7 @@ def get_or_create_week():
             fecha_fin=next_sunday
         )
         nueva.save()
+        sugerir_productos()
         return nueva
 
 
@@ -130,6 +131,17 @@ def get_cooperativa_global(request):
 
 def get_id_cooperativa_global(request):
     return(get_cooperativa_global(request)['id'])
+
+
+def sugerir_productos():
+    ClienteProducto.objects.update(sugerir=False)
+    ofertas_productos=Oferta_Producto.objects.filter(fk_oferta__fk_semana=get_or_create_week(), cantidad_aceptada__gt=0)\
+        .distinct('fk_producto')
+
+    for oferta_producto in ofertas_productos:
+        cliente_producto_id = ClienteProducto.objects.filter(fk_producto=oferta_producto.fk_producto)\
+            .order_by('cantidad').values('id')[:10]
+        ClienteProducto.objects.filter(id__in=cliente_producto_id).update(sugerir=True)
 
 def get_cooperativa_cliente(request):
     cooperativa = request.session.get('cooperativa', None)
