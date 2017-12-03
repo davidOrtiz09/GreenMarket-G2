@@ -36,16 +36,20 @@ def catalogo_validaciones(semana_id, request):
             'semana':semana, 'cooperativa': cooperativa})
 
 
-def obtener_cantidad_vendida(semana, id_producto):
-    productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+def obtener_cantidad_vendida(semana, id_producto, cooperativa_id):
+    productos_vendidos = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana,
+                                                        fk_producto=id_producto,
+                                                        fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id)
     cantidad = 0
     for pro in productos_vendidos:
         cantidad = cantidad + pro.cantidad_vendida
     return cantidad
 
 
-def obtener_valor_compra(semana, id_producto):
-    ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana, fk_producto=id_producto)
+def obtener_valor_compra(semana, id_producto, cooperativa_id):
+    ofertaProducto = Oferta_Producto.objects.filter(fk_oferta__fk_semana__in=semana,
+                                                    fk_producto=id_producto,
+                                                    fk_oferta__fk_productor__fk_cooperativa_id=cooperativa_id)
     sumPrecios=0
     for ofertaProd in ofertaProducto:
         sumPrecios = sumPrecios + ofertaProd.precioProvedor

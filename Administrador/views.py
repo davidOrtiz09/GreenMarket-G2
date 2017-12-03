@@ -287,9 +287,9 @@ class ObtenerMejoresProductos(View):
                                                         fk_catalogo__fk_cooperativa_id=get_id_cooperativa_global(
                                                             request))
         for pro in catalogoProd:
-            valor_compra = obtener_valor_compra(semanas, pro.fk_producto)
+            valor_compra = obtener_valor_compra(semanas, pro.fk_producto, get_id_cooperativa_global(request))
             valor_venta = pro.precio
-            cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto)
+            cantVendida = obtener_cantidad_vendida(semanas, pro.fk_producto, get_id_cooperativa_global(request))
             producto = Producto.objects.filter(id=pro.fk_producto_id).first()
             porcentaje = int
             if cantVendida != 0:

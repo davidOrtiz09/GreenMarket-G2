@@ -92,7 +92,7 @@ class CrearOferta(AbstractProductorLoggedView):
     def get(self, request):
         context = {
             'form': 'form',
-            'semana': get_or_create_week()
+            'semana': get_or_create_next_week()
         }
         return render(request, 'Productor/crear_oferta.html', context)
 
