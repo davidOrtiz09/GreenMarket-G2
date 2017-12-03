@@ -7,45 +7,22 @@
             <div class="col-md-2 col-sm-1"></div>
             <div id="AgregarProductor" class="col-md-8 col-sm-11 row">
                 <div id="headerPopUp" class="col-md-12">
-                    <h2>Agregar un nuevo Productor</h2>
-                </div>
-
-                <div id="seccionDepartamento" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Departamento</strong>
-                    <select class="col-md-6 col-sm-12 form-control" id="selectDepartamento">
-                    </select>
-                </div>
-
-                <div id="seccionCiudad" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Ciudad</strong>
-                    <select class="col-md-6 col-sm-12 form-control" id="selectCiudad">
-                    </select>
-                </div>
-
-                <div id="seccionCooperativa" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Cooperativa</strong>
-                    <select class="col-md-6 col-sm-12 form-control" id="selectCooperativa">
-                    </select>
+                    <h2>Editar un Productor</h2>
                 </div>
 
                 <div id="seccionNombre" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Nombres</strong>
-                    <input type="text" id="inputNombre" class="col-md-6 col-sm-12 form-control">
-                </div>
-
-                <div id="seccionCorreo" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Correo</strong>
-                    <input type="text" id="inputCorreo" class="col-md-6 col-sm-12 form-control">
+                    <input type="text" id="inputNombreActualizar" class="col-md-6 col-sm-12 form-control" value="{{ Productor.nombre }}" >
                 </div>
 
                 <div id="seccionDireccion" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Dirección</strong>
-                    <input type="text" id="inputDireccion" class="col-md-6 col-sm-12 form-control">
+                    <input type="text" id="inputDireccionActualizar" class="col-md-6 col-sm-12 form-control" value="{{ Productor.direccion }}">
                 </div>
 
                 <div id="seccionDescripcionProductor" class="col-md-12 row secciones">
                     <strong class="col-md-6 col-sm-12">Descripción del Productor</strong>
-                    <textarea id="inputDescripcionProductor" class="col-md-6 col-sm-12 form-control" rows="4"></textarea>
+                    <textarea id="inputDescripcionProductorActualizar" class="col-md-6 col-sm-12 form-control" rows="4"> {{ Productor.descripcion }}</textarea>
                 </div>
 
                 <div id="seccionSeleccionarUbicacion" class="col-md-12 row secciones">
@@ -53,23 +30,13 @@
                     <div class="col-md-6 col-sm-12 row" style="margin-left: 0px;margin-right: 0px;">
                         <button onclick="verMapa();" class="col-md-6 col-sm-12 btn btn-success" type="button">Mapa</button>
                         <p id="coordenadasMapa" class="col-md-6" style="line-height: 45px; margin-bottom: 0px !important;">
+                            {{ Productor.coordenadas_gps }}
                         </p>
                     </div>
                 </div>
-
-                <div id="seccionPassword1" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Contraseña</strong>
-                    <input type="password" id="inputPassword1" class="col-md-6 col-sm-12 form-control">
-                </div>
-
-                <div id="seccionPassword2" class="col-md-12 row secciones">
-                    <strong class="col-md-6 col-sm-12">Por favor repita la contraseña</strong>
-                    <input type="password" id="inputPassword2" class="col-md-6 col-sm-12 form-control">
-                </div>
-
                 <div id="seccionAgregarProductor" class="col-md-12 row secciones" style="margin-top: 40px;">
                     <div class="col-md-3 col-sm-1"></div>
-                    <button onclick="agregarProductor();" type="button" class="col-md-6 col-sm-11 btn btn-primary">Agregar Productor</button>
+                    <button onclick="ActualizarProductor( {{ Productor.id }} );" type="button" class="col-md-6 col-sm-11 btn btn-primary">Actualizar Productor</button>
                     <div class="col-md-3 col-sm-1"></div>
                 </div>
             </div>
@@ -99,6 +66,11 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBW8AoH_Jh_QtuL0d-BC0RUAIMckKEZYiM"
     async defer></script>
     <script src="{% static 'Administrador/productores/js/productores.js' %}"></script>
+    <script>
+        var coordenadas = '{{ Productor.coordenadas_gps }}'.split(',');
+        latSelect = coordenadas[0];
+        longSelect = coordenadas[1];
+    </script>
 {% endblock %}
 {% block styles %}
     <link href="{% static 'Administrador/styles.css' %}" rel="stylesheet">

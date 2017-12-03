@@ -29,4 +29,5 @@ urlpatterns = [
 
     url(r'^productos-sugeridos', views.ProductosSugeridos.as_view(), name='productos-sugeridos'),
 
+    url(r'^get-cooperativa-by-location/$', views.getIdCooperativaByLocation.as_view(), name='get-cooperativa-by-location'),
 ]

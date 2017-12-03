@@ -130,7 +130,7 @@ def get_cooperativa_global(request):
 
 
 def get_id_cooperativa_global(request):
-    return get_cooperativa_global(request)['id']
+    return(get_cooperativa_global(request)['id'])
 
 
 def sugerir_productos():
@@ -142,3 +142,15 @@ def sugerir_productos():
         cliente_producto_id = ClienteProducto.objects.filter(fk_producto=oferta_producto.fk_producto)\
             .order_by('cantidad').values('id')[:10]
         ClienteProducto.objects.filter(id__in=cliente_producto_id).update(sugerir=True)
+
+def get_cooperativa_cliente(request):
+    cooperativa = request.session.get('cooperativa', None)
+
+    if (cooperativa is None):
+        cooperativa = Cooperativa.objects.first()
+        request.session['cooperativa'] = cooperativa.id
+
+    return cooperativa
+
+def set_cooperativa_cliente(request, id):
+    request.session['cooperativa'] = id

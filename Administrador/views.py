@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from Administrador.forms import CooperativaForm
-from Administrador.models import MejoresClientes, ProductorDestacado, ProductosSugeridos
+from Administrador.models import MejoresClientes, ProductorDestacado, ProductosSugeridos, Ciudad, Departamento
 from django.views.decorators.csrf import csrf_exempt
 from MarketPlace.models import Oferta_Producto, Catalogo, Producto, Pedido, PedidoProducto, Catalogo_Producto, \
     Productor, Oferta, Cooperativa, Canasta, Semana, Cliente, CanastaProducto, Orden_Compra, ClienteProducto
@@ -520,6 +520,13 @@ class CrearProductor(AbstractAdministradorLoggedView):
     def get(self, request):
         return render(request, 'Administrador/crear-productor.html', {})
 
+class ActualizarProductorView(AbstractAdministradorLoggedView):
+    def get(self, request):
+        idProductor = request.GET.get('id')
+        productor = Productor.objects.filter(id=idProductor).values('id','nombre','direccion','descripcion','coordenadas_gps')
+
+        return render(request, 'Administrador/actualizar-productor.html', {'Productor':productor.first()})
+
 
 class GetDepartamentos(View):
     def get(self, request):
@@ -552,7 +559,6 @@ class AgregarProductor(AbstractAdministradorLoggedView):
         cooperativa = Cooperativa.objects.filter(id=body["cooperativaId"]).first()
 
         nombre = body["nombre"]
-        apellido = body["apellido"]
         contrasena = body["contrasena"]
         correo = body["correo"]
 
@@ -564,7 +570,7 @@ class AgregarProductor(AbstractAdministradorLoggedView):
             username=correo,
             password=contrasena,
             first_name=nombre,
-            last_name=apellido,
+            last_name="",
             email=correo
         )
         user_model.save()
@@ -579,6 +585,48 @@ class AgregarProductor(AbstractAdministradorLoggedView):
         productor_model.save()
         return JsonResponse({"Mensaje": "Finalizó con exito"})
 
+@method_decorator(csrf_exempt, name='dispatch')
+class ActualizarProductor(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        nombreNuevo = body["nombre"]
+        idProductor = body["idProductor"]
+        direccionNuevo = body["direccion"]
+        descripcionNuevo = body["descripcion"]
+        coordenadasNuevo = body["coordenadas"]
+
+        productor = Productor.objects.filter(id=idProductor).first()
+
+        productor.nombre = nombreNuevo
+        productor.direccion = direccionNuevo
+        productor.descripcion = descripcionNuevo
+        productor.coordenadas_gps = coordenadasNuevo
+
+        productor.save()
+
+        return JsonResponse({"Mensaje": "Finalizó con exito"})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EliminarProductor(AbstractAdministradorLoggedView):
+    def get(self, request):
+        return JsonResponse({})
+
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        idProductor = body["productorId"]
+
+        productor = Productor.objects.filter(id=idProductor).first()
+
+        productor.delete()
+
+        return JsonResponse({"Mensaje": "Finalizó con exito"})
 
 class ConsultarPagosPendientes(View):
     def get(self, request):
@@ -690,7 +738,9 @@ class Cooperativas(AbstractAdministradorLoggedView):
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearCooperativas(AbstractAdministradorLoggedView):
     def get(self, request):
-        return render(request, 'Administrador/crear-cooperativa.html', {})
+        ciudades = Ciudad.get_all_ciudades()
+        departamentos = Departamento.get_all_departamentos()
+        return render(request, 'Administrador/crear-cooperativa.html', {'ciudades': ciudades, 'departamentos': departamentos})
 
     def post(self, request):
         form = CooperativaForm(request.POST)
@@ -699,7 +749,9 @@ class CrearCooperativas(AbstractAdministradorLoggedView):
             nombre = cleaned_data.get('nombre')
             ciudad = cleaned_data.get('ciudad')
             departamento = cleaned_data.get('departamento')
-            Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento)
+            coordenada = cleaned_data.get('coordenada')
+            print coordenada
+            Cooperativa.objects.create(nombre=nombre, ciudad=ciudad, departamento=departamento, coordenadas_gps=coordenada)
             cooperativas = Cooperativa.objects.all().order_by('id')
             return render(request, 'Administrador/Cooperativas.html', {'listaCooperativas': cooperativas})
         else:

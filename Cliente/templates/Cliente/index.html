@@ -7,6 +7,15 @@
 
 {% block main %}
     <section id="lista-productos-app">
+        <div id="mensajePython" style="display: none;">
+            {{ mensajePython }}
+        </div>
+        <div id="valueSelectCoop" style="display: none;">
+            {{ cooperativaSeleccionada }}
+        </div>
+        <div id="valueGeoLocation" onclick="geoFindMe();" style="display:none">
+            {{ buscarGeolocation }}
+        </div>
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -33,12 +42,14 @@
                             <span class="sr-only">Next</span>
                         </a>
                     </div>
+                <form method="post" action="{% url 'cliente:index' %}">
+                {% csrf_token %}
                     <div class="form-row justify-content-center">
                         <div class="col-auto">
                             <label for="cooperativa">Cooperativa</label>
                             <select name="cooperativa_id" id="cooperativa" class="custom-select">
                                 {% for cooperativa in cooperativas %}
-                                    <option value="{{ cooperativa.id }}">{{ cooperativa.nombre }}</option>
+                                    <option value="{{ cooperativa.id }}" >{{ cooperativa.nombre }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -59,13 +70,15 @@
                                 </label>
                             </div>
                         {% endif %}
+                    <input type="submit" id="botonFiltrarProductos" value="Buscar" class="btn btn-primary">
 
-                    </div>
+                        </div>
+                    </form>
                 </div>
 
             </div>
 
-            <div class="row">
+            <div class="row" id="lista-productos-app">
                 {% include 'Cliente/_elements/_producto-preview.html' %}
             </div>
         </div>
